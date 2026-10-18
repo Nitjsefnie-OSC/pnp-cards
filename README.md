@@ -59,6 +59,10 @@ tu carpeta, organizadas como tú quieras.
 - **Unir PDF**: añade varios PDF, ordénalos arrastrándolos (o con el teclado) y únelos en uno.
   Muestra la portada y las páginas de cada uno, y avisa de los que están dañados o protegidos con
   contraseña.
+- **Dividir imagen**: corta hojas con varias cartas en una imagen por carta. Ajusta la zona (o
+  pulsa «Quitar el margen»), las filas y las columnas; con varias hojas puedes usar los mismos
+  ajustes para todas. Las partes se guardan en PNG, sin pérdida y con los ppp de la hoja, en un
+  `.zip`, y con «Añadir a Cartas» pasan directamente a la lista de cartas.
 
 ## Desarrollo
 

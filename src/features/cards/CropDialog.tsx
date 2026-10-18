@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useId,
   useMemo,
   useRef,
@@ -11,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from '../../components/form/Fields';
 import { useModalDialog } from '../../components/useModalDialog';
+import { useObjectUrl } from '../../components/useObjectUrl';
 import { NumberField } from '../../components/form/NumberField';
 import { cropRect, CROP_DPI } from '../../lib/crop';
 import type { CropSettings } from '../../lib/settings';
@@ -18,17 +18,6 @@ import { pxToMm } from '../../lib/units';
 import { useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import styles from './CropDialog.module.css';
-
-/** URL temporal de la imagen a tamaño completo, liberada al cambiar de imagen o cerrar. */
-function useObjectUrl(blob: Blob | null) {
-  const url = useMemo(() => (blob ? URL.createObjectURL(blob) : null), [blob]);
-  useEffect(() => {
-    return () => {
-      if (url) URL.revokeObjectURL(url);
-    };
-  }, [url]);
-  return url;
-}
 
 export function CropDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t, i18n } = useTranslation();

@@ -9,6 +9,9 @@ import { useSessionAutosave } from './project/useSessionAutosave';
 const MergePage = lazy(() =>
   import('./features/merge/MergePage').then((m) => ({ default: m.MergePage })),
 );
+const SplitPage = lazy(() =>
+  import('./features/split/SplitPage').then((m) => ({ default: m.SplitPage })),
+);
 
 function SessionAutosave() {
   useSessionAutosave();
@@ -30,7 +33,14 @@ export function App() {
               </Suspense>
             }
           />
-          <Route path="split" element={<ComingSoon titleKey="nav.split" />} />
+          <Route
+            path="split"
+            element={
+              <Suspense fallback={null}>
+                <SplitPage />
+              </Suspense>
+            }
+          />
           <Route path="pdf-to-images" element={<ComingSoon titleKey="nav.pdfToImages" />} />
           <Route path="extract-images" element={<ComingSoon titleKey="nav.extractImages" />} />
           <Route path="templates" element={<ComingSoon titleKey="nav.templates" />} />
