@@ -1,0 +1,15 @@
+name: Mejora
+description: Propón una función nueva o un cambio
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qué necesitas
+      description: Qué quieres conseguir y por qué no puedes hacerlo ahora.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Cómo lo imaginas

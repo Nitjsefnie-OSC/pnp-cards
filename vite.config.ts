@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// GitHub Pages sirve el sitio en https://<usuario>.github.io/pnp-cards/
+// GitHub Pages sirve el sitio en https://onzebol.github.io/pnp-cards/
 export default defineConfig({
   base: '/pnp-cards/',
   plugins: [react()],

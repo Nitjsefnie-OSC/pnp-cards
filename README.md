@@ -4,7 +4,7 @@ Herramienta web para preparar cartas de juegos de mesa _print and play_: añades
 las cartas, indicas cuántas copias quieres de cada una y obtienes un PDF listo para imprimir y
 recortar.
 
-**Úsala aquí:** https://<usuario>.github.io/pnp-cards/
+**Úsala aquí:** https://onzebol.github.io/pnp-cards/
 
 Todo se hace en tu navegador: tus imágenes no se suben a ningún sitio.
 
