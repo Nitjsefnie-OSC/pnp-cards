@@ -1,7 +1,7 @@
-/** Mensajes de un worker de tarea larga: progreso, resultado (bytes) o error. */
-export type WorkerMessage =
+/** Mensajes de un worker de tarea larga: progreso, resultado o error. */
+export type WorkerMessage<T = unknown> =
   | { type: 'progress'; done: number; total: number }
-  | { type: 'done'; result: Uint8Array }
+  | { type: 'done'; result: T }
   | { type: 'error'; code: string; message: string; detail?: string };
 
 /** Error de una tarea en un worker, con un código para mostrar un mensaje útil. */
@@ -26,11 +26,11 @@ export interface TaskOptions {
  * Ejecuta una tarea en un Web Worker creado para ella. Al abortar la señal se termina el worker
  * y la promesa se rechaza con un AbortError.
  */
-export function runWorker(
+export function runWorker<T = Uint8Array>(
   createWorker: () => Worker,
   input: unknown,
   { onProgress, signal }: TaskOptions = {},
-): Promise<Uint8Array> {
+): Promise<T> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) return reject(new DOMException('Cancelado', 'AbortError'));
 
@@ -45,7 +45,7 @@ export function runWorker(
     };
     signal?.addEventListener('abort', abort);
 
-    worker.onmessage = (e: MessageEvent<WorkerMessage>) => {
+    worker.onmessage = (e: MessageEvent<WorkerMessage<T>>) => {
       const msg = e.data;
       if (msg.type === 'progress') onProgress?.(msg.done, msg.total);
       else if (msg.type === 'done') {

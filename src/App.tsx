@@ -12,6 +12,11 @@ const MergePage = lazy(() =>
 const SplitPage = lazy(() =>
   import('./features/split/SplitPage').then((m) => ({ default: m.SplitPage })),
 );
+const ExtractImagesPage = lazy(() =>
+  import('./features/extractImages/ExtractImagesPage').then((m) => ({
+    default: m.ExtractImagesPage,
+  })),
+);
 const PdfToImagesPage = lazy(() =>
   import('./features/pdfToImages/PdfToImagesPage').then((m) => ({ default: m.PdfToImagesPage })),
 );
@@ -52,7 +57,14 @@ export function App() {
               </Suspense>
             }
           />
-          <Route path="extract-images" element={<ComingSoon titleKey="nav.extractImages" />} />
+          <Route
+            path="extract-images"
+            element={
+              <Suspense fallback={null}>
+                <ExtractImagesPage />
+              </Suspense>
+            }
+          />
           <Route path="templates" element={<ComingSoon titleKey="nav.templates" />} />
         </Route>
       </Routes>

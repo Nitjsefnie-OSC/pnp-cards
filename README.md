@@ -66,6 +66,10 @@ tu carpeta, organizadas como tú quieras.
 - **PDF a imágenes**: convierte las páginas de un PDF (todas o un rango como «1-3, 5») en JPG
   al 95 % o PNG sin pérdida, a 150, 300, 600 ppp u otra resolución. Las imágenes llevan sus ppp,
   se descargan en un `.zip` y se pueden pasar a Cartas o a Dividir imagen.
+- **Extraer imágenes**: saca las imágenes incrustadas en un PDF a su resolución original. Los
+  JPEG normales salen tal cual; el resto (CMYK, colores invertidos, transparencias…) se decodifica
+  para que los colores salgan como en el PDF. Las repetidas se guardan una vez con « xN» en el
+  nombre, se pueden ignorar las pequeñas y eliges cuáles descargar en `.zip` o pasar a Cartas.
 
 ## Desarrollo
 
