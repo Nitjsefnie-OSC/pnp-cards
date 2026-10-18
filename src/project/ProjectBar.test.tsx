@@ -1,0 +1,310 @@
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import i18n from '../i18n';
+import { parseProject, serializeProject } from '../lib/project';
+import { DEFAULT_SETTINGS } from '../lib/settings';
+import { useCardsStore, type ImageFolder } from '../store/cardsStore';
+import { useSettingsStore } from '../store/settingsStore';
+import { CardsPage } from '../features/cards/CardsPage';
+import type { PickedFolder } from './folder';
+import { createMemoryStorage, type ProjectStorage } from './storage';
+import { StorageContext } from './storageContext';
+import { resetSessionOffer } from './useProjectActions';
+import { useSessionAutosave } from './useSessionAutosave';
+
+// jsdom no tiene createImageBitmap ni File System Access: se simulan el cargador y las carpetas.
+const fake = vi.hoisted(() => ({
+  pickFolder: vi.fn<() => Promise<PickedFolder | null>>(),
+  reopenFolder: vi.fn<(folder: ImageFolder) => Promise<PickedFolder | null>>(),
+}));
+
+vi.mock('../features/cards/loadImages', async (importOriginal) => {
+  const real = await importOriginal<typeof import('../features/cards/loadImages')>();
+  const loadImage = async (file: File, path = file.name) => ({
+    name: file.name,
+    path,
+    blob: file,
+    format: 'png' as const,
+    widthPx: 744,
+    heightPx: 1039,
+    dpi: { x: 300, y: 300 },
+    thumbUrl: null,
+  });
+  return {
+    ...real,
+    loadImage,
+    loadImages: async (entries: { file: File; path: string }[]) => ({
+      images: await Promise.all(real.sortByPath(entries).map((e) => loadImage(e.file, e.path))),
+      failed: [],
+    }),
+  };
+});
+
+vi.mock('./folder', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  pickFolder: () => fake.pickFolder(),
+  reopenFolder: (folder: ImageFolder) => fake.reopenFolder(folder),
+}));
+
+const png = (name: string) => new File(['x'], name, { type: 'image/png' });
+const folderWith = (name: string, paths: string[], handle: unknown = null): PickedFolder => ({
+  folder: { name, handle: handle as FileSystemDirectoryHandle | null },
+  files: paths.map((path) => ({ path, file: png(path.split('/').pop()!) })),
+});
+
+const projectJson = serializeProject({
+  name: 'Mazmorra',
+  folder: 'cartas',
+  settings: { ...DEFAULT_SETTINGS, mode: 'horizontal8' },
+  cards: [
+    { path: 'heroes/elfo.png', name: 'elfo.png', copies: 3 },
+    { path: '', name: '', copies: 1 },
+    { path: 'orco.png', name: 'orco.png', copies: 2 },
+  ],
+});
+
+function renderPage(storage: ProjectStorage = createMemoryStorage()) {
+  render(
+    <StorageContext value={storage}>
+      <CardsPage />
+    </StorageContext>,
+  );
+  return storage;
+}
+
+beforeAll(() => i18n.changeLanguage('es'));
+beforeEach(() => {
+  resetSessionOffer();
+  fake.pickFolder.mockReset();
+  fake.reopenFolder.mockReset();
+  useCardsStore.getState().reset();
+  useSettingsStore.getState().reset();
+  URL.createObjectURL = vi.fn(() => 'blob:x');
+  URL.revokeObjectURL = vi.fn();
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+});
+
+describe('abrir un proyecto', () => {
+  it('pide la carpeta de las imágenes y las carga con sus copias', async () => {
+    const user = userEvent.setup();
+    fake.pickFolder.mockResolvedValue(folderWith('cartas', ['heroes/elfo.png', 'orco.png']));
+    renderPage();
+
+    await user.upload(
+      screen.getByTestId('project-input'),
+      new File([projectJson], 'Mazmorra.pnpcards'),
+    );
+    expect(await screen.findByText(/El proyecto usa 2 imágenes/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Elegir carpeta…' }));
+
+    expect(await screen.findByText('Has abierto Mazmorra.')).toBeInTheDocument();
+    const { cards, name, folder } = useCardsStore.getState();
+    expect(name).toBe('Mazmorra');
+    expect(folder?.name).toBe('cartas');
+    expect(cards.map((c) => [c.path, c.copies])).toEqual([
+      ['heroes/elfo.png', 3],
+      ['', 1],
+      ['orco.png', 2],
+    ]);
+    expect(useSettingsStore.getState().settings.mode).toBe('horizontal8');
+  });
+
+  it('dice qué imágenes no ha encontrado en la carpeta', async () => {
+    const user = userEvent.setup();
+    fake.pickFolder.mockResolvedValue(folderWith('otra', ['orco.png']));
+    renderPage();
+
+    await user.upload(
+      screen.getByTestId('project-input'),
+      new File([projectJson], 'Mazmorra.pnpcards'),
+    );
+    await user.click(await screen.findByRole('button', { name: 'Elegir carpeta…' }));
+
+    expect(await screen.findByText('No se han encontrado: heroes/elfo.png')).toBeInTheDocument();
+    expect(useCardsStore.getState().cards).toHaveLength(2);
+  });
+
+  it('también se pueden elegir las imágenes sueltas', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.upload(
+      screen.getByTestId('project-input'),
+      new File([projectJson], 'Mazmorra.pnpcards'),
+    );
+    await user.upload(await screen.findByTestId('project-images'), [
+      png('elfo.png'),
+      png('orco.png'),
+    ]);
+    expect(await screen.findByText('Has abierto Mazmorra.')).toBeInTheDocument();
+    expect(useCardsStore.getState().cards).toHaveLength(3);
+  });
+
+  it('explica que un archivo no es un proyecto', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    renderPage();
+    await user.upload(screen.getByTestId('project-input'), new File(['hola'], 'nota.pnpcards'));
+    expect(
+      await screen.findByText('nota.pnpcards no es un proyecto de PnP Cards ni de PDFCartas.'),
+    ).toBeInTheDocument();
+  });
+
+  it('abre los .bsk de PDFCartas con el mismo paso de la carpeta', async () => {
+    const user = userEvent.setup();
+    const bsk = `<?xml version="1.0"?><BSK><version>4</version><modo>1</modo><colocar>1</colocar>
+      <forzar>0</forzar><recortar>0</recortar><corte>0</corte><col_derecha>0</col_derecha>
+      <imagenes>
+        <imagen><url>\\img\\goblin x3.png</url></imagen>
+        <imagen><url>\\img\\troll.png</url><copias>2</copias></imagen>
+      </imagenes></BSK>`;
+    fake.pickFolder.mockResolvedValue(folderWith('viejo', ['img/goblin x3.png', 'img/troll.png']));
+    renderPage();
+
+    await user.upload(screen.getByTestId('project-input'), new File([bsk], 'viejo.bsk'));
+    await user.click(await screen.findByRole('button', { name: 'Elegir carpeta…' }));
+
+    await waitFor(() => expect(useCardsStore.getState().name).toBe('viejo'));
+    expect(useCardsStore.getState().cards.map((c) => [c.name, c.copies])).toEqual([
+      ['goblin x3.png', 3],
+      ['troll.png', 2],
+    ]);
+    expect(useSettingsStore.getState().settings).toMatchObject({
+      mode: 'horizontal8',
+      placement: 'together',
+    });
+  });
+});
+
+describe('guardar un proyecto', () => {
+  it('descarga <nombre>.pnpcards: un JSON con rutas y copias, sin imágenes', async () => {
+    const user = userEvent.setup();
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    let saved: Blob | undefined;
+    URL.createObjectURL = vi.fn((blob: Blob) => {
+      saved = blob;
+      return 'blob:x';
+    });
+    useCardsStore.getState().load(
+      '',
+      [
+        {
+          name: 'elfo.png',
+          path: 'heroes/elfo.png',
+          blob: png('elfo.png'),
+          format: 'png',
+          widthPx: 1,
+          heightPx: 1,
+          dpi: null,
+          thumbUrl: null,
+          copies: 2,
+        },
+      ],
+      { name: 'cartas', handle: null },
+    );
+    const storage = renderPage();
+
+    await user.type(screen.getByLabelText('Nombre del proyecto'), 'Mi juego');
+    await user.click(screen.getByRole('button', { name: 'Guardar archivo' }));
+
+    await waitFor(() => expect(click).toHaveBeenCalled());
+    expect((click.mock.contexts[0] as HTMLAnchorElement).download).toBe('Mi juego.pnpcards');
+    const project = parseProject(await saved!.text());
+    expect(project).toMatchObject({ name: 'Mi juego', folder: 'cartas' });
+    expect(project.cards).toEqual([{ path: 'heroes/elfo.png', name: 'elfo.png', copies: 2 }]);
+    expect((await storage.listRecent()).map((r) => r.project.name)).toEqual(['Mi juego']);
+  });
+});
+
+describe('recientes', () => {
+  it('reabre un proyecto reciente con su carpeta recordada', async () => {
+    const user = userEvent.setup();
+    const handle = { name: 'cartas' };
+    const storage = createMemoryStorage();
+    await storage.addRecent({
+      project: parseProject(projectJson),
+      folder: { name: 'cartas', handle: handle as unknown as FileSystemDirectoryHandle },
+    });
+    fake.reopenFolder.mockResolvedValue(
+      folderWith('cartas', ['heroes/elfo.png', 'orco.png'], handle),
+    );
+    renderPage(storage);
+
+    await user.click(screen.getByRole('button', { name: 'Recientes…' }));
+    await user.click(await screen.findByRole('button', { name: 'Abrir' }));
+    await user.click(await screen.findByRole('button', { name: 'Abrir «cartas»' }));
+
+    await waitFor(() => expect(useCardsStore.getState().cards).toHaveLength(3));
+    expect(fake.reopenFolder).toHaveBeenCalledWith(expect.objectContaining({ name: 'cartas' }));
+  });
+});
+
+describe('sesión', () => {
+  function Autosave() {
+    useSessionAutosave();
+    return null;
+  }
+
+  it('al volver, ofrece seguir con la última sesión', async () => {
+    const user = userEvent.setup();
+    const storage = createMemoryStorage();
+    await storage.saveSession({
+      project: parseProject(projectJson),
+      folder: { name: 'cartas', handle: null },
+    });
+    fake.pickFolder.mockResolvedValue(folderWith('cartas', ['heroes/elfo.png', 'orco.png']));
+    renderPage(storage);
+
+    expect(await screen.findByText('¿Seguir donde lo dejaste?')).toBeInTheDocument();
+    expect(
+      screen.getByText('La última vez las imágenes estaban en la carpeta «cartas».'),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Elegir carpeta…' }));
+    await waitFor(() => expect(useCardsStore.getState().name).toBe('Mazmorra'));
+  });
+
+  it('guarda la sesión como JSON y carpeta, sin imágenes', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const storage = createMemoryStorage();
+    render(
+      <StorageContext value={storage}>
+        <Autosave />
+      </StorageContext>,
+    );
+    act(() => {
+      useCardsStore.getState().load(
+        'Bosque',
+        [
+          {
+            name: 'a.png',
+            path: 'a.png',
+            blob: png('a.png'),
+            format: 'png',
+            widthPx: 1,
+            heightPx: 1,
+            dpi: null,
+            thumbUrl: null,
+            copies: 4,
+          },
+        ],
+        { name: 'bosque', handle: null },
+      );
+    });
+    await vi.advanceTimersByTimeAsync(1500);
+    const session = await storage.loadSession();
+    expect(session?.folder?.name).toBe('bosque');
+    expect(session?.project.cards).toEqual([{ path: 'a.png', name: 'a.png', copies: 4 }]);
+    expect(Object.keys(session?.project.cards[0] ?? {})).not.toContain('blob');
+    vi.useRealTimers();
+  });
+});
+
+describe('añadir carpeta', () => {
+  it('añade las imágenes de la carpeta, ordenadas por ruta, y la recuerda para el proyecto', async () => {
+    const user = userEvent.setup();
+    fake.pickFolder.mockResolvedValue(folderWith('cartas', ['b/2.png', 'a/1.png']));
+    renderPage();
+    await user.click(screen.getByRole('button', { name: 'Añadir carpeta' }));
+    await waitFor(() => expect(useCardsStore.getState().cards).toHaveLength(2));
+    expect(useCardsStore.getState().cards.map((c) => c.path)).toEqual(['a/1.png', 'b/2.png']);
+    expect(useCardsStore.getState().folder?.name).toBe('cartas');
+  });
+});

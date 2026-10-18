@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from '../../components/form/Fields';
+import { useModalDialog } from '../../components/useModalDialog';
 import { NumberField } from '../../components/form/NumberField';
 import { cropRect, CROP_DPI } from '../../lib/crop';
 import type { CropSettings } from '../../lib/settings';
@@ -36,7 +37,7 @@ export function CropDialog({ open, onClose }: { open: boolean; onClose: () => vo
     maximumFractionDigits: 1,
   });
   const mm = (px: number) => mmFormat.format(pxToMm(px, CROP_DPI));
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const dialogRef = useModalDialog(open);
   const stageRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ startX: number; startY: number; x: number; y: number } | null>(null);
   const selectId = useId();
@@ -48,18 +49,6 @@ export function CropDialog({ open, onClose }: { open: boolean; onClose: () => vo
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const card = images.find((c) => c.id === selectedId) ?? images[0];
   const url = useObjectUrl(open && card ? card.blob : null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) {
-      if (typeof dialog.showModal === 'function') dialog.showModal();
-      else dialog.setAttribute('open', '');
-    } else if (!open && dialog.open) {
-      if (typeof dialog.close === 'function') dialog.close();
-      else dialog.removeAttribute('open');
-    }
-  }, [open]);
 
   const setCrop = (patch: Partial<CropSettings>) => update({ crop: { ...crop, ...patch } });
   const rect = card ? cropRect(card, { ...crop, enabled: true }) : null;

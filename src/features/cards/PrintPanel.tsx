@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { downloadUrl as download } from '../../components/download';
+import { safeFileName } from '../../lib/filename';
 import { resolveGrid } from '../../lib/layout';
 import { totalCards, useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
@@ -14,16 +16,9 @@ import styles from './CardsPage.module.css';
 type Status =
   | { kind: 'idle' }
   | { kind: 'running'; done: number; total: number }
-  | { kind: 'ready'; url: string; bytes: number; pages: number }
+  | { kind: 'ready'; url: string; fileName: string; bytes: number; pages: number }
   | { kind: 'cancelled' }
   | { kind: 'error'; message: string };
-
-function download(url: string, fileName: string) {
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  a.click();
-}
 
 export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?: GeneratePdf }) {
   const { t, i18n } = useTranslation();
@@ -44,7 +39,8 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
   async function generate() {
     const { cards } = useCardsStore.getState();
     const { settings, openAfter } = useSettingsStore.getState();
-    const fileName = t('cards.fileName');
+    const projectName = useCardsStore.getState().name.trim();
+    const fileName = projectName ? `${safeFileName(projectName)}.pdf` : t('cards.fileName');
     // La pestaña se abre ya, durante el clic, para que el navegador no la bloquee.
     const tab = openAfter ? window.open('', '_blank') : null;
     const controller = new AbortController();
@@ -55,7 +51,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
       const pdf = await generatePdf(
         {
           settings,
-          title: t('cards.pdfTitle'),
+          title: projectName || t('cards.pdfTitle'),
           cards: cards.map((c) => ({
             data: c.blob,
             format: c.format,
@@ -78,6 +74,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
       setStatus({
         kind: 'ready',
         url,
+        fileName,
         bytes: pdf.byteLength,
         pages: Math.ceil(totalCards(cards) / resolveGrid(settings).perPage),
       });
@@ -136,7 +133,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
                 <button
                   type="button"
                   className={styles.linkButton}
-                  onClick={() => download(status.url, t('cards.fileName'))}
+                  onClick={() => download(status.url, status.fileName)}
                 >
                   {t('cards.downloadAgain')}
                 </button>

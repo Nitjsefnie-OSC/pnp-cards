@@ -66,3 +66,18 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   cutLines: { enabled: false, style: 'normal', color: '#000000', widthHundredthsMm: 4 },
   bleed: { enabled: false, mm: 2, color: '#ffffff' },
 };
+
+export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] };
+
+/** Completa una configuración guardada (quizá de una versión anterior) con los valores por defecto. */
+export function mergeSettings(saved: DeepPartial<LayoutSettings> | undefined): LayoutSettings {
+  const d = DEFAULT_SETTINGS;
+  return {
+    ...d,
+    ...saved,
+    customPageMm: { ...d.customPageMm, ...saved?.customPageMm },
+    crop: { ...d.crop, ...saved?.crop },
+    cutLines: { ...d.cutLines, ...saved?.cutLines },
+    bleed: { ...d.bleed, ...saved?.bleed },
+  };
+}

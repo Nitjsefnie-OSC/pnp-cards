@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
+import { ProjectBar } from '../../project/ProjectBar';
+import { useProjectActions } from '../../project/useProjectActions';
 import { CardTray } from './CardTray';
 import { PrintPanel } from './PrintPanel';
 import { SettingsPanel } from './SettingsPanel';
@@ -27,6 +29,7 @@ function DpiWarning() {
 export function CardsPage() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('cards');
+  const actions = useProjectActions();
 
   return (
     <div className={styles.page}>
@@ -55,8 +58,9 @@ export function CardsPage() {
         <SettingsPanel />
       </aside>
       <div id="panel-cards" className={styles.cards} data-active={tab === 'cards' || undefined}>
+        <ProjectBar actions={actions} />
         <DpiWarning />
-        <CardTray />
+        <CardTray onProjectFile={(file) => void actions.openFile(file)} />
       </div>
       <aside
         id="panel-preview"

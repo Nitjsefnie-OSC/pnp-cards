@@ -11,3 +11,6 @@ export function parseCopies(fileName: string): number | null {
   const copies = Number(digits);
   return copies > 0 ? copies : null;
 }
+
+/** Quita de un nombre los caracteres que no valen en un nombre de archivo. */
+export const safeFileName = (name: string) => name.replace(/[\\/:*?"<>|]/g, '_').trim();

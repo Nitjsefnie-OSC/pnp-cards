@@ -7,6 +7,8 @@ export type ImageFormat = 'jpeg' | 'png';
 export interface CardImage {
   id: string;
   name: string;
+  /** Ruta dentro de la carpeta de imágenes (o el nombre, si se añadió suelta); '' = en blanco. */
+  path: string;
   /** null en una imagen en blanco. */
   blob: Blob | null;
   /** Formato de `blob`; las demás imágenes se convierten a PNG al cargarlas. */
@@ -20,7 +22,16 @@ export interface CardImage {
 
 export type NewImage = Omit<CardImage, 'id' | 'copies'>;
 
+/** Carpeta de las imágenes del proyecto. En Chrome y Edge se guarda el acceso para reabrirla. */
+export interface ImageFolder {
+  name: string;
+  handle: FileSystemDirectoryHandle | null;
+}
+
 interface CardsState {
+  /** Nombre del proyecto ('' = sin nombre). */
+  name: string;
+  folder: ImageFolder | null;
   cards: CardImage[];
   /** Última carta quitada, para poder deshacerlo. */
   lastRemoved: { card: CardImage; index: number } | null;
@@ -31,6 +42,16 @@ interface CardsState {
   undoRemove: () => void;
   move: (id: string, overId: string) => void;
   clear: () => void;
+  setName: (name: string) => void;
+  setFolder: (folder: ImageFolder | null) => void;
+  /** Sustituye el proyecto actual por otro. */
+  load: (
+    name: string,
+    cards: (NewImage & { copies: number })[],
+    folder: ImageFolder | null,
+  ) => void;
+  /** Proyecto nuevo: sin nombre ni cartas. */
+  reset: () => void;
 }
 
 export const totalCards = (cards: CardImage[]) => cards.reduce((n, c) => n + c.copies, 0);
@@ -39,7 +60,14 @@ const revoke = (card: CardImage) => {
   if (card.thumbUrl) URL.revokeObjectURL(card.thumbUrl);
 };
 
+const revokeAll = (s: CardsState) => {
+  s.cards.forEach(revoke);
+  if (s.lastRemoved) revoke(s.lastRemoved.card);
+};
+
 export const useCardsStore = create<CardsState>()((set) => ({
+  name: '',
+  folder: null,
   cards: [],
   lastRemoved: null,
 
@@ -62,6 +90,7 @@ export const useCardsStore = create<CardsState>()((set) => ({
         {
           id: crypto.randomUUID(),
           name: '',
+          path: '',
           blob: null,
           format: 'png',
           widthPx: 0,
@@ -114,8 +143,28 @@ export const useCardsStore = create<CardsState>()((set) => ({
 
   clear: () =>
     set((s) => {
-      s.cards.forEach(revoke);
-      if (s.lastRemoved) revoke(s.lastRemoved.card);
+      revokeAll(s);
       return { cards: [], lastRemoved: null };
+    }),
+
+  setName: (name) => set({ name }),
+
+  setFolder: (folder) => set({ folder }),
+
+  load: (name, cards, folder) =>
+    set((s) => {
+      revokeAll(s);
+      return {
+        name,
+        folder,
+        cards: cards.map((c) => ({ ...c, id: crypto.randomUUID() })),
+        lastRemoved: null,
+      };
+    }),
+
+  reset: () =>
+    set((s) => {
+      revokeAll(s);
+      return { name: '', folder: null, cards: [], lastRemoved: null };
     }),
 }));

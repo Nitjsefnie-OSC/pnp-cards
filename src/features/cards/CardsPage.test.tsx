@@ -10,6 +10,7 @@ import { SettingsPanel } from './SettingsPanel';
 function fakeImage(name: string, dpi: NewImage['dpi'] = { x: 300, y: 300 }): NewImage {
   return {
     name,
+    path: name,
     blob: new Blob(['x'], { type: 'image/png' }),
     format: 'png',
     widthPx: 744,
@@ -36,8 +37,8 @@ describe('CardTray', () => {
 
   it('añade las imágenes elegidas y cuenta archivos y cartas', async () => {
     const user = userEvent.setup();
-    const loadImages = vi.fn(async (files: File[]) => ({
-      images: files.map((f) => fakeImage(f.name)),
+    const loadImages = vi.fn(async (entries: { path: string }[]) => ({
+      images: entries.map((e) => fakeImage(e.path)),
       failed: [],
     }));
     render(<CardTray loadImages={loadImages} />);

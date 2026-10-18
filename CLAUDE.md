@@ -28,6 +28,14 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   sin recodificar). Sin APIs de DOM ni de worker, para poder probarlo en entorno node.
 - `src/workers/` — `pdf.worker.ts` ejecuta `buildPdf`; `pdfClient.ts` (`generatePdf`) lo lanza con
   progreso y cancela con `terminate()` al abortar la señal.
+- `src/project/` — proyectos. El `.pnpcards` es solo JSON (`src/lib/project.ts`): configuración y,
+  por carta, ruta relativa a su carpeta, nombre y copias. Las imágenes NO se guardan en ningún sitio
+  (ni en el archivo ni en IndexedDB): al abrir se pide la carpeta (`folder.ts`: File System Access
+  en Chrome/Edge, que permite recordarla; `webkitdirectory` en el resto) y se emparejan con
+  `matchImages` (`src/lib/imageMatch.ts`). IndexedDB (`storage.ts`) guarda la sesión y «Recientes»
+  como JSON + carpeta; `createMemoryStorage` para tests, inyectado con `StorageContext`.
+  `.bsk` y doble clic (`launchQueue`, `file_handlers` en `public/manifest.webmanifest`) usan el
+  mismo flujo.
 - `src/store/` — Zustand. La configuración se persiste en localStorage con `persist`;
   las cartas (con sus blobs) no.
 - `src/features/<herramienta>/` — componentes de cada herramienta (ruta en HashRouter).

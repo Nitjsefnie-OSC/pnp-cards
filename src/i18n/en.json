@@ -66,7 +66,10 @@
     "pdfTitle": "Cards",
     "errorEmpty": "There are no cards to print: they all have zero copies.",
     "errorBlank": "Blank images take their size from another card. Add an image or force the width and height under Card size.",
-    "errorUnknown": "The PDF could not be created ({{message}}). Try fewer images or check that none are damaged."
+    "errorUnknown": "The PDF could not be created ({{message}}). Try fewer images or check that none are damaged.",
+    "addFolder": "Add folder",
+    "ignoredWithProject_one": "The project was opened; the other dropped image wasn’t added.",
+    "ignoredWithProject_other": "The project was opened; the other {{count}} dropped images weren’t added."
   },
   "settings": {
     "page": "Page",
@@ -141,5 +144,51 @@
     "area": "Cropped area",
     "done": "Done",
     "noImages": "Add an image to adjust the crop."
+  },
+  "project": {
+    "name": "Project name",
+    "defaultName": "Project",
+    "new": "New",
+    "open": "Open…",
+    "save": "Save file",
+    "replaceConfirm": "Replace the current project? Anything you haven’t saved will be lost.",
+    "newConfirm": "Start a new project? Anything you haven’t saved will be lost.",
+    "opened": "You opened {{name}}.",
+    "savedFile": "You saved {{name}}.",
+    "invalid": "{{name}} isn’t a PnP Cards or PDFCartas project.",
+    "newer": "{{name}} was saved with a newer version of PnP Cards. Reload the page to update it.",
+    "recent": "Recent…",
+    "saveFailed": "The project couldn’t be saved. Try another folder."
+  },
+  "folder": {
+    "title": "Open “{{name}}”",
+    "intro_one": "The project uses {{count}} image. Point to the folder it’s in: it is found by its path or, failing that, its name.",
+    "intro_other": "The project uses {{count}} images. Point to the folder they’re in: they are found by their path or, failing that, their name.",
+    "restoreTitle": "Pick up where you left off?",
+    "restoreIntro_one": "Your last session was “{{name}}”, with {{count}} image. To continue, open its folder again.",
+    "restoreIntro_other": "Your last session was “{{name}}”, with {{count}} images. To continue, open its folder again.",
+    "useKnown": "Open “{{name}}”",
+    "pickFolder": "Choose folder…",
+    "pickFiles": "Choose images…",
+    "cancel": "Cancel",
+    "discard": "Start fresh",
+    "hint": "Last time the images were in the “{{name}}” folder.",
+    "loading": "Loading the images…",
+    "missing": "Not found: {{names}}",
+    "denied": "No permission to read the folder. Press again and choose “Allow”, or choose the folder.",
+    "gone": "The “{{name}}” folder can’t be found. It may have moved: choose it again.",
+    "unreadable": "The folder couldn’t be read."
+  },
+  "recent": {
+    "title": "Recent projects",
+    "empty": "Projects you open or save will appear here.",
+    "open": "Open",
+    "remove": "Remove",
+    "removeNamed": "Remove {{name}} from recent",
+    "meta_one": "{{count}} image, {{date}}",
+    "meta_other": "{{count}} images, {{date}}",
+    "folder": "Folder: {{name}}",
+    "note": "Only the project and its folder are remembered; the images stay in your folder.",
+    "close": "Close"
   }
 }

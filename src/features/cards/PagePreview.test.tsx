@@ -9,6 +9,7 @@ import { PagePreview } from './PagePreview';
 
 const image = (name: string, over: Partial<NewImage> = {}): NewImage => ({
   name,
+  path: name,
   blob: new Blob(['x'], { type: 'image/png' }),
   format: 'png',
   widthPx: 822,

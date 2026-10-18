@@ -14,17 +14,25 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { useTranslation } from 'react-i18next';
+import type { FolderFile } from '../../lib/imageMatch';
+import { pickFolder as defaultPickFolder, type PickedFolder } from '../../project/folder';
+import { isProjectFile } from '../../project/useProjectActions';
 import { totalCards, useCardsStore } from '../../store/cardsStore';
 import { CardTile } from './CardTile';
-import { loadImages as defaultLoadImages, type LoadResult } from './loadImages';
+import { loadImages as defaultLoadImages, looseFiles, type LoadResult } from './loadImages';
 import styles from './CardTray.module.css';
 
 const hasFiles = (e: DragEvent) => e.dataTransfer.types.includes('Files');
 
 export function CardTray({
   loadImages = defaultLoadImages,
+  pickFolder = defaultPickFolder,
+  onProjectFile,
 }: {
-  loadImages?: (files: File[]) => Promise<LoadResult>;
+  loadImages?: (entries: FolderFile[]) => Promise<LoadResult>;
+  pickFolder?: () => Promise<PickedFolder | null>;
+  /** Se llama si entre los archivos soltados hay un proyecto (.pnpcards o .bsk). */
+  onProjectFile?: (file: File) => void;
 }) {
   const { t } = useTranslation();
   const cards = useCardsStore((s) => s.cards);
@@ -33,23 +41,33 @@ export function CardTray({
   const [loading, setLoading] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
   const [dropping, setDropping] = useState(false);
+  const [notice, setNotice] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  async function add(files: File[]) {
-    if (files.length === 0) return;
-    setLoading(files.length);
+  async function add(entries: FolderFile[]) {
+    if (entries.length === 0) return;
+    setLoading(entries.length);
     setFailed([]);
+    setNotice('');
     try {
-      const result = await loadImages(files);
+      const result = await loadImages(entries);
       useCardsStore.getState().addImages(result.images);
       setFailed(result.failed);
     } finally {
       setLoading(0);
     }
+  }
+
+  async function addFolder() {
+    const picked = await pickFolder().catch(() => null);
+    if (!picked) return;
+    // La carpeta añadida pasa a ser la del proyecto: es la que se pedirá al reabrirlo.
+    useCardsStore.getState().setFolder(picked.folder);
+    await add(picked.files);
   }
 
   function onDragEnd({ active, over }: DragEndEvent) {
@@ -76,7 +94,15 @@ export function CardTray({
         if (!hasFiles(e)) return;
         e.preventDefault();
         setDropping(false);
-        void add([...e.dataTransfer.files]);
+        const files = [...e.dataTransfer.files];
+        const project = files.find(isProjectFile);
+        if (project && onProjectFile) {
+          const others = files.length - 1;
+          setNotice(others > 0 ? t('cards.ignoredWithProject', { count: others }) : '');
+          onProjectFile(project);
+        } else {
+          void add(looseFiles(files));
+        }
       }}
     >
       <div className={styles.toolbar}>
@@ -96,10 +122,18 @@ export function CardTray({
           hidden
           data-testid="file-input"
           onChange={(e) => {
-            void add([...(e.target.files ?? [])]);
+            void add(looseFiles([...(e.target.files ?? [])]));
             e.target.value = '';
           }}
         />
+        <button
+          type="button"
+          className={styles.secondary}
+          onClick={() => void addFolder()}
+          disabled={loading > 0}
+        >
+          {t('cards.addFolder')}
+        </button>
         <button
           type="button"
           className={styles.secondary}
@@ -138,6 +172,7 @@ export function CardTray({
           </button>
         </p>
       ) : null}
+      {notice ? <p className={styles.status}>{notice}</p> : null}
       {loading > 0 ? (
         <p className={styles.status} role="status">
           {t('cards.loading', { count: loading })}

@@ -1,4 +1,5 @@
 import { readDpi } from '../../lib/dpi';
+import type { FolderFile } from '../../lib/imageMatch';
 import type { ImageFormat, NewImage } from '../../store/cardsStore';
 
 const ACCEPTED = /\.(jpe?g|png|webp|gif|bmp|tiff?)$/i;
@@ -9,9 +10,13 @@ const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'bas
 export const isAcceptedImage = (file: File) =>
   file.type.startsWith('image/') || ACCEPTED.test(file.name);
 
-/** Ordena por nombre, como hacía PDFCartas al soltar archivos. */
-export const sortByName = (files: File[]) =>
-  [...files].sort((a, b) => collator.compare(a.name, b.name));
+/** Ordena por ruta (o nombre), como hacía PDFCartas al soltar archivos. */
+export const sortByPath = (entries: FolderFile[]) =>
+  [...entries].sort((a, b) => collator.compare(a.path, b.path));
+
+/** Archivos sueltos: su ruta es su nombre. */
+export const looseFiles = (files: File[]): FolderFile[] =>
+  files.map((file) => ({ file, path: file.name }));
 
 function detectFormat(bytes: Uint8Array): ImageFormat | 'tiff' | 'other' {
   if (bytes[0] === 0xff && bytes[1] === 0xd8) return 'jpeg';
@@ -58,7 +63,7 @@ async function thumbnail(bitmap: ImageBitmap): Promise<string> {
  * Lee un archivo de imagen: ppp, tamaño en píxeles y miniatura. JPG y PNG se guardan tal cual
  * (se incrustarán sin recodificar); TIFF, WebP y demás se convierten a PNG.
  */
-export async function loadImage(file: File): Promise<NewImage> {
+export async function loadImage(file: File, path = file.name): Promise<NewImage> {
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
   const detected = detectFormat(bytes);
@@ -83,6 +88,7 @@ export async function loadImage(file: File): Promise<NewImage> {
   try {
     return {
       name: file.name,
+      path,
       blob,
       format,
       widthPx: bitmap.width,
@@ -100,15 +106,18 @@ export interface LoadResult {
   failed: string[];
 }
 
-/** Carga las imágenes aceptadas, ordenadas por nombre; las que no se pueden leer van en `failed`. */
-export async function loadImages(files: File[]): Promise<LoadResult> {
+/**
+ * Carga las imágenes aceptadas, ordenadas por ruta, de una en una para no disparar la memoria;
+ * las que no se pueden leer van en `failed`.
+ */
+export async function loadImages(entries: FolderFile[]): Promise<LoadResult> {
   const images: NewImage[] = [];
   const failed: string[] = [];
-  for (const file of sortByName(files.filter(isAcceptedImage))) {
+  for (const { file, path } of sortByPath(entries.filter((e) => isAcceptedImage(e.file)))) {
     try {
-      images.push(await loadImage(file));
+      images.push(await loadImage(file, path));
     } catch {
-      failed.push(file.name);
+      failed.push(path);
     }
   }
   return { images, failed };

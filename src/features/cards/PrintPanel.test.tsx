@@ -8,6 +8,7 @@ import { PrintPanel } from './PrintPanel';
 
 const image: NewImage = {
   name: 'a.png',
+  path: 'a.png',
   blob: new Blob(['x'], { type: 'image/png' }),
   format: 'png',
   widthPx: 744,

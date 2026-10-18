@@ -2,10 +2,17 @@ import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ComingSoon } from './components/ComingSoon';
 import { CardsPage } from './features/cards/CardsPage';
+import { useSessionAutosave } from './project/useSessionAutosave';
+
+function SessionAutosave() {
+  useSessionAutosave();
+  return null;
+}
 
 export function App() {
   return (
     <HashRouter>
+      <SessionAutosave />
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<CardsPage />} />

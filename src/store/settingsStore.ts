@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DEFAULT_SETTINGS, type LayoutSettings } from '../lib/settings';
-
-type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] };
+import { DEFAULT_SETTINGS, mergeSettings, type LayoutSettings } from '../lib/settings';
 
 interface SettingsState {
   settings: LayoutSettings;
@@ -10,20 +8,9 @@ interface SettingsState {
   openAfter: boolean;
   update: (patch: Partial<LayoutSettings>) => void;
   setOpenAfter: (open: boolean) => void;
+  /** Sustituye toda la configuración (al abrir un proyecto). */
+  replace: (settings: LayoutSettings) => void;
   reset: () => void;
-}
-
-/** Completa una configuración guardada (quizá de una versión anterior) con los valores por defecto. */
-export function mergeSettings(saved: DeepPartial<LayoutSettings> | undefined): LayoutSettings {
-  const d = DEFAULT_SETTINGS;
-  return {
-    ...d,
-    ...saved,
-    customPageMm: { ...d.customPageMm, ...saved?.customPageMm },
-    crop: { ...d.crop, ...saved?.crop },
-    cutLines: { ...d.cutLines, ...saved?.cutLines },
-    bleed: { ...d.bleed, ...saved?.bleed },
-  };
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -33,6 +20,7 @@ export const useSettingsStore = create<SettingsState>()(
       openAfter: true,
       update: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
       setOpenAfter: (openAfter) => set({ openAfter }),
+      replace: (settings) => set({ settings }),
       reset: () => set({ settings: DEFAULT_SETTINGS, openAfter: true }),
     }),
     {

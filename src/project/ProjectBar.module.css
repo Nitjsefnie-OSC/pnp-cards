@@ -1,0 +1,73 @@
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* El nombre del proyecto hace de título de la bandeja. */
+.name {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-s);
+  background: transparent;
+  font-family: var(--font-label);
+  font-size: 1.625rem;
+  font-weight: 600;
+}
+
+.name:hover {
+  border-color: var(--border);
+}
+
+.name:focus-visible {
+  border-color: var(--focus);
+  background: var(--surface);
+}
+
+.name::placeholder {
+  color: var(--text-muted);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.buttons button {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.buttons button:hover:not(:disabled) {
+  border-color: var(--steel);
+}
+
+.buttons button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.message {
+  margin: 0;
+  min-height: 1.5em;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.message[data-tone='error'] {
+  color: var(--danger);
+}

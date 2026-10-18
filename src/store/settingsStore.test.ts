@@ -1,5 +1,5 @@
-import { DEFAULT_SETTINGS } from '../lib/settings';
-import { mergeSettings, useSettingsStore } from './settingsStore';
+import { DEFAULT_SETTINGS, mergeSettings } from '../lib/settings';
+import { useSettingsStore } from './settingsStore';
 
 describe('settingsStore', () => {
   beforeEach(() => useSettingsStore.getState().reset());

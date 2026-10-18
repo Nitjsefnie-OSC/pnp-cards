@@ -66,7 +66,10 @@
     "pdfTitle": "Cartas",
     "errorEmpty": "No hay cartas que imprimir: todas tienen cero copias.",
     "errorBlank": "Las imágenes en blanco toman el tamaño de otra carta. Añade una imagen o fuerza el ancho y el alto en Tamaño de la carta.",
-    "errorUnknown": "No se ha podido generar el PDF ({{message}}). Prueba con menos imágenes o revisa que no estén dañadas."
+    "errorUnknown": "No se ha podido generar el PDF ({{message}}). Prueba con menos imágenes o revisa que no estén dañadas.",
+    "addFolder": "Añadir carpeta",
+    "ignoredWithProject_one": "Se ha abierto el proyecto; la otra imagen soltada no se ha añadido.",
+    "ignoredWithProject_other": "Se ha abierto el proyecto; las otras {{count}} imágenes soltadas no se han añadido."
   },
   "settings": {
     "page": "Página",
@@ -141,5 +144,51 @@
     "area": "Zona recortada",
     "done": "Listo",
     "noImages": "Añade alguna imagen para ajustar el recorte."
+  },
+  "project": {
+    "name": "Nombre del proyecto",
+    "defaultName": "Proyecto",
+    "new": "Nuevo",
+    "open": "Abrir…",
+    "save": "Guardar archivo",
+    "replaceConfirm": "¿Sustituir el proyecto actual? Lo que no hayas guardado se perderá.",
+    "newConfirm": "¿Empezar un proyecto nuevo? Lo que no hayas guardado se perderá.",
+    "opened": "Has abierto {{name}}.",
+    "savedFile": "Has guardado {{name}}.",
+    "invalid": "{{name}} no es un proyecto de PnP Cards ni de PDFCartas.",
+    "newer": "{{name}} se guardó con una versión más nueva de PnP Cards. Recarga la página para actualizarla.",
+    "recent": "Recientes…",
+    "saveFailed": "No se ha podido guardar el proyecto. Prueba en otra carpeta."
+  },
+  "folder": {
+    "title": "Abrir «{{name}}»",
+    "intro_one": "El proyecto usa {{count}} imagen. Indica la carpeta donde está: se busca por su ruta y, si no, por su nombre.",
+    "intro_other": "El proyecto usa {{count}} imágenes. Indica la carpeta donde están: se buscan por su ruta y, si no, por su nombre.",
+    "restoreTitle": "¿Seguir donde lo dejaste?",
+    "restoreIntro_one": "Tu última sesión era «{{name}}», con {{count}} imagen. Para seguir, vuelve a abrir su carpeta.",
+    "restoreIntro_other": "Tu última sesión era «{{name}}», con {{count}} imágenes. Para seguir, vuelve a abrir su carpeta.",
+    "useKnown": "Abrir «{{name}}»",
+    "pickFolder": "Elegir carpeta…",
+    "pickFiles": "Elegir imágenes…",
+    "cancel": "Cancelar",
+    "discard": "Empezar de cero",
+    "hint": "La última vez las imágenes estaban en la carpeta «{{name}}».",
+    "loading": "Cargando las imágenes…",
+    "missing": "No se han encontrado: {{names}}",
+    "denied": "Sin permiso para leer la carpeta. Pulsa otra vez y elige «Permitir», o elige la carpeta.",
+    "gone": "No se encuentra la carpeta «{{name}}». Puede que se haya movido: elígela otra vez.",
+    "unreadable": "No se ha podido leer la carpeta."
+  },
+  "recent": {
+    "title": "Proyectos recientes",
+    "empty": "Aquí aparecerán los proyectos que abras o guardes.",
+    "open": "Abrir",
+    "remove": "Quitar",
+    "removeNamed": "Quitar {{name}} de recientes",
+    "meta_one": "{{count}} imagen, {{date}}",
+    "meta_other": "{{count}} imágenes, {{date}}",
+    "folder": "Carpeta: {{name}}",
+    "note": "Solo se recuerda el proyecto y su carpeta; las imágenes siguen en tu carpeta.",
+    "close": "Cerrar"
   }
 }

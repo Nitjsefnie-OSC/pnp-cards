@@ -3,6 +3,7 @@ import { useCardsStore, totalCards, type CardImage } from './cardsStore';
 function image(name: string, over: Partial<CardImage> = {}): Omit<CardImage, 'id' | 'copies'> {
   return {
     name,
+    path: name,
     blob: new Blob(['x'], { type: 'image/png' }),
     format: 'png',
     widthPx: 744,
@@ -66,5 +67,32 @@ describe('cardsStore', () => {
     const [a, , c] = store().cards;
     store().move(a.id, c.id);
     expect(store().cards.map((x) => x.name)).toEqual(['b.png', 'c.png', 'a.png']);
+  });
+
+  it('carga un proyecto entero: nombre y cartas con sus copias', () => {
+    store().addImages([image('vieja.png')]);
+    store().load(
+      'Mi juego',
+      [
+        { ...image('a.png'), copies: 4 },
+        { ...image(''), blob: null, copies: 2 },
+      ],
+      { name: 'cartas', handle: null },
+    );
+    expect(store().name).toBe('Mi juego');
+    expect(store().folder).toEqual({ name: 'cartas', handle: null });
+    expect(store().cards.map((c) => [c.name, c.copies, c.blob === null])).toEqual([
+      ['a.png', 4, false],
+      ['', 2, true],
+    ]);
+    expect(store().lastRemoved).toBeNull();
+  });
+
+  it('empezar un proyecto nuevo vacía la lista y el nombre', () => {
+    store().load('Mi juego', [{ ...image('a.png'), copies: 1 }], null);
+    store().reset();
+    expect(store().name).toBe('');
+    expect(store().folder).toBeNull();
+    expect(store().cards).toEqual([]);
   });
 });
