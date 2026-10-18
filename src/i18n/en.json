@@ -425,5 +425,12 @@
   },
   "confirm": {
     "cancel": "Cancel"
+  },
+  "pwa": {
+    "install": "Install",
+    "newVersion": "A new version of PnP Cards is available.",
+    "update": "Update",
+    "later": "Later",
+    "offlineReady": "PnP Cards now works offline."
   }
 }

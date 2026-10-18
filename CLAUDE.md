@@ -49,6 +49,10 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
 - `src/features/<herramienta>/` — componentes de cada herramienta (ruta en HashRouter).
 - `src/components/` — componentes compartidos y layout.
 - `src/i18n/` — react-i18next, `es.json` y `en.json` (mismas claves en ambos).
+- PWA: `vite-plugin-pwa` (Workbox) precarga todo el build para uso sin conexión, con
+  `registerType: 'prompt'` (aviso «Actualizar», sin recarga automática) y el manifiesto de `public/`.
+  Desactivado en desarrollo; en los tests, `virtual:pwa-register/react` apunta a
+  `src/test/pwaRegisterMock.ts`.
 - `src/styles/tokens.css` — tokens de color y tipografía; tema oscuro con `[data-theme='dark']`.
 
 ## Convenciones

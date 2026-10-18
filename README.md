@@ -8,6 +8,10 @@ recortar.
 
 Todo se hace en tu navegador: tus imágenes no se suben a ningún sitio.
 
+**Se puede instalar** como una aplicación más (Chrome o Edge en el ordenador: botón «Instalar»
+de la cabecera) y, una vez cargada, **funciona sin conexión**. Cuando hay una versión nueva, la
+app te avisa y se actualiza al pulsar «Actualizar».
+
 ## Cómo se usa
 
 1. **Añade las imágenes** de las cartas con «Añadir imágenes» o arrastrándolas a la bandeja. Se

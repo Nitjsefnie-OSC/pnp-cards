@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../i18n';
 import { useUiStore, type ThemePreference } from '../store/uiStore';
+import { InstallButton, UpdateNotice } from './AppUpdates';
 import { ConfirmHost } from './ConfirmHost';
 import { useApplyTheme } from './useApplyTheme';
 import styles from './Layout.module.css';
@@ -58,6 +59,7 @@ export function Layout() {
           ))}
         </nav>
         <div className={styles.prefs}>
+          <InstallButton />
           <label>
             <span className="visually-hidden">{t('theme.label')}</span>
             <select value={theme} onChange={(e) => setTheme(e.target.value as ThemePreference)}>
@@ -85,6 +87,7 @@ export function Layout() {
         <Outlet />
       </main>
       <ConfirmHost />
+      <UpdateNotice />
     </div>
   );
 }

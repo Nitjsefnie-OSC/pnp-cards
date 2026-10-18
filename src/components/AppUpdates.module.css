@@ -1,0 +1,64 @@
+.install {
+  padding: 2px var(--space-3);
+  border: 1px solid var(--paper);
+  border-radius: var(--radius-s);
+  background: var(--paper);
+  color: var(--mat);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.install:hover {
+  filter: brightness(0.95);
+}
+
+/* Aviso abajo a la derecha, sin tapar el botón de generar en móvil. */
+.toast {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  max-width: min(440px, calc(100vw - 32px));
+  padding: var(--space-3) var(--space-4);
+  background: var(--ink);
+  color: #f4f6f3;
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-m);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.3);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.later,
+.update {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-s);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.later {
+  border: 1px solid rgb(255 255 255 / 0.4);
+  background: transparent;
+  color: inherit;
+}
+
+.update {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+@media (max-width: 560px) {
+  .toast {
+    left: var(--space-4);
+    bottom: calc(var(--space-4) + 72px);
+  }
+}

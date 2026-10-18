@@ -425,5 +425,12 @@
   },
   "confirm": {
     "cancel": "Cancelar"
+  },
+  "pwa": {
+    "install": "Instalar",
+    "newVersion": "Hay una versión nueva de PnP Cards.",
+    "update": "Actualizar",
+    "later": "Más tarde",
+    "offlineReady": "PnP Cards ya funciona sin conexión."
   }
 }
