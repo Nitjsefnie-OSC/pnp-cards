@@ -8,6 +8,7 @@ import {
   PdfError,
   type GeneratePdf,
 } from '../../workers/pdfClient';
+import { PagePreview } from './PagePreview';
 import styles from './CardsPage.module.css';
 
 type Status =
@@ -113,7 +114,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
   return (
     <div className={styles.print}>
       <div className={styles.mat}>
-        <p>{t('cards.previewSoon')}</p>
+        <PagePreview />
       </div>
       <div className={styles.printArea}>
         <div aria-live="polite" className={styles.status}>

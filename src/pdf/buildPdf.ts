@@ -1,4 +1,15 @@
-import { PDFDocument, rgb, type PDFImage, type PDFPage } from 'pdf-lib';
+import {
+  PDFDocument,
+  clip,
+  endPath,
+  popGraphicsState,
+  pushGraphicsState,
+  rectangle,
+  rgb,
+  type PDFImage,
+  type PDFPage,
+} from 'pdf-lib';
+import { imageDrawRect } from '../lib/crop';
 import type { Dpi } from '../lib/dpi';
 import { planDocument } from '../lib/plan';
 import type { LayoutSettings } from '../lib/settings';
@@ -30,7 +41,7 @@ function hexToRgb(hex: string) {
 
 /**
  * Genera el PDF de cartas. Cada imagen se incrusta una sola vez y se reutiliza en todas sus
- * copias; JPG y PNG van tal cual, sin volver a codificarlos.
+ * copias; JPG y PNG van tal cual, sin volver a codificarlos, también al recortar.
  */
 export async function buildPdf(
   input: BuildInput,
@@ -72,9 +83,17 @@ export async function buildPdf(
       page.drawRectangle({ ...r, color: bleedColor });
     }
 
-    for (const { card, placement } of planned.items) {
+    for (const { card, placement, crop } of planned.items) {
       const img = await image(card);
-      if (img) page.drawImage(img, placement);
+      if (img && crop) {
+        // Se dibuja la imagen entera y una máscara del tamaño del hueco oculta lo recortado.
+        const { x, y, width, height } = placement;
+        page.pushOperators(pushGraphicsState(), rectangle(x, y, width, height), clip(), endPath());
+        page.drawImage(img, imageDrawRect(placement, crop, cards[card]));
+        page.pushOperators(popGraphicsState());
+      } else if (img) {
+        page.drawImage(img, placement);
+      }
       done += 1;
       onProgress?.(done, plan.total);
     }

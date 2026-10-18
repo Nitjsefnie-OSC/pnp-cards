@@ -98,4 +98,34 @@ describe('planDocument', () => {
   it('con las líneas de corte desactivadas, la página no tiene líneas', () => {
     expect(planDocument(settings(), [big]).pages[0].cutLines).toBeNull();
   });
+
+  describe('con recorte', () => {
+    const cropped = settings({
+      crop: { enabled: true, widthMm: 63, heightMm: 88, centered: true, x: 0, y: 0 },
+    });
+    const noDpi: CardSpec = { widthPx: 822, heightPx: 1122, dpi: null, blank: false, copies: 1 };
+
+    it('la carta mide lo que el recorte, a 300 ppp, aunque la imagen no indique sus ppp', () => {
+      const { placement } = planDocument(cropped, [noDpi]).pages[0].items[0];
+      expect(placement.width).toBeCloseTo(178.56, 3);
+      expect(placement.height).toBeCloseTo(249.36, 3);
+    });
+
+    it('centra el recorte en cada imagen por separado', () => {
+      const other: CardSpec = { ...noDpi, widthPx: 800, heightPx: 1100 };
+      const [a, b] = planDocument(cropped, [noDpi, other]).pages[0].items;
+      expect(a.crop).toEqual({ x: 39, y: 42, width: 744, height: 1039 });
+      expect(b.crop).toEqual({ x: 28, y: 31, width: 744, height: 1039 });
+    });
+
+    it('marca las cartas cuyo recorte no cabe en la imagen', () => {
+      const tiny: CardSpec = { ...noDpi, widthPx: 500 };
+      const plan = planDocument(cropped, [noDpi, tiny]);
+      expect(plan.clampedCards).toEqual([1]);
+    });
+
+    it('sin recorte, las colocaciones no tienen recorte', () => {
+      expect(planDocument(settings(), [big]).pages[0].items[0].crop).toBeNull();
+    });
+  });
 });

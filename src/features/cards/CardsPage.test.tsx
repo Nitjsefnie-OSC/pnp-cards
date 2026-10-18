@@ -106,6 +106,15 @@ describe('CardsPage', () => {
     expect(screen.queryByText(/no indican su resolución/)).not.toBeInTheDocument();
   });
 
+  it('no avisa de los ppp si se recorta, porque el recorte ya fija el tamaño', () => {
+    useSettingsStore.getState().update({
+      crop: { enabled: true, widthMm: 63, heightMm: 88, centered: true, x: 0, y: 0 },
+    });
+    useCardsStore.getState().addImages([fakeImage('a.png', null)]);
+    render(<CardsPage />);
+    expect(screen.queryByText(/no indican su resolución/)).not.toBeInTheDocument();
+  });
+
   it('calcula las páginas según la distribución', () => {
     useCardsStore.getState().addImages([fakeImage('a x10.png')]);
     render(<CardsPage />);

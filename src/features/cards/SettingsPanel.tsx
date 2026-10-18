@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, ColorField, FieldRow, RadioGroup, Section } from '../../components/form/Fields';
 import { NumberField } from '../../components/form/NumberField';
 import type { CutLineStyle, LayoutMode, PaperSize, Placement } from '../../lib/settings';
 import { useSettingsStore } from '../../store/settingsStore';
+import { CropDialog } from './CropDialog';
 import styles from './SettingsPanel.module.css';
 
 export function SettingsPanel() {
@@ -13,6 +15,9 @@ export function SettingsPanel() {
   const setOpenAfter = useSettingsStore((st) => st.setOpenAfter);
   const reset = useSettingsStore((st) => st.reset);
   const mm = t('settings.mm');
+  const [cropOpen, setCropOpen] = useState(false);
+  const cropW = s.crop.widthMm > 0 ? s.crop.widthMm : t('crop.full');
+  const cropH = s.crop.heightMm > 0 ? s.crop.heightMm : t('crop.full');
 
   return (
     <div className={styles.panel}>
@@ -159,7 +164,19 @@ export function SettingsPanel() {
           checked={s.crop.enabled}
           onChange={(enabled) => update({ crop: { ...s.crop, enabled } })}
         />
-        <p className={styles.hint}>{t('settings.cropSoon')}</p>
+        {s.crop.enabled ? (
+          <FieldRow>
+            <p className={styles.hint}>
+              {s.crop.centered
+                ? t('crop.summaryCentered', { w: cropW, h: cropH })
+                : t('crop.summaryAt', { w: cropW, h: cropH, x: s.crop.x, y: s.crop.y })}
+            </p>
+            <button type="button" className={styles.button} onClick={() => setCropOpen(true)}>
+              {t('crop.edit')}
+            </button>
+          </FieldRow>
+        ) : null}
+        <CropDialog open={cropOpen} onClose={() => setCropOpen(false)} />
       </Section>
 
       <Section title={t('settings.cut')}>

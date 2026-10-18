@@ -1,0 +1,137 @@
+.dialog {
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--text);
+  overscroll-behavior: contain;
+}
+
+.dialog::backdrop {
+  background: rgb(10 30 24 / 0.6);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.done {
+  padding: var(--space-2) var(--space-5);
+  border: 0;
+  border-radius: var(--radius-s);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.done:hover {
+  filter: brightness(1.1);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--space-5);
+  margin: 0;
+  padding: var(--space-4);
+}
+
+.stageWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background-color: var(--mat);
+  border-radius: var(--radius-s);
+}
+
+.stage {
+  position: relative;
+  /* Tan ancho como quepa sin que la imagen pase del alto de la ventana. */
+  width: min(100%, calc((100dvh - 240px) * var(--ratio)));
+  overflow: hidden;
+  user-select: none;
+}
+
+.stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Lo que queda fuera del recorte se oscurece con una sombra enorme. */
+.rect {
+  position: absolute;
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.55);
+  outline: 2px solid var(--accent);
+  cursor: move;
+  touch-action: none;
+}
+
+.rect:focus-visible {
+  outline: 3px solid var(--focus);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.select select {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.info {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.stageWrap .hint {
+  color: #dcebe3;
+}
+
+.warning {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+}
+
+@media (max-width: 760px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stage {
+    width: 100%;
+  }
+}

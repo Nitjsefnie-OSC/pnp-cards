@@ -66,8 +66,7 @@
     "pdfTitle": "Cartas",
     "errorEmpty": "No hay cartas que imprimir: todas tienen cero copias.",
     "errorBlank": "Las imágenes en blanco toman el tamaño de otra carta. Añade una imagen o fuerza el ancho y el alto en Tamaño de la carta.",
-    "errorUnknown": "No se ha podido generar el PDF ({{message}}). Prueba con menos imágenes o revisa que no estén dañadas.",
-    "previewSoon": "La vista previa de la página llegará en la fase 1d."
+    "errorUnknown": "No se ha podido generar el PDF ({{message}}). Prueba con menos imágenes o revisa que no estén dañadas."
   },
   "settings": {
     "page": "Página",
@@ -97,7 +96,6 @@
     "sizeHint": "Si no fuerzas el tamaño, se usa la resolución de cada imagen.",
     "crop": "Recorte",
     "cropEnabled": "Recortar las imágenes",
-    "cropSoon": "El editor de recorte llegará en la fase 1d.",
     "cut": "Corte",
     "cutLines": "Líneas de corte",
     "style": "Estilo",
@@ -112,5 +110,36 @@
     "reset": "Restablecer ajustes",
     "mm": "mm",
     "hundredthsMm": "1/100 mm"
+  },
+  "preview": {
+    "page": "Página {{page}} de {{pages}}",
+    "prev": "Página anterior",
+    "next": "Página siguiente",
+    "empty": "Añade cartas para ver cómo quedará cada página.",
+    "label": "Vista previa de la página {{page}}",
+    "clamped_one": "El recorte no cabe en {{count}} carta; se ajustará a su borde.",
+    "clamped_other": "El recorte no cabe en {{count}} cartas; se ajustará al borde de cada una."
+  },
+  "crop": {
+    "title": "Recorte",
+    "edit": "Ajustar recorte…",
+    "summaryCentered": "{{w}} × {{h}} mm, centrado",
+    "summaryAt": "{{w}} × {{h}} mm en X {{x}}, Y {{y}} px",
+    "full": "entera",
+    "card": "Ver sobre",
+    "width": "Ancho",
+    "height": "Alto",
+    "zeroHint": "Con 0 mm se usa toda la imagen en esa dirección.",
+    "centered": "Centrado en cada imagen",
+    "x": "X",
+    "y": "Y",
+    "px": "px",
+    "imageInfo": "Imagen: {{w}} × {{h}} px ({{wmm}} × {{hmm}} mm a 300 ppp)",
+    "cropInfo": "Recorte: {{w}} × {{h}} px",
+    "clamped": "El recorte no cabe en esta imagen y se ajusta a su borde.",
+    "hint": "Arrastra el rectángulo o muévelo con las flechas (con Mayús, de 10 en 10 px).",
+    "area": "Zona recortada",
+    "done": "Listo",
+    "noImages": "Añade alguna imagen para ajustar el recorte."
   }
 }

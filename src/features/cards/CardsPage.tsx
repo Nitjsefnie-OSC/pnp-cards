@@ -13,8 +13,10 @@ const TABS: Tab[] = ['cards', 'settings', 'preview'];
 function DpiWarning() {
   const { t } = useTranslation();
   const missing = useCardsStore((s) => s.cards.some((c) => c.blob && !c.dpi));
-  const forced = useSettingsStore((s) => s.settings.forceWidth || s.settings.forceHeight);
-  if (!missing || forced) return null;
+  const sized = useSettingsStore(
+    (s) => s.settings.forceWidth || s.settings.forceHeight || s.settings.crop.enabled,
+  );
+  if (!missing || sized) return null;
   return (
     <p className={styles.warning} role="status">
       {t('cards.noDpi')}

@@ -1,5 +1,6 @@
 import { bleedRects, type Rect } from './bleed';
 import { cardSize, type Size } from './cardSize';
+import { CROP_DPI, cropRect, type PxRect } from './crop';
 import { cutLines, type CutLines } from './cutLines';
 import type { Dpi } from './dpi';
 import { layoutPage, resolveGrid, type Placement } from './layout';
@@ -17,6 +18,8 @@ export interface PlannedItem {
   /** Índice de la carta en la lista recibida. */
   card: number;
   placement: Placement;
+  /** Parte de la imagen que se ve (en píxeles), o null si se ve entera. */
+  crop: PxRect | null;
 }
 
 export interface PlannedPage {
@@ -31,6 +34,8 @@ export interface PlannedPage {
 export interface DocumentPlan {
   pages: PlannedPage[];
   total: number;
+  /** Índices de las cartas cuyo recorte no cabía en la imagen y se ha ajustado. */
+  clampedCards: number[];
 }
 
 export type PlanErrorCode = 'empty' | 'blank-without-size';
@@ -46,8 +51,18 @@ export class PlanError extends Error {
  * Tamaño en puntos de cada carta. Una imagen en blanco toma el de la carta anterior (o el de
  * la siguiente si va la primera), salvo que se fuercen ancho y alto.
  */
-function cardSizes(settings: LayoutSettings, cards: CardSpec[]): Size[] {
-  const own = cards.map((c) => (c.blank ? null : cardSize(c, settings)));
+function cardSizes(settings: LayoutSettings, cards: CardSpec[], crops: (PxRect | null)[]): Size[] {
+  const own = cards.map((c, i) => {
+    if (c.blank) return null;
+    const crop = crops[i];
+    // Una imagen recortada pasa a medir lo que el recorte, a 300 ppp (como en PDFCartas).
+    return crop
+      ? cardSize(
+          { widthPx: crop.width, heightPx: crop.height, dpi: { x: CROP_DPI, y: CROP_DPI } },
+          settings,
+        )
+      : cardSize(c, settings);
+  });
   const forcedBoth = settings.forceWidth && settings.forceHeight;
   return own.map((size, i) => {
     if (size) return size;
@@ -65,7 +80,14 @@ export function planDocument(settings: LayoutSettings, cards: CardSpec[]): Docum
   const sequence = cards.flatMap((c, i) => Array.from({ length: Math.max(0, c.copies) }, () => i));
   if (sequence.length === 0) throw new PlanError('empty');
 
-  const sizes = cardSizes(settings, cards);
+  const clampedCards: number[] = [];
+  const crops = cards.map((c, i) => {
+    if (!settings.crop.enabled || c.blank) return null;
+    const { clamped, ...rect } = cropRect(c, settings.crop);
+    if (clamped) clampedCards.push(i);
+    return rect;
+  });
+  const sizes = cardSizes(settings, cards, crops);
   const { perPage } = resolveGrid(settings);
   const reference = sizes[sequence[0]];
 
@@ -78,11 +100,11 @@ export function planDocument(settings: LayoutSettings, cards: CardSpec[]): Docum
     pages.push({
       number,
       size: page,
-      items: pageCards.map((card, i) => ({ card, placement: placements[i] })),
+      items: pageCards.map((card, i) => ({ card, placement: placements[i], crop: crops[card] })),
       bleed: bleedRects(placements, settings),
       cutLines: cutLines(settings, pageSizes[0], reference),
     });
   }
 
-  return { pages, total: sequence.length };
+  return { pages, total: sequence.length, clampedCards };
 }

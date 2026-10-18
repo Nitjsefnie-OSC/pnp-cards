@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { readFileSync } from 'node:fs';
-import { PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
+import { decodePDFRawStream, PDFArray, PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
 import { DEFAULT_SETTINGS } from '../lib/settings';
 import { buildPdf, type PdfCard } from './buildPdf';
 
@@ -30,6 +30,18 @@ function imageStreams(doc: PDFDocument) {
       (obj): obj is PDFRawStream =>
         obj instanceof PDFRawStream && obj.dict.get(PDFName.of('Subtype')) === PDFName.of('Image'),
     );
+}
+
+/** Operadores de dibujo de una página, como texto. */
+function pageContent(doc: PDFDocument, index: number) {
+  const contents = doc.getPage(index).node.Contents();
+  const streams =
+    contents instanceof PDFArray
+      ? contents.asArray().map((r) => doc.context.lookup(r))
+      : [contents];
+  return streams
+    .map((s) => new TextDecoder().decode(decodePDFRawStream(s as PDFRawStream).decode()))
+    .join('\n');
 }
 
 describe('buildPdf', () => {
@@ -85,5 +97,18 @@ describe('buildPdf', () => {
     );
     expect(doc.getTitle()).toBe('Cartas');
     expect(doc.getCreator()).toBe('PnP Cards');
+  });
+
+  it('recorta sin volver a codificar: el JPG sigue intacto y la página lleva una máscara', async () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      crop: { enabled: true, widthMm: 2, heightMm: 3, centered: true, x: 0, y: 0 },
+    };
+    const doc = await PDFDocument.load(await buildPdf({ settings, cards: [card(jpg, 'jpeg', 2)] }));
+    const [stream] = imageStreams(doc);
+    expect(stream.getContents()).toEqual(jpg);
+
+    // re = rectángulo, W n = usarlo como máscara de recorte.
+    expect(pageContent(doc, 0)).toMatch(/re\s+W\s+n/);
   });
 });

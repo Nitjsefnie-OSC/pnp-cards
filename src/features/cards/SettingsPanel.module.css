@@ -9,6 +9,20 @@
   font-size: 0.875rem;
 }
 
+.button {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover {
+  border-color: var(--steel);
+}
+
 .footer {
   display: flex;
   flex-direction: column;

@@ -66,8 +66,7 @@
     "pdfTitle": "Cards",
     "errorEmpty": "There are no cards to print: they all have zero copies.",
     "errorBlank": "Blank images take their size from another card. Add an image or force the width and height under Card size.",
-    "errorUnknown": "The PDF could not be created ({{message}}). Try fewer images or check that none are damaged.",
-    "previewSoon": "The page preview arrives in phase 1d."
+    "errorUnknown": "The PDF could not be created ({{message}}). Try fewer images or check that none are damaged."
   },
   "settings": {
     "page": "Page",
@@ -97,7 +96,6 @@
     "sizeHint": "If you don’t force a size, each image’s resolution is used.",
     "crop": "Crop",
     "cropEnabled": "Crop the images",
-    "cropSoon": "The crop editor arrives in phase 1d.",
     "cut": "Cutting",
     "cutLines": "Cut lines",
     "style": "Style",
@@ -112,5 +110,36 @@
     "reset": "Reset settings",
     "mm": "mm",
     "hundredthsMm": "1/100 mm"
+  },
+  "preview": {
+    "page": "Page {{page}} of {{pages}}",
+    "prev": "Previous page",
+    "next": "Next page",
+    "empty": "Add cards to see how each page will look.",
+    "label": "Preview of page {{page}}",
+    "clamped_one": "The crop doesn’t fit {{count}} card; it will be fitted to its edge.",
+    "clamped_other": "The crop doesn’t fit {{count}} cards; it will be fitted to each card’s edge."
+  },
+  "crop": {
+    "title": "Crop",
+    "edit": "Adjust crop…",
+    "summaryCentered": "{{w}} × {{h}} mm, centred",
+    "summaryAt": "{{w}} × {{h}} mm at X {{x}}, Y {{y}} px",
+    "full": "full",
+    "card": "Show on",
+    "width": "Width",
+    "height": "Height",
+    "zeroHint": "0 mm uses the whole image in that direction.",
+    "centered": "Centred on each image",
+    "x": "X",
+    "y": "Y",
+    "px": "px",
+    "imageInfo": "Image: {{w}} × {{h}} px ({{wmm}} × {{hmm}} mm at 300 dpi)",
+    "cropInfo": "Crop: {{w}} × {{h}} px",
+    "clamped": "The crop doesn’t fit this image and is fitted to its edge.",
+    "hint": "Drag the rectangle or move it with the arrow keys (Shift moves 10 px).",
+    "area": "Cropped area",
+    "done": "Done",
+    "noImages": "Add an image to adjust the crop."
   }
 }
