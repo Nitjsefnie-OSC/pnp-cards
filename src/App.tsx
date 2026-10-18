@@ -12,6 +12,9 @@ const MergePage = lazy(() =>
 const SplitPage = lazy(() =>
   import('./features/split/SplitPage').then((m) => ({ default: m.SplitPage })),
 );
+const PdfToImagesPage = lazy(() =>
+  import('./features/pdfToImages/PdfToImagesPage').then((m) => ({ default: m.PdfToImagesPage })),
+);
 
 function SessionAutosave() {
   useSessionAutosave();
@@ -41,7 +44,14 @@ export function App() {
               </Suspense>
             }
           />
-          <Route path="pdf-to-images" element={<ComingSoon titleKey="nav.pdfToImages" />} />
+          <Route
+            path="pdf-to-images"
+            element={
+              <Suspense fallback={null}>
+                <PdfToImagesPage />
+              </Suspense>
+            }
+          />
           <Route path="extract-images" element={<ComingSoon titleKey="nav.extractImages" />} />
           <Route path="templates" element={<ComingSoon titleKey="nav.templates" />} />
         </Route>

@@ -18,6 +18,8 @@ export interface PdfInfo {
   pages: number;
   /** Miniatura de la primera página (URL de un Blob). */
   thumbUrl: string | null;
+  /** Tamaño de la primera página en puntos PDF. */
+  firstPage?: { width: number; height: number };
 }
 
 /** El PDF está dañado o protegido con contraseña. */
@@ -47,7 +49,11 @@ export async function inspectPdf(file: Blob, thumbHeight = 160): Promise<PdfInfo
     canvas.height = Math.ceil(viewport.height);
     await page.render({ canvas, canvasContext: canvas.getContext('2d')!, viewport }).promise;
     const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/jpeg', 0.8));
-    return { pages: doc.numPages, thumbUrl: blob ? URL.createObjectURL(blob) : null };
+    return {
+      pages: doc.numPages,
+      thumbUrl: blob ? URL.createObjectURL(blob) : null,
+      firstPage: { width: base.width, height: base.height },
+    };
   } catch {
     // Sin miniatura, pero se puede unir igualmente.
     return { pages: doc.numPages, thumbUrl: null };

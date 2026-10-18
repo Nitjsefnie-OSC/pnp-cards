@@ -63,6 +63,9 @@ tu carpeta, organizadas como tú quieras.
   pulsa «Quitar el margen»), las filas y las columnas; con varias hojas puedes usar los mismos
   ajustes para todas. Las partes se guardan en PNG, sin pérdida y con los ppp de la hoja, en un
   `.zip`, y con «Añadir a Cartas» pasan directamente a la lista de cartas.
+- **PDF a imágenes**: convierte las páginas de un PDF (todas o un rango como «1-3, 5») en JPG
+  al 95 % o PNG sin pérdida, a 150, 300, 600 ppp u otra resolución. Las imágenes llevan sus ppp,
+  se descargan en un `.zip` y se pueden pasar a Cartas o a Dividir imagen.
 
 ## Desarrollo
 
