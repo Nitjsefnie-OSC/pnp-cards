@@ -75,7 +75,9 @@
     "copiesLess": "Remove a copy of {{name}}",
     "copiesMore": "Add a copy of {{name}}",
     "clearTitle": "Remove all cards?",
-    "clearMessage": "The list will be empty. You can add the images again whenever you like."
+    "clearMessage": "The list will be empty. You can add the images again whenever you like.",
+    "dividerLabel": "Preview width",
+    "dividerHint": "Drag to change the preview width; double-click for the default width"
   },
   "settings": {
     "page": "Page",

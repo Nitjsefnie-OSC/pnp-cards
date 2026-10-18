@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { ProjectBar } from '../../project/ProjectBar';
 import { useProjectActions } from '../../project/useProjectActions';
 import { CardTray } from './CardTray';
+import { PreviewDivider } from './PreviewDivider';
+import { usePreviewWidth } from './usePreviewWidth';
 import { PrintPanel } from './PrintPanel';
 import { SettingsPanel } from './SettingsPanel';
 import styles from './CardsPage.module.css';
@@ -34,9 +36,13 @@ export function CardsPage() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('cards');
   const actions = useProjectActions();
+  const previewWidth = usePreviewWidth();
 
   return (
-    <div className={styles.page}>
+    <div
+      className={styles.page}
+      style={{ '--preview-width': `${previewWidth}px` } as CSSProperties}
+    >
       <div className={styles.tabs} role="tablist">
         {TABS.map((id) => (
           <button
@@ -72,6 +78,7 @@ export function CardsPage() {
         data-active={tab === 'preview' || undefined}
         aria-label={t('cards.tabs.preview')}
       >
+        <PreviewDivider />
         <PrintPanel />
       </aside>
     </div>

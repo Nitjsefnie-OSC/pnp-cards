@@ -1,6 +1,6 @@
 .page {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr) 380px;
+  grid-template-columns: 300px minmax(0, 1fr) var(--preview-width, 380px);
   grid-template-areas: 'settings cards preview';
   height: 100%;
 }
@@ -22,6 +22,7 @@
 }
 
 .preview {
+  position: relative;
   grid-area: preview;
   overflow-y: auto;
   background: var(--surface);
@@ -154,7 +155,54 @@
   cursor: default;
 }
 
+/* Divisor arrastrable en el borde izquierdo de la vista previa. */
+.divider {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 2;
+  width: 10px;
+  margin-left: -5px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.divider::after {
+  content: '';
+  position: absolute;
+  inset: 0 4px;
+  background: transparent;
+  transition: background-color 120ms ease;
+}
+
+.divider:hover::after,
+.divider:focus-visible::after,
+.divider[data-dragging]::after {
+  background: var(--accent);
+}
+
+.divider:focus-visible {
+  outline: none;
+}
+
+.dividerValue {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-3);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-s);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-family: var(--font-label);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 @media (max-width: 1100px) {
+  .divider {
+    display: none;
+  }
+
   .page {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);

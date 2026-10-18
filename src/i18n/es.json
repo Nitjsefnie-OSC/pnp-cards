@@ -75,7 +75,9 @@
     "copiesLess": "Quitar una copia de {{name}}",
     "copiesMore": "Añadir una copia de {{name}}",
     "clearTitle": "¿Quitar todas las cartas?",
-    "clearMessage": "La lista se queda vacía. Puedes volver a añadir las imágenes cuando quieras."
+    "clearMessage": "La lista se queda vacía. Puedes volver a añadir las imágenes cuando quieras.",
+    "dividerLabel": "Ancho de la vista previa",
+    "dividerHint": "Arrastra para cambiar el ancho de la vista previa; doble clic para el ancho por defecto"
   },
   "settings": {
     "page": "Página",
