@@ -1,5 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import i18n from '../i18n';
 import { parseProject, serializeProject } from '../lib/project';
 import { DEFAULT_SETTINGS } from '../lib/settings';
@@ -66,10 +67,12 @@ const projectJson = serializeProject({
 
 function renderPage(storage: ProjectStorage = createMemoryStorage()) {
   render(
-    <StorageContext value={storage}>
-      <CardsPage />
-      <ConfirmHost />
-    </StorageContext>,
+    <MemoryRouter>
+      <StorageContext value={storage}>
+        <CardsPage />
+        <ConfirmHost />
+      </StorageContext>
+    </MemoryRouter>,
   );
   return storage;
 }

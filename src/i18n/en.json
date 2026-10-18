@@ -432,5 +432,26 @@
     "update": "Update",
     "later": "Later",
     "offlineReady": "PnP Cards now works offline."
+  },
+  "privacy": {
+    "link": "Privacy",
+    "title": "Privacy",
+    "local": "Your images, PDFs and projects never leave your computer: everything happens in the browser.",
+    "stats": "To learn which tools are used and improve the app, visits and some actions are counted anonymously with GoatCounter, without cookies or identifiers.",
+    "measured": "What is counted",
+    "measuredItems": [
+      "Which tools are visited.",
+      "That a PDF is created, with the number of pages and cards in ranges and the options used (layout, crop, cutting, double-sided).",
+      "Errors and cancellations, only by their code.",
+      "That a project is opened or saved, a folder is added or a tool is used.",
+      "Language, theme and whether the app is installed. Browser, system and country come from the service itself."
+    ],
+    "never": "What is never counted",
+    "neverItems": [
+      "Images, file names, project names or folder paths.",
+      "Anything that identifies you: no cookies, no identifiers, no full IP address."
+    ],
+    "optIn": "Send anonymous usage statistics",
+    "doNotTrack": "Your browser asks not to be tracked, so nothing is sent."
   }
 }

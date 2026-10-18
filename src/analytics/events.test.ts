@@ -1,0 +1,66 @@
+import { cardsBucket, eventPaths, pagesBucket } from './events';
+
+describe('rangos', () => {
+  it('agrupa las páginas en 1, 2-5, 6-20 y más de 20', () => {
+    expect([1, 2, 5, 6, 20, 21, 300].map(pagesBucket)).toEqual([
+      '1',
+      '2-5',
+      '2-5',
+      '6-20',
+      '6-20',
+      'mas-de-20',
+      'mas-de-20',
+    ]);
+  });
+
+  it('agrupa las cartas en rangos', () => {
+    expect([1, 9, 10, 54, 55, 200, 201].map(cardsBucket)).toEqual([
+      '1-9',
+      '1-9',
+      '10-54',
+      '10-54',
+      '55-200',
+      '55-200',
+      'mas-de-200',
+    ]);
+  });
+});
+
+describe('eventPaths', () => {
+  it('un PDF generado cuenta el evento y cada dato por separado', () => {
+    expect(
+      eventPaths({
+        name: 'pdf-generado',
+        pages: 7,
+        cards: 60,
+        layout: 'manual',
+        crop: true,
+        cutLines: false,
+        bleed: true,
+        duplex: false,
+      }),
+    ).toEqual([
+      'pdf-generado',
+      'pdf-generado/paginas/6-20',
+      'pdf-generado/cartas/55-200',
+      'pdf-generado/distribucion/manual',
+      'pdf-generado/opcion/recorte',
+      'pdf-generado/opcion/margen-de-corte',
+    ]);
+  });
+
+  it('los errores solo mandan su código, limpio', () => {
+    expect(eventPaths({ name: 'pdf-error', code: 'Blank Without Size/../x' })).toEqual([
+      'pdf-error',
+      'pdf-error/codigo/blank-without-size-x',
+    ]);
+  });
+
+  it('los eventos sin datos son una sola ruta', () => {
+    expect(eventPaths({ name: 'unir-pdf' })).toEqual(['unir-pdf']);
+    expect(eventPaths({ name: 'proyecto-abierto', kind: 'bsk' })).toEqual([
+      'proyecto-abierto',
+      'proyecto-abierto/tipo/bsk',
+    ]);
+  });
+});

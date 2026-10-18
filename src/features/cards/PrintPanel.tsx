@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { track } from '../../analytics/track';
 import { downloadUrl as download } from '../../components/download';
 import { formatSize } from '../../components/formatSize';
 import { safeFileName } from '../../lib/filename';
@@ -72,6 +73,16 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
       );
       download(url, fileName);
       if (tab) tab.location.href = url;
+      track({
+        name: 'pdf-generado',
+        pages: Math.ceil(totalCards(cards) / resolveGrid(settings).perPage),
+        cards: totalCards(cards),
+        layout: settings.mode,
+        crop: settings.crop.enabled,
+        cutLines: settings.cutLines.enabled,
+        bleed: settings.bleed.enabled,
+        duplex: settings.duplex,
+      });
       setStatus({
         kind: 'ready',
         url,
@@ -81,7 +92,11 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
       });
     } catch (err) {
       tab?.close();
+      if (!(err instanceof DOMException && err.name === 'AbortError')) {
+        track({ name: 'pdf-error', code: err instanceof TaskError ? err.code : 'unknown' });
+      }
       if (err instanceof DOMException && err.name === 'AbortError') {
+        track({ name: 'pdf-cancelado' });
         setStatus({ kind: 'cancelled' });
       } else if (err instanceof TaskError && err.code === 'blank-without-size') {
         setStatus({ kind: 'error', message: t('cards.errorBlank') });

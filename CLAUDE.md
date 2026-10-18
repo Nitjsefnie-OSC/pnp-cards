@@ -49,6 +49,9 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
 - `src/features/<herramienta>/` — componentes de cada herramienta (ruta en HashRouter).
 - `src/components/` — componentes compartidos y layout.
 - `src/i18n/` — react-i18next, `es.json` y `en.json` (mismas claves en ambos).
+- Estadísticas: `src/analytics/` (GoatCounter). `track()` solo acepta el tipo cerrado
+  `AnalyticsEvent` (rangos y valores fijos, nunca nombres); solo se activa en producción, en
+  onzebol.github.io, con `VITE_GOATCOUNTER_CODE` y sin Do Not Track ni la casilla desactivada.
 - PWA: `vite-plugin-pwa` (Workbox) precarga todo el build para uso sin conexión, con
   `registerType: 'prompt'` (aviso «Actualizar», sin recarga automática) y el manifiesto de `public/`.
   Desactivado en desarrollo; en los tests, `virtual:pwa-register/react` apunta a

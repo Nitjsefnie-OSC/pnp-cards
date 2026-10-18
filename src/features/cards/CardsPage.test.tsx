@@ -157,7 +157,7 @@ describe('CardTray', () => {
 describe('SettingsPanel', () => {
   it('muestra columnas y filas solo en modo manual', async () => {
     const user = userEvent.setup();
-    render(<SettingsPanel />);
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
     expect(screen.queryByLabelText('Columnas')).not.toBeInTheDocument();
     await user.click(screen.getByLabelText('Manual'));
     expect(screen.getByLabelText('Columnas')).toHaveValue('3');
@@ -165,7 +165,7 @@ describe('SettingsPanel', () => {
 
   it('guarda el margen escrito con coma decimal', async () => {
     const user = userEvent.setup();
-    render(<SettingsPanel />);
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
     const margin = screen.getByLabelText('Margen de la página');
     await user.clear(margin);
     await user.type(margin, '5,5');

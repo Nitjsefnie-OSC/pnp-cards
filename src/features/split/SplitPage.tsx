@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { track } from '../../analytics/track';
 import { confirmAction } from '../../components/confirmAction';
 import { useNavigate } from 'react-router-dom';
 import { downloadUrl } from '../../components/download';
@@ -149,6 +150,7 @@ export function SplitPage({
         new Blob([zip as Uint8Array<ArrayBuffer>], { type: 'application/zip' }),
       );
       downloadUrl(url, t('split.fileName'));
+      track({ name: 'dividir-imagen' });
       setStatus({ kind: 'ready', url, zip, parts: total });
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError')

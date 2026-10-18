@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { CardsPage } from './features/cards/CardsPage';
+import { useAnalytics } from './analytics/useAnalytics';
 import { useSessionAutosave } from './project/useSessionAutosave';
 
 // Las herramientas secundarias (y pdf.js) se descargan al abrirlas.
@@ -23,15 +24,21 @@ const PdfToImagesPage = lazy(() =>
   import('./features/pdfToImages/PdfToImagesPage').then((m) => ({ default: m.PdfToImagesPage })),
 );
 
-function SessionAutosave() {
+const PrivacyPage = lazy(() =>
+  import('./features/privacy/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
+);
+
+/** Tareas de fondo de la app: guardado de la sesión y estadísticas anónimas. */
+function Background() {
   useSessionAutosave();
+  useAnalytics();
   return null;
 }
 
 export function App() {
   return (
     <HashRouter>
-      <SessionAutosave />
+      <Background />
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<CardsPage />} />
@@ -72,6 +79,14 @@ export function App() {
             element={
               <Suspense fallback={null}>
                 <TemplatesPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="privacy"
+            element={
+              <Suspense fallback={null}>
+                <PrivacyPage />
               </Suspense>
             }
           />

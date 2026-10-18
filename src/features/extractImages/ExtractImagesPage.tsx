@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { track } from '../../analytics/track';
 import { useNavigate } from 'react-router-dom';
 import { downloadBlob } from '../../components/download';
 import { Checkbox } from '../../components/form/Fields';
@@ -106,6 +107,7 @@ export function ExtractImagesPage({
         setStatus({ kind: 'rendering', done, total });
       });
       setExcluded(new Set());
+      track({ name: 'extraer-imagenes' });
       setStatus({ kind: 'ready', images: result, skipped: analysis.skipped });
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError')

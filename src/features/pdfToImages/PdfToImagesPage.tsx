@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { track } from '../../analytics/track';
 import { useNavigate } from 'react-router-dom';
 import { downloadUrl } from '../../components/download';
 import { RadioGroup } from '../../components/form/Fields';
@@ -123,6 +124,7 @@ export function PdfToImagesPage({
       const url = URL.createObjectURL(blob);
       const zipName = t('pdfToImages.zipName', { name });
       downloadUrl(url, zipName);
+      track({ name: 'pdf-a-imagenes' });
       setStatus({ kind: 'ready', images, url, zipName, bytes: blob.size });
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError')

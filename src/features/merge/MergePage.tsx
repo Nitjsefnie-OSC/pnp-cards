@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
+import { track } from '../../analytics/track';
 import { confirmAction } from '../../components/confirmAction';
 import { downloadUrl } from '../../components/download';
 import { formatSize } from '../../components/formatSize';
@@ -219,6 +220,7 @@ export function MergePage({
         new Blob([result as Uint8Array<ArrayBuffer>], { type: 'application/pdf' }),
       );
       downloadUrl(url, t('merge.fileName'));
+      track({ name: 'unir-pdf' });
       setStatus({ kind: 'ready', url, bytes: result.byteLength, pages: totalPages });
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {

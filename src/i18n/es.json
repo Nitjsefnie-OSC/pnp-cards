@@ -432,5 +432,26 @@
     "update": "Actualizar",
     "later": "Más tarde",
     "offlineReady": "PnP Cards ya funciona sin conexión."
+  },
+  "privacy": {
+    "link": "Privacidad",
+    "title": "Privacidad",
+    "local": "Tus imágenes, tus PDF y tus proyectos no salen de tu equipo: todo se hace en el navegador.",
+    "stats": "Para saber qué herramientas se usan y mejorar la app, se cuentan las visitas y algunos usos de forma anónima con GoatCounter, sin cookies ni identificadores.",
+    "measured": "Qué se cuenta",
+    "measuredItems": [
+      "Qué herramientas se visitan.",
+      "Que se genera un PDF, con el número de páginas y de cartas en rangos y las opciones usadas (distribución, recorte, corte, doble cara).",
+      "Los errores y las cancelaciones, solo por su código.",
+      "Que se abre o se guarda un proyecto, se añade una carpeta o se usa una herramienta.",
+      "El idioma, el tema y si la app está instalada. El navegador, el sistema y el país los da el propio servicio."
+    ],
+    "never": "Qué no se cuenta nunca",
+    "neverItems": [
+      "Imágenes, nombres de archivo, nombres de proyecto ni rutas de carpetas.",
+      "Nada que te identifique: ni cookies, ni identificadores, ni tu dirección IP completa."
+    ],
+    "optIn": "Enviar estadísticas anónimas de uso",
+    "doNotTrack": "Tu navegador pide no ser rastreado, así que no se envía nada."
   }
 }

@@ -12,6 +12,7 @@ import {
   serializeProject,
   type ProjectFile,
 } from '../lib/project';
+import { track } from '../analytics/track';
 import { confirmAction } from '../components/confirmAction';
 import { useCardsStore, type ImageFolder } from '../store/cardsStore';
 import { pickFolder, reopenFolder, type PickedFolder } from './folder';
@@ -28,6 +29,8 @@ export interface PendingProject {
   knownFolder: ImageFolder | null;
   /** true al recuperar la última sesión al abrir la app. */
   restoring: boolean;
+  /** De qué archivo viene (para las estadísticas). */
+  kind: 'pnpcards' | 'bsk';
 }
 
 const isBsk = (file: File) => /\.bsk$/i.test(file.name);
@@ -95,7 +98,12 @@ export function useProjectActions() {
         (r) => r.project.name === project.name,
       );
       setMessage(null);
-      setPending({ project, knownFolder: recent?.folder ?? null, restoring: false });
+      setPending({
+        project,
+        knownFolder: recent?.folder ?? null,
+        restoring: false,
+        kind: isBsk(file) ? 'bsk' : 'pnpcards',
+      });
     },
     [confirmReplace, storage, t],
   );
@@ -104,7 +112,12 @@ export function useProjectActions() {
     async (entry: RecentProject) => {
       if (!(await confirmReplace('open'))) return false;
       setMessage(null);
-      setPending({ project: entry.project, knownFolder: entry.folder, restoring: false });
+      setPending({
+        project: entry.project,
+        knownFolder: entry.folder,
+        restoring: false,
+        kind: 'pnpcards',
+      });
       return true;
     },
     [confirmReplace],
@@ -117,6 +130,7 @@ export function useProjectActions() {
       setBusy(true);
       try {
         const missing = await openProjectWithFolder(pending.project, picked);
+        track({ name: 'proyecto-abierto', kind: pending.kind });
         setPending(null);
         // Se recuerda el proyecto tal como venía, también con las imágenes que falten.
         await storage
@@ -186,6 +200,7 @@ export function useProjectActions() {
       return;
     }
     await storage.addRecent({ project, folder }).catch(() => {});
+    track({ name: 'proyecto-guardado' });
     setMessage({ text: t('project.savedFile', { name: fileName }), tone: 'info' });
   }, [storage, t]);
 
@@ -204,7 +219,12 @@ export function useProjectActions() {
       .then((session) => {
         const hasImages = session?.project.cards.some((c) => c.name);
         if (session && hasImages && useCardsStore.getState().cards.length === 0) {
-          setPending({ project: session.project, knownFolder: session.folder, restoring: true });
+          setPending({
+            project: session.project,
+            knownFolder: session.folder,
+            restoring: true,
+            kind: 'pnpcards',
+          });
         }
       })
       .catch(() => {});

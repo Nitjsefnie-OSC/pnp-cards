@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { confirmAction } from '../../components/confirmAction';
 import type { FolderFile } from '../../lib/imageMatch';
 import { pickFolder as defaultPickFolder, type PickedFolder } from '../../project/folder';
+import { track } from '../../analytics/track';
 import { isProjectFile } from '../../project/useProjectActions';
 import { totalCards, useCardsStore } from '../../store/cardsStore';
 import { CardTile } from './CardTile';
@@ -69,6 +70,7 @@ export function CardTray({
     if (!picked) return;
     // La carpeta añadida pasa a ser la del proyecto: es la que se pedirá al reabrirlo.
     useCardsStore.getState().setFolder(picked.folder);
+    track({ name: 'carpeta-añadida' });
     await add(picked.files);
   }
 

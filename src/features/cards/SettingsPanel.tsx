@@ -285,6 +285,9 @@ export function SettingsPanel() {
         <button type="button" className={styles.reset} onClick={reset}>
           {t('settings.reset')}
         </button>
+        <Link to="/privacy" className={styles.reset}>
+          {t('privacy.link')}
+        </Link>
       </div>
     </div>
   );

@@ -6,7 +6,9 @@ recortar.
 
 **Úsala aquí:** https://onzebol.github.io/pnp-cards/
 
-Todo se hace en tu navegador: tus imágenes no se suben a ningún sitio.
+Todo se hace en tu navegador: tus imágenes no se suben a ningún sitio. Para mejorar la app se recogen
+estadísticas anónimas de uso (sin cookies, sin nombres de archivo ni imágenes); el detalle y la
+casilla para desactivarlas están en «Privacidad».
 
 **Se puede instalar** como una aplicación más (Chrome o Edge en el ordenador: botón «Instalar»
 de la cabecera) y, una vez cargada, **funciona sin conexión**. Cuando hay una versión nueva, la
@@ -91,6 +93,13 @@ npm test           # tests
 npm run lint       # ESLint
 npm run build      # build de producción en dist/
 ```
+
+## Estadísticas
+
+Se cuentan con [GoatCounter](https://www.goatcounter.com/) solo en la web publicada. Para
+activarlas, crea el sitio en GoatCounter y guarda su código (la parte `CODIGO` de
+`CODIGO.goatcounter.com`) como variable del repositorio `GOATCOUNTER_CODE` en
+_Settings → Secrets and variables → Actions → Variables_. Sin esa variable no se envía nada.
 
 ## Despliegue
 
