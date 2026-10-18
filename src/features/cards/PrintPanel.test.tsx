@@ -42,7 +42,7 @@ function controllable() {
 
 beforeAll(() => i18n.changeLanguage('es'));
 beforeEach(() => {
-  useCardsStore.getState().clear();
+  useCardsStore.getState().reset();
   useSettingsStore.getState().reset();
   useSettingsStore.getState().setOpenAfter(false);
   URL.createObjectURL = vi.fn(() => 'blob:pdf');
@@ -76,6 +76,36 @@ describe('PrintPanel', () => {
     expect(click).toHaveBeenCalledTimes(1);
     expect(screen.getByText('PDF listo: 2 páginas, 2,4 MB.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Abrir el PDF' })).toHaveAttribute('href', 'blob:pdf');
+  });
+
+  it('con reversos, envía el reverso y qué cartas no lo llevan, y cuenta sus páginas', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
+    useCardsStore.getState().setBack({ ...image, name: 'dorso.png', widthPx: 750 });
+    useCardsStore.getState().addImages([{ ...image, name: 'a x10.png' }, image]);
+    const id = useCardsStore.getState().cards[1].id;
+    useCardsStore.getState().setNoBack(id, true);
+    const gen = controllable();
+    render(<PrintPanel generatePdf={gen.generate} />);
+
+    // 11 cartas: 2 páginas de cartas y 2 de reversos.
+    expect(screen.getByText('4 páginas')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Generar PDF' }));
+    const [input] = gen.generate.mock.calls[0];
+    expect(input.back).toMatchObject({ format: 'png', widthPx: 750, heightPx: 1039 });
+    expect(input.cards.map((c) => c.noBack ?? false)).toEqual([false, true]);
+  });
+
+  it('explica que falta la imagen del reverso', async () => {
+    const user = userEvent.setup();
+    useCardsStore.getState().addImages([image]);
+    const gen = controllable();
+    render(<PrintPanel generatePdf={gen.generate} />);
+
+    await user.click(screen.getByRole('button', { name: 'Generar PDF' }));
+    await gen.fail(new TaskError('no-back', 'no-back'));
+    expect(screen.getByRole('alert')).toHaveTextContent('Elige la imagen del reverso');
   });
 
   it('se puede cancelar mientras se genera', async () => {

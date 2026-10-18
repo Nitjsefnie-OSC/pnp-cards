@@ -14,7 +14,9 @@ export function FolderDialog({ actions }: { actions: Actions }) {
   const ref = useModalDialog(pending !== null);
   const titleId = useId();
   const filesRef = useRef<HTMLInputElement>(null);
-  const count = pending?.project.cards.filter((c) => c.name).length ?? 0;
+  // Las imágenes de las cartas y la del reverso común.
+  const count =
+    (pending?.project.cards.filter((c) => c.name).length ?? 0) + (pending?.project.back ? 1 : 0);
   const name = pending?.project.name ?? '';
   const known = pending?.knownFolder;
 

@@ -28,7 +28,14 @@ export function useSessionAutosave() {
       timer = setTimeout(save, DELAY_MS);
     };
     const offCards = useCardsStore.subscribe((s, prev) => {
-      if (s.cards !== prev.cards || s.name !== prev.name || s.folder !== prev.folder) schedule();
+      if (
+        s.cards !== prev.cards ||
+        s.back !== prev.back ||
+        s.name !== prev.name ||
+        s.folder !== prev.folder
+      ) {
+        schedule();
+      }
     });
     const offSettings = useSettingsStore.subscribe((s, prev) => {
       if (s.settings !== prev.settings) schedule();

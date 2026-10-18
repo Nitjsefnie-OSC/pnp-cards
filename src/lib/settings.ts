@@ -4,6 +4,8 @@ export type LayoutMode = 'vertical9' | 'horizontal8' | 'manual' | 'template';
 export type PaperSize = 'A4' | 'A3' | 'custom';
 export type Placement = 'separated' | 'together';
 export type CutLineStyle = 'normal' | 'full' | 'cross';
+/** Por dónde se da la vuelta al papel al imprimir a doble cara. */
+export type BackFlip = 'long' | 'short';
 
 export interface CropSettings {
   enabled: boolean;
@@ -29,7 +31,11 @@ export interface LayoutSettings {
   /** Margen de la página en mm (solo con cartas separadas). */
   marginMm: number;
   rightToLeft: boolean;
-  duplex: boolean;
+  /**
+   * Páginas de reversos detrás de cada página de cartas, en espejo. La imagen del reverso va con
+   * las cartas, no aquí.
+   */
+  backs: { enabled: boolean; flip: BackFlip };
 
   forceWidth: boolean;
   forceHeight: boolean;
@@ -61,7 +67,7 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   placement: 'separated',
   marginMm: 8,
   rightToLeft: false,
-  duplex: false,
+  backs: { enabled: false, flip: 'long' },
   forceWidth: false,
   forceHeight: false,
   cardWidthMm: 0,
@@ -77,9 +83,13 @@ export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? Partial<T[
 /** Completa una configuración guardada (quizá de una versión anterior) con los valores por defecto. */
 export function mergeSettings(saved: DeepPartial<LayoutSettings> | undefined): LayoutSettings {
   const d = DEFAULT_SETTINGS;
+  // `duplex` (doble cara manual, de PDFCartas) ya no existe: los reversos se generan solos.
+  const rest: DeepPartial<LayoutSettings> & { duplex?: unknown } = { ...saved };
+  delete rest.duplex;
   return {
     ...d,
-    ...saved,
+    ...rest,
+    backs: { ...d.backs, ...saved?.backs },
     customPageMm: { ...d.customPageMm, ...saved?.customPageMm },
     crop: { ...d.crop, ...saved?.crop },
     cutLines: { ...d.cutLines, ...saved?.cutLines },

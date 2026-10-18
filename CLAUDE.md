@@ -23,7 +23,9 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   ppp, recorte, división, nombres de archivo, formato de proyecto. Todo con tests.
   Coordenadas en puntos PDF (1/72"), origen abajo a la izquierda, como iText y pdf-lib.
   `plan.ts` (`planDocument`) reúne todo: qué carta va en cada hueco, margen y líneas de corte por
-  página. Lo usan el PDF y la vista previa, así que nunca difieren.
+  página. Lo usan el PDF y la vista previa, así que nunca difieren. Con reversos, intercala tras
+  cada página de cartas una de reversos en espejo (`side: 'back'`); la imagen del reverso común
+  vive en `cardsStore.back`, no en la configuración.
 - `src/pdf/` — construcción de PDF con pdf-lib (`buildPdf`: cada imagen se incrusta una vez; JPG/PNG
   sin recodificar). Sin APIs de DOM ni de worker, para poder probarlo en entorno node.
 - `src/workers/` — un worker por tarea larga (`pdf.worker.ts` genera cartas, `merge.worker.ts` une
@@ -37,7 +39,8 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   en uso se copia en `settings.template` (viaja con el proyecto); la lista vive en
   `features/templates/templatesStore.ts` (localStorage) y sincroniza esa copia al editarla.
 - `src/project/` — proyectos. El `.pnpcards` es solo JSON (`src/lib/project.ts`): configuración y,
-  por carta, ruta relativa a su carpeta, nombre y copias. Las imágenes NO se guardan en ningún sitio
+  por carta, ruta relativa a su carpeta, nombre, copias y si va sin reverso; y la ruta del
+  reverso común (`back`). Las imágenes NO se guardan en ningún sitio
   (ni en el archivo ni en IndexedDB): al abrir se pide la carpeta (`folder.ts`: File System Access
   en Chrome/Edge, que permite recordarla; `webkitdirectory` en el resto) y se emparejan con
   `matchImages` (`src/lib/imageMatch.ts`). IndexedDB (`storage.ts`) guarda la sesión y «Recientes»

@@ -68,7 +68,8 @@ function parseXml(doc: Document): BskProject {
     placement: text('colocar') === '1' ? 'together' : 'separated',
     marginMm: num('sep_margen', d.marginMm),
     rightToLeft: flag('col_derecha', d.rightToLeft),
-    duplex: version >= 3 ? flag('col_doblecara', d.duplex) : d.duplex,
+    // col_doblecara (doble cara manual, con los reversos en la lista) no se lee: aquí los
+    // reversos se generan solos y las imágenes de reverso del .bsk quedan como cartas.
     forceWidth: (forzar & 1) !== 0,
     forceHeight: (forzar & 2) !== 0,
     cardWidthMm: num('for_ancho', d.cardWidthMm),

@@ -2,13 +2,19 @@ import { useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { planDocument, PlanError, type DocumentPlan, type PlannedItem } from '../../lib/plan';
 import { slotLocalSize, slotSvgMatrix } from '../../lib/template';
-import { printableCards, useCardsStore, type CardImage } from '../../store/cardsStore';
+import {
+  printableBack,
+  printableCards,
+  useCardsStore,
+  type CardImage,
+  type NewImage,
+} from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import styles from './PagePreview.module.css';
 
 type PlanResult = { plan: DocumentPlan } | { error: PlanError } | null;
 
-function usePlan(cards: CardImage[]): PlanResult {
+function usePlan(cards: CardImage[], back: NewImage | null): PlanResult {
   const settings = useSettingsStore((s) => s.settings);
   return useMemo(() => {
     if (cards.length === 0) return null;
@@ -17,23 +23,26 @@ function usePlan(cards: CardImage[]): PlanResult {
         plan: planDocument(
           settings,
           cards.map((c) => ({ ...c, blank: c.blob === null })),
+          back,
         ),
       };
     } catch (err) {
       if (err instanceof PlanError) return { error: err };
       throw err;
     }
-  }, [cards, settings]);
+  }, [cards, back, settings]);
 }
 
-/** Una carta en la página, con la parte recortada oculta igual que en el PDF. */
+type PreviewImage = Pick<NewImage, 'thumbUrl' | 'widthPx' | 'heightPx'>;
+
+/** Una carta (o su reverso) en la página, con la parte recortada oculta igual que en el PDF. */
 function PreviewCard({
   item,
   card,
   pageHeight,
 }: {
   item: PlannedItem;
-  card: CardImage;
+  card: PreviewImage;
   pageHeight: number;
 }) {
   const { x, width, height } = item.placement;
@@ -70,7 +79,8 @@ export function PagePreview() {
   const { t } = useTranslation();
   const all = useCardsStore((s) => s.cards);
   const cards = useMemo(() => printableCards(all), [all]);
-  const result = usePlan(cards);
+  const back = printableBack(useCardsStore((s) => s.back));
+  const result = usePlan(cards, back);
   const bleedColor = useSettingsStore((s) => s.settings.bleed.color);
   const lineColor = useSettingsStore((s) => s.settings.cutLines.color);
   const [requested, setRequested] = useState(0);
@@ -84,7 +94,9 @@ export function PagePreview() {
             ? 'cards.errorEmpty'
             : result.error.code === 'no-template'
               ? 'cards.errorTemplate'
-              : 'cards.errorBlank',
+              : result.error.code === 'no-back'
+                ? 'cards.errorNoBack'
+                : 'cards.errorBlank',
         )}
       </p>
     );
@@ -94,6 +106,7 @@ export function PagePreview() {
   const index = Math.min(requested, plan.pages.length - 1);
   const page = plan.pages[index];
   const { width: W, height: H } = page.size;
+  const isBack = page.side === 'back';
 
   return (
     <div className={styles.preview}>
@@ -102,7 +115,7 @@ export function PagePreview() {
           className={styles.page}
           viewBox={`0 0 ${W} ${H}`}
           role="img"
-          aria-label={t('preview.label', { page: page.number })}
+          aria-label={t(isBack ? 'preview.labelBack' : 'preview.label', { page: page.number })}
           style={{ '--ratio': W / H } as CSSProperties}
         >
           <rect width={W} height={H} className={styles.paper} />
@@ -117,7 +130,12 @@ export function PagePreview() {
             />
           ))}
           {page.items.map((item, i) => (
-            <PreviewCard key={i} item={item} card={cards[item.card]} pageHeight={H} />
+            <PreviewCard
+              key={i}
+              item={item}
+              card={isBack ? back! : cards[item.card]}
+              pageHeight={H}
+            />
           ))}
           {page.cutLines ? (
             <g stroke={lineColor} className={styles.lines}>
@@ -139,7 +157,10 @@ export function PagePreview() {
           ‹
         </button>
         <span aria-live="polite">
-          {t('preview.page', { page: index + 1, pages: plan.pages.length })}
+          {t(isBack ? 'preview.pageBack' : 'preview.page', {
+            page: index + 1,
+            pages: plan.pages.length,
+          })}
         </span>
         <button
           type="button"

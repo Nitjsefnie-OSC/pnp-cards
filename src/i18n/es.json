@@ -77,7 +77,8 @@
     "clearTitle": "¿Quitar todas las cartas?",
     "clearMessage": "La lista se queda vacía. Puedes volver a añadir las imágenes cuando quieras.",
     "dividerLabel": "Ancho de la vista previa",
-    "dividerHint": "Arrastra para cambiar el ancho de la vista previa; doble clic para el ancho por defecto"
+    "dividerHint": "Arrastra para cambiar el ancho de la vista previa; doble clic para el ancho por defecto",
+    "errorNoBack": "Elige la imagen del reverso en Ajustes › Reverso, o quita los reversos."
   },
   "settings": {
     "page": "Página",
@@ -99,8 +100,6 @@
     "together": "Pegadas (centradas)",
     "margin": "Margen de la página",
     "rightToLeft": "De derecha a izquierda",
-    "duplex": "Impresión a doble cara",
-    "duplexHint": "Invierte el orden en las páginas pares.",
     "size": "Tamaño de la carta",
     "forceWidth": "Forzar ancho",
     "forceHeight": "Forzar alto",
@@ -127,7 +126,23 @@
     "editTemplates": "Editar plantillas",
     "templateMissing": "Elige una plantilla.",
     "templateMarks": "Con plantilla, cada hueco lleva marcas de corte en sus esquinas.",
-    "projectTemplate": "{{name}} (del proyecto)"
+    "projectTemplate": "{{name}} (del proyecto)",
+    "backs": "Reverso",
+    "backsEnabled": "Añadir reversos",
+    "backsHint": "Detrás de cada página de cartas va otra con sus reversos, en espejo, para imprimir a doble cara.",
+    "backImage": "Reverso común",
+    "backChoose": "Elegir imagen…",
+    "backChange": "Cambiar…",
+    "backRemove": "Quitar",
+    "backNone": "Todavía no has elegido la imagen del reverso.",
+    "backMissing": "No se encuentra {{name}}. Elígela otra vez.",
+    "backFailed": "No se ha podido leer {{name}}.",
+    "backSize": "{{w}} × {{h}} px",
+    "backFit": "Se ajusta al tamaño de cada carta; si tiene otra forma, se recorta centrado.",
+    "backPerCard": "Para dejar una carta sin reverso, márcalo en su información.",
+    "flip": "Volteo del papel",
+    "flipLong": "Por el borde largo",
+    "flipShort": "Por el borde corto"
   },
   "preview": {
     "page": "Página {{page}} de {{pages}}",
@@ -136,7 +151,9 @@
     "empty": "Añade cartas para ver cómo quedará cada página.",
     "label": "Vista previa de la página {{page}}",
     "clamped_one": "El recorte no cabe en {{count}} carta; se ajustará a su borde.",
-    "clamped_other": "El recorte no cabe en {{count}} cartas; se ajustará al borde de cada una."
+    "clamped_other": "El recorte no cabe en {{count}} cartas; se ajustará al borde de cada una.",
+    "pageBack": "Página {{page}} de {{pages}} · reversos",
+    "labelBack": "Vista previa de la página {{page}}, de reversos"
   },
   "crop": {
     "title": "Recorte",
@@ -421,7 +438,8 @@
     "weight": "Peso",
     "copies": "Copias",
     "blank": "Imagen en blanco: en el PDF queda un hueco del tamaño de la carta anterior.",
-    "missing": "No se encuentra esta imagen en la carpeta del proyecto."
+    "missing": "No se encuentra esta imagen en la carpeta del proyecto.",
+    "noBack": "Sin reverso"
   },
   "confirm": {
     "cancel": "Cancelar"

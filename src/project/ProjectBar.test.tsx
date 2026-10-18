@@ -63,6 +63,7 @@ const projectJson = serializeProject({
     { path: '', name: '', copies: 1 },
     { path: 'orco.png', name: 'orco.png', copies: 2 },
   ],
+  back: null,
 });
 
 function renderPage(storage: ProjectStorage = createMemoryStorage()) {
@@ -111,6 +112,55 @@ describe('abrir un proyecto', () => {
       ['orco.png', 2],
     ]);
     expect(useSettingsStore.getState().settings.mode).toBe('horizontal8');
+  });
+
+  it('carga el reverso común y las cartas sin reverso', async () => {
+    const user = userEvent.setup();
+    fake.pickFolder.mockResolvedValue(
+      folderWith('cartas', ['heroes/elfo.png', 'orco.png', 'reversos/dorso.png']),
+    );
+    renderPage();
+    const json = serializeProject({
+      name: 'Mazmorra',
+      folder: 'cartas',
+      settings: { ...DEFAULT_SETTINGS, backs: { enabled: true, flip: 'short' } },
+      cards: [
+        { path: 'heroes/elfo.png', name: 'elfo.png', copies: 3 },
+        { path: 'orco.png', name: 'orco.png', copies: 2, noBack: true },
+      ],
+      back: { path: 'reversos/dorso.png', name: 'dorso.png' },
+    });
+
+    await user.upload(screen.getByTestId('project-input'), new File([json], 'Mazmorra.pnpcards'));
+    expect(await screen.findByText(/El proyecto usa 3 imágenes/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Elegir carpeta…' }));
+
+    expect(await screen.findByText('Has abierto Mazmorra.')).toBeInTheDocument();
+    const { cards, back } = useCardsStore.getState();
+    expect(cards.map((c) => [c.path, !!c.noBack])).toEqual([
+      ['heroes/elfo.png', false],
+      ['orco.png', true],
+    ]);
+    expect(back).toMatchObject({ path: 'reversos/dorso.png', name: 'dorso.png' });
+    expect(useSettingsStore.getState().settings.backs).toEqual({ enabled: true, flip: 'short' });
+  });
+
+  it('si el reverso no está en la carpeta, lo dice y lo conserva para no perderlo', async () => {
+    const user = userEvent.setup();
+    fake.pickFolder.mockResolvedValue(folderWith('cartas', ['elfo.png']));
+    renderPage();
+    const json = serializeProject({
+      name: 'Mazmorra',
+      folder: 'cartas',
+      settings: DEFAULT_SETTINGS,
+      cards: [{ path: 'elfo.png', name: 'elfo.png', copies: 1 }],
+      back: { path: 'dorso.png', name: 'dorso.png' },
+    });
+
+    await user.upload(screen.getByTestId('project-input'), new File([json], 'Mazmorra.pnpcards'));
+    await user.click(await screen.findByRole('button', { name: 'Elegir carpeta…' }));
+    expect(await screen.findByText('No se han encontrado: dorso.png')).toBeInTheDocument();
+    expect(useCardsStore.getState().back).toMatchObject({ name: 'dorso.png', missing: true });
   });
 
   it('con cartas en la lista, pregunta antes de sustituir el proyecto', async () => {

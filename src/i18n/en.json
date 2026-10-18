@@ -77,7 +77,8 @@
     "clearTitle": "Remove all cards?",
     "clearMessage": "The list will be empty. You can add the images again whenever you like.",
     "dividerLabel": "Preview width",
-    "dividerHint": "Drag to change the preview width; double-click for the default width"
+    "dividerHint": "Drag to change the preview width; double-click for the default width",
+    "errorNoBack": "Choose the back image under Settings › Backs, or turn backs off."
   },
   "settings": {
     "page": "Page",
@@ -99,8 +100,6 @@
     "together": "Butted together (centred)",
     "margin": "Page margin",
     "rightToLeft": "Right to left",
-    "duplex": "Double-sided printing",
-    "duplexHint": "Reverses the order on even pages.",
     "size": "Card size",
     "forceWidth": "Force width",
     "forceHeight": "Force height",
@@ -127,7 +126,23 @@
     "editTemplates": "Edit templates",
     "templateMissing": "Choose a template.",
     "templateMarks": "With a template, each slot gets crop marks at its corners.",
-    "projectTemplate": "{{name}} (from the project)"
+    "projectTemplate": "{{name}} (from the project)",
+    "backs": "Backs",
+    "backsEnabled": "Add backs",
+    "backsHint": "Each page of cards is followed by a page with their backs, mirrored, for double-sided printing.",
+    "backImage": "Common back",
+    "backChoose": "Choose image…",
+    "backChange": "Change…",
+    "backRemove": "Remove",
+    "backNone": "You haven't chosen the back image yet.",
+    "backMissing": "{{name}} can't be found. Choose it again.",
+    "backFailed": "Couldn't read {{name}}.",
+    "backSize": "{{w}} × {{h}} px",
+    "backFit": "It's fitted to each card; if its shape differs, it's cropped to the centre.",
+    "backPerCard": "To leave a card without a back, mark it in its info panel.",
+    "flip": "Paper flip",
+    "flipLong": "On the long edge",
+    "flipShort": "On the short edge"
   },
   "preview": {
     "page": "Page {{page}} of {{pages}}",
@@ -136,7 +151,9 @@
     "empty": "Add cards to see how each page will look.",
     "label": "Preview of page {{page}}",
     "clamped_one": "The crop doesn’t fit {{count}} card; it will be fitted to its edge.",
-    "clamped_other": "The crop doesn’t fit {{count}} cards; it will be fitted to each card’s edge."
+    "clamped_other": "The crop doesn’t fit {{count}} cards; it will be fitted to each card’s edge.",
+    "pageBack": "Page {{page}} of {{pages}} · backs",
+    "labelBack": "Preview of page {{page}}, backs"
   },
   "crop": {
     "title": "Crop",
@@ -421,7 +438,8 @@
     "weight": "File size",
     "copies": "Copies",
     "blank": "Blank image: the PDF leaves a gap the size of the previous card.",
-    "missing": "This image can’t be found in the project folder."
+    "missing": "This image can’t be found in the project folder.",
+    "noBack": "No back"
   },
   "confirm": {
     "cancel": "Cancel"

@@ -9,6 +9,17 @@ const project: ProjectFile = {
     { path: 'heroes/elfo x3.png', name: 'elfo x3.png', copies: 3 },
     { path: '', name: '', copies: 2 },
   ],
+  back: null,
+};
+
+const withBack: ProjectFile = {
+  ...project,
+  settings: { ...DEFAULT_SETTINGS, backs: { enabled: true, flip: 'short' } },
+  cards: [
+    { path: 'elfo.png', name: 'elfo.png', copies: 1 },
+    { path: 'mapa.png', name: 'mapa.png', copies: 1, noBack: true },
+  ],
+  back: { path: 'reversos/dorso.png', name: 'dorso.png' },
 };
 
 describe('archivo .pnpcards', () => {
@@ -16,7 +27,7 @@ describe('archivo .pnpcards', () => {
     const json = JSON.parse(serializeProject(project));
     expect(json).toMatchObject({
       format: 'pnp-cards',
-      version: 1,
+      version: 2,
       name: 'Mi juego',
       folder: 'cartas',
     });
@@ -28,6 +39,30 @@ describe('archivo .pnpcards', () => {
 
   it('al guardarlo y abrirlo se recupera el mismo proyecto', () => {
     expect(parseProject(serializeProject(project))).toEqual(project);
+  });
+
+  it('guarda la ruta del reverso común y qué cartas no llevan reverso', () => {
+    const json = JSON.parse(serializeProject(withBack));
+    expect(json.back).toEqual({ path: 'reversos/dorso.png', name: 'dorso.png' });
+    expect(json.cards).toEqual([
+      { path: 'elfo.png', name: 'elfo.png', copies: 1 },
+      { path: 'mapa.png', name: 'mapa.png', copies: 1, noBack: true },
+    ]);
+    expect(parseProject(serializeProject(withBack))).toEqual(withBack);
+  });
+
+  it('abre los proyectos de la versión 1: sin reverso y sin la doble cara manual', () => {
+    const p = parseProject(
+      JSON.stringify({
+        format: 'pnp-cards',
+        version: 1,
+        settings: { duplex: true },
+        cards: [{ path: 'a.png', name: 'a.png', copies: 2 }],
+      }),
+    );
+    expect(p.back).toBeNull();
+    expect(p.cards).toEqual([{ path: 'a.png', name: 'a.png', copies: 2 }]);
+    expect(p.settings).toEqual(DEFAULT_SETTINGS);
   });
 
   it('completa con los valores por defecto la configuración que falte', () => {

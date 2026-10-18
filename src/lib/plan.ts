@@ -1,10 +1,10 @@
 import { bleedRects, type Rect } from './bleed';
 import { cardSize, type Size } from './cardSize';
-import { CROP_DPI, cropRect, type PxRect } from './crop';
+import { coverCrop, CROP_DPI, cropRect, type PxRect } from './crop';
 import { cutLines, type CutLines } from './cutLines';
 import type { Dpi } from './dpi';
 import { isMirrored, layoutPage, resolveGrid, type Placement } from './layout';
-import { slotBox, slotCropMarks, type Rotation, type Template } from './template';
+import { slotBox, slotCropMarks, slotLocalSize, type Rotation, type Template } from './template';
 import { mmToPt } from './units';
 import type { LayoutSettings } from './settings';
 
@@ -14,6 +14,14 @@ export interface CardSpec {
   dpi: Dpi | null;
   blank: boolean;
   copies: number;
+  /** La carta no lleva reverso (con los reversos activados). */
+  noBack?: boolean;
+}
+
+/** Imagen del reverso común: solo hace falta su tamaño, para recortarla a cada hueco. */
+export interface BackSpec {
+  widthPx: number;
+  heightPx: number;
 }
 
 export interface PlannedItem {
@@ -22,13 +30,18 @@ export interface PlannedItem {
   placement: Placement;
   /** Parte de la imagen que se ve (en píxeles), o null si se ve entera. */
   crop: PxRect | null;
-  /** Solo con plantilla: giro de la carta dentro de su hueco (`placement`). */
+  /** Giro de la carta dentro de su hueco (`placement`): con plantilla o en un reverso. */
   rotation?: Rotation;
 }
 
 export interface PlannedPage {
   /** Número de página, desde 1. */
   number: number;
+  /**
+   * Cartas o reversos. En una página de reversos, cada elemento es el reverso de la carta
+   * `card` y su recorte es el de la imagen del reverso.
+   */
+  side: 'front' | 'back';
   size: Size;
   items: PlannedItem[];
   bleed: Rect[];
@@ -37,12 +50,13 @@ export interface PlannedPage {
 
 export interface DocumentPlan {
   pages: PlannedPage[];
+  /** Cartas del documento (sin contar los reversos). */
   total: number;
   /** Índices de las cartas cuyo recorte no cabía en la imagen y se ha ajustado. */
   clampedCards: number[];
 }
 
-export type PlanErrorCode = 'empty' | 'blank-without-size' | 'no-template';
+export type PlanErrorCode = 'empty' | 'blank-without-size' | 'no-template' | 'no-back';
 
 export class PlanError extends Error {
   constructor(readonly code: PlanErrorCode) {
@@ -83,12 +97,70 @@ function cardSizes(settings: LayoutSettings, cards: CardSpec[], crops: (PxRect |
 const MARK_GAP = 1;
 const MARK_LENGTH = 12;
 
-/** Al dar la vuelta a la hoja, un giro a la izquierda pasa a ser a la derecha. */
+/** Al reflejar la hoja en horizontal, un giro a la izquierda pasa a ser a la derecha. */
 const MIRRORED_ROTATION: Record<Rotation, Rotation> = { 0: 0, 90: 270, 180: 180, 270: 90 };
+/** Al reflejarla en vertical (volteo por el borde corto), además queda cabeza abajo. */
+const FLIPPED_ROTATION: Record<Rotation, Rotation> = { 0: 180, 90: 90, 180: 0, 270: 270 };
 
 /**
- * Con plantilla, cada carta va a su hueco (estirada a su tamaño y con su giro), en orden. A doble
- * cara (páginas pares) o de derecha a izquierda, los huecos se reflejan en horizontal.
+ * Página de reversos de una página de cartas: cada reverso en el hueco de su carta reflejado
+ * como queda al dar la vuelta a la hoja, y recortado para llenarlo. Las cartas en blanco y las
+ * marcadas sin reverso dejan su hueco vacío.
+ */
+function backPage(
+  settings: LayoutSettings,
+  front: PlannedPage,
+  cards: CardSpec[],
+  back: BackSpec,
+): PlannedPage {
+  const { width: W, height: H } = front.size;
+  const long = settings.backs.flip === 'long';
+  const items = front.items
+    .filter((item) => !cards[item.card].blank && !cards[item.card].noBack)
+    .map(({ card, placement: box, rotation }): PlannedItem => {
+      const flipped = (long ? MIRRORED_ROTATION : FLIPPED_ROTATION)[rotation ?? 0];
+      const local = slotLocalSize(box, flipped);
+      return {
+        card,
+        placement: long
+          ? { ...box, x: W - box.x - box.width }
+          : { ...box, y: H - box.y - box.height },
+        crop: coverCrop(back, local.width / local.height),
+        // Sin plantilla, un reverso derecho se queda sin giro, como las cartas.
+        rotation: rotation === undefined && flipped === 0 ? undefined : flipped,
+      };
+    });
+  return {
+    number: front.number + 1,
+    side: 'back',
+    size: front.size,
+    items,
+    bleed: bleedRects(
+      items.map((i) => i.placement),
+      settings,
+    ),
+    cutLines: null,
+  };
+}
+
+/** Intercala detrás de cada página de cartas su página de reversos, si están activados. */
+function withBacks(
+  settings: LayoutSettings,
+  fronts: PlannedPage[],
+  cards: CardSpec[],
+  back: BackSpec | null,
+): PlannedPage[] {
+  if (!settings.backs.enabled) return fronts;
+  if (!back) throw new PlanError('no-back');
+  return fronts.flatMap((page, i) => {
+    const front = { ...page, number: 2 * i + 1 };
+    return [front, backPage(settings, front, cards, back)];
+  });
+}
+
+/**
+ * Con plantilla, cada carta va a su hueco (estirada a su tamaño y con su giro), en orden. De
+ * derecha a izquierda, los huecos se reflejan en horizontal.
  */
 function planTemplate(
   settings: LayoutSettings,
@@ -103,7 +175,7 @@ function planTemplate(
   const pages: PlannedPage[] = [];
   for (let start = 0; start < sequence.length; start += perPage) {
     const pageCards = sequence.slice(start, start + perPage);
-    const mirrored = isMirrored(settings, pages.length + 1);
+    const mirrored = isMirrored(settings);
     const items = pageCards.map((card, i) => {
       const box = slotBox(template.slots[i], page.height);
       const rotation = template.slots[i].rotation;
@@ -117,6 +189,7 @@ function planTemplate(
     const boxes = items.map((i) => i.placement);
     pages.push({
       number: pages.length + 1,
+      side: 'front',
       size: page,
       items,
       bleed: bleedRects(boxes, settings),
@@ -131,8 +204,15 @@ function planTemplate(
   return pages;
 }
 
-/** Plan completo del PDF: qué carta va en cada hueco de cada página, con sus cortes. */
-export function planDocument(settings: LayoutSettings, cards: CardSpec[]): DocumentPlan {
+/**
+ * Plan completo del PDF: qué carta va en cada hueco de cada página, con sus cortes y, si están
+ * activados, las páginas de reversos (con la imagen `back`).
+ */
+export function planDocument(
+  settings: LayoutSettings,
+  cards: CardSpec[],
+  back: BackSpec | null = null,
+): DocumentPlan {
   const sequence = cards.flatMap((c, i) => Array.from({ length: Math.max(0, c.copies) }, () => i));
   if (sequence.length === 0) throw new PlanError('empty');
 
@@ -147,7 +227,7 @@ export function planDocument(settings: LayoutSettings, cards: CardSpec[]): Docum
     const template = settings.template;
     if (!template || template.slots.length === 0) throw new PlanError('no-template');
     return {
-      pages: planTemplate(settings, template, sequence, crops),
+      pages: withBacks(settings, planTemplate(settings, template, sequence, crops), cards, back),
       total: sequence.length,
       clampedCards,
     };
@@ -162,9 +242,10 @@ export function planDocument(settings: LayoutSettings, cards: CardSpec[]): Docum
     const number = pages.length + 1;
     const pageCards = sequence.slice(start, start + perPage);
     const pageSizes = pageCards.map((i) => sizes[i]);
-    const { page, placements } = layoutPage(settings, pageSizes, number, reference);
+    const { page, placements } = layoutPage(settings, pageSizes, reference);
     pages.push({
       number,
+      side: 'front',
       size: page,
       items: pageCards.map((card, i) => ({ card, placement: placements[i], crop: crops[card] })),
       bleed: bleedRects(placements, settings),
@@ -172,5 +253,5 @@ export function planDocument(settings: LayoutSettings, cards: CardSpec[]): Docum
     });
   }
 
-  return { pages, total: sequence.length, clampedCards };
+  return { pages: withBacks(settings, pages, cards, back), total: sequence.length, clampedCards };
 }

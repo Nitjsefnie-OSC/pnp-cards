@@ -112,6 +112,52 @@ describe('buildPdf', () => {
     expect(pageContent(doc, 0)).toMatch(/re\s+W\s+n/);
   });
 
+  describe('con reversos', () => {
+    const back = { data: new Blob([png]), format: 'png' as const, widthPx: 30, heightPx: 30 };
+    const withBacks = (flip: 'long' | 'short') => ({
+      ...DEFAULT_SETTINGS,
+      backs: { enabled: true, flip },
+    });
+
+    it('intercala una página de reversos tras cada página de cartas', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({
+          settings: withBacks('long'),
+          cards: [card(jpg, 'jpeg', 10)],
+          back,
+        }),
+      );
+      expect(doc.getPageCount()).toBe(4);
+      // Do = dibujar una imagen: 9 reversos en la página 2 y 1 en la 4.
+      expect(pageContent(doc, 1).match(/\bDo\b/g)).toHaveLength(9);
+      expect(pageContent(doc, 3).match(/\bDo\b/g)).toHaveLength(1);
+    });
+
+    it('incrusta el reverso una sola vez y sin volver a codificarlo', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({ settings: withBacks('long'), cards: [card(jpg, 'jpeg', 12)], back }),
+      );
+      expect(imageStreams(doc)).toHaveLength(2);
+    });
+
+    it('por el borde corto, gira el reverso media vuelta: -1 0 0 -1 e f cm', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({ settings: withBacks('short'), cards: [card(jpg, 'jpeg', 1)], back }),
+      );
+      expect(pageContent(doc, 1)).toMatch(/-1 0 0 -1 [\d.]+ [\d.]+ cm/);
+    });
+
+    it('el progreso cuenta solo las cartas', async () => {
+      const progress: [number, number][] = [];
+      await buildPdf(
+        { settings: withBacks('long'), cards: [card(png, 'png', 3)], back },
+        (done, total) => progress.push([done, total]),
+      );
+      expect(progress.at(-1)).toEqual([3, 3]);
+      expect(progress).toHaveLength(3);
+    });
+  });
+
   it('con plantilla, gira la carta en su hueco sin volver a codificarla', async () => {
     const settings = {
       ...DEFAULT_SETTINGS,

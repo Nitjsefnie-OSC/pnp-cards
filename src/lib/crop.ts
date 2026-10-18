@@ -15,6 +15,17 @@ export const CROP_DPI = 300;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 /**
+ * Parte central de la imagen con la forma `aspect` (ancho / alto): la que llena un hueco de esa
+ * forma sin deformarse.
+ */
+export function coverCrop(image: { widthPx: number; heightPx: number }, aspect: number): PxRect {
+  const { widthPx: W, heightPx: H } = image;
+  const width = W / H > aspect ? Math.round(H * aspect) : W;
+  const height = W / H > aspect ? H : Math.round(W / aspect);
+  return { x: Math.round((W - width) / 2), y: Math.round((H - height) / 2), width, height };
+}
+
+/**
  * Rectángulo de recorte en píxeles (origen arriba a la izquierda). Un tamaño de 0 mm deja la
  * dimensión entera; si el recorte no cabe, se ajusta a la imagen y `clamped` es true.
  */

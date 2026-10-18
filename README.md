@@ -26,12 +26,15 @@ app te avisa y se actualiza al pulsar «Actualizar».
 4. **Elige la distribución** en Ajustes:
    - _Página_: vertical 3 × 3 o horizontal 4 × 2 en A4, o manual (columnas × filas en A4, A3 o
      un tamaño en mm).
-   - _Colocación_: separadas (con margen) o pegadas y centradas; de derecha a izquierda; doble
-     cara (invierte el orden en las páginas pares para que coincidan los reversos).
+   - _Colocación_: separadas (con margen) o pegadas y centradas; de derecha a izquierda.
    - _Tamaño de la carta_: si no lo fuerzas, se usa la resolución (ppp) de cada imagen. Las
      imágenes sin ppp se tratan como de 72 ppp y la app te avisa.
    - _Recorte_: un rectángulo en mm a 300 ppp, centrado en cada imagen o en una posición fija.
      Ajústalo con «Ajustar recorte…» arrastrando el rectángulo.
+   - _Reverso_: elige una imagen de reverso común y, detrás de cada página de cartas, va otra con
+     sus reversos en espejo (volteo por el borde largo o corto) para imprimir a doble cara. Los
+     reversos no son cartas: no hay que añadirlos a la lista ni contar copias. Una carta se puede
+     dejar sin reverso desde su información.
    - _Corte_: líneas de corte normales, completas o en cruz, y margen de corte (sangrado).
 5. **Revisa la vista previa** de cada página y pulsa **Generar PDF**. Se descarga y, si quieres, se
    abre en otra pestaña.
@@ -42,7 +45,7 @@ recortan: la calidad de impresión es la de tus archivos.
 ### Proyectos
 
 Un proyecto `.pnpcards` es un archivo pequeño (JSON) con la configuración y la lista de cartas:
-la ruta de cada imagen dentro de su carpeta y sus copias. **Las imágenes no se copian**: siguen en
+la ruta de cada imagen dentro de su carpeta y sus copias, y la del reverso común. **Las imágenes no se copian**: siguen en
 tu carpeta, organizadas como tú quieras.
 
 - **Añadir carpeta** añade todas las imágenes de una carpeta (y sus subcarpetas). Esa carpeta pasa
@@ -78,7 +81,7 @@ tu carpeta, organizadas como tú quieras.
   nombre, se pueden ignorar las pequeñas y eliges cuáles descargar en `.zip` o pasar a Cartas.
 - **Plantillas**: coloca los huecos donde quieras en un editor visual (al milímetro, con giro de
   0/90/180/270°) y elige «Plantilla» en la distribución de Cartas: cada carta ocupa un hueco, en
-  orden. Lleva margen y marcas de corte por hueco, respeta la doble cara, se guarda en el
+  orden. Lleva margen y marcas de corte por hueco, admite reversos, se guarda en el
   navegador y se exporta o importa como `.pnptemplate`. Puedes empezar desde la distribución que
   ya usas.
 

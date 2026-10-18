@@ -23,7 +23,7 @@ const images = (container: HTMLElement) => container.querySelectorAll('image');
 
 beforeAll(() => i18n.changeLanguage('es'));
 beforeEach(() => {
-  useCardsStore.getState().clear();
+  useCardsStore.getState().reset();
   useSettingsStore.getState().reset();
   URL.createObjectURL = vi.fn(() => 'blob:full');
   URL.revokeObjectURL = vi.fn();
@@ -47,6 +47,28 @@ describe('PagePreview', () => {
     await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
     expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
     expect(images(container)).toHaveLength(1);
+  });
+
+  it('con reversos, detrás de cada página muestra la de reversos con su imagen', async () => {
+    const user = userEvent.setup();
+    useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
+    useCardsStore.getState().setBack(image('dorso.png'));
+    useCardsStore.getState().addImages([image('a x3.png')]);
+    const { container } = render(<PagePreview />);
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
+    expect(screen.getByText('Página 2 de 2 · reversos')).toBeInTheDocument();
+    const backs = [...images(container)].map((i) => i.getAttribute('href'));
+    expect(backs).toEqual(['blob:dorso.png', 'blob:dorso.png', 'blob:dorso.png']);
+  });
+
+  it('con reversos pero sin imagen, pide elegirla', () => {
+    useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
+    useCardsStore.getState().setBack(null);
+    useCardsStore.getState().addImages([image('a.png')]);
+    render(<PagePreview />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Elige la imagen del reverso');
   });
 
   it('dibuja las líneas de corte si están activadas', () => {

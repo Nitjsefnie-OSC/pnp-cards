@@ -303,6 +303,34 @@
   background: var(--surface);
 }
 
+/* Marca de «sin reverso», sobre la esquina inferior de la miniatura. */
+.noBack {
+  position: absolute;
+  top: calc(var(--space-2) + 160px - 1.5rem - 4px);
+  left: calc(var(--space-2) + 4px);
+  padding: 1px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.infoCheck {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  cursor: pointer;
+}
+
+.infoCheck input {
+  accent-color: var(--accent);
+}
+
 /* En pantallas estrechas, la información sale como un panel abajo del todo. */
 @media (max-width: 560px) {
   .infoPanel {

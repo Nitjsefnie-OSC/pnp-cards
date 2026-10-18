@@ -105,24 +105,23 @@ export function computeSpacing(settings: LayoutSettings, grid: Grid, ref: Size):
   };
 }
 
-/** Si la página se rellena de derecha a izquierda (opción o página par a doble cara). */
-export function isMirrored(settings: LayoutSettings, pageNumber: number) {
-  return settings.rightToLeft || (settings.duplex && pageNumber % 2 === 0);
+/** Si la página se rellena de derecha a izquierda. */
+export function isMirrored(settings: LayoutSettings) {
+  return settings.rightToLeft;
 }
 
 /**
- * Coloca en una página (numerada desde 1) las cartas que le tocan. Cada carta usa su propio
+ * Coloca en una página las cartas que le tocan. Cada carta usa su propio
  * tamaño; la separación sale de la carta de referencia del documento.
  */
 export function layoutPage(
   settings: LayoutSettings,
   cards: Size[],
-  pageNumber: number,
   reference: Size = cards[0],
 ): PageLayout {
   const grid = resolveGrid(settings);
   const { left, top, sepX, sepY } = computeSpacing(settings, grid, reference);
-  const mirrored = isMirrored(settings, pageNumber);
+  const mirrored = isMirrored(settings);
 
   const placements = cards.slice(0, grid.perPage).map((card, i) => {
     const posX = i % grid.columns;

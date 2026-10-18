@@ -6,6 +6,7 @@ import { NumberField } from '../../components/form/NumberField';
 import type { CutLineStyle, LayoutMode, PaperSize, Placement } from '../../lib/settings';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useTemplatesStore } from '../templates/templatesStore';
+import { BackSettings } from './BackSettings';
 import { CropDialog } from './CropDialog';
 import styles from './SettingsPanel.module.css';
 
@@ -152,12 +153,6 @@ export function SettingsPanel() {
           checked={s.rightToLeft}
           onChange={(rightToLeft) => update({ rightToLeft })}
         />
-        <Checkbox
-          label={t('settings.duplex')}
-          hint={t('settings.duplexHint')}
-          checked={s.duplex}
-          onChange={(duplex) => update({ duplex })}
-        />
       </Section>
 
       <Section title={t('settings.size')}>
@@ -216,6 +211,8 @@ export function SettingsPanel() {
         ) : null}
         <CropDialog open={cropOpen} onClose={() => setCropOpen(false)} />
       </Section>
+
+      <BackSettings />
 
       <Section title={t('settings.cut')}>
         <Checkbox

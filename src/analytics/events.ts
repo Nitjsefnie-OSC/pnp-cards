@@ -14,7 +14,7 @@ export type AnalyticsEvent =
       crop: boolean;
       cutLines: boolean;
       bleed: boolean;
-      duplex: boolean;
+      backs: boolean;
     }
   | { name: 'pdf-error'; code: string }
   | { name: 'pdf-cancelado' }
@@ -71,7 +71,7 @@ export function eventPaths(event: AnalyticsEvent): string[] {
         ...(event.crop ? [`${base}/opcion/recorte`] : []),
         ...(event.cutLines ? [`${base}/opcion/lineas-de-corte`] : []),
         ...(event.bleed ? [`${base}/opcion/margen-de-corte`] : []),
-        ...(event.duplex ? [`${base}/opcion/doble-cara`] : []),
+        ...(event.backs ? [`${base}/opcion/reversos`] : []),
       ];
     case 'pdf-error':
       return [base, `${base}/codigo/${clean(event.code)}`];

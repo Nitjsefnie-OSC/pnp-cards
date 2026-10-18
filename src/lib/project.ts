@@ -1,3 +1,4 @@
+import type { ImageRef } from './imageMatch';
 import { mergeSettings, type LayoutSettings } from './settings';
 
 /** Extensión de los proyectos: un JSON que apunta a las imágenes de la carpeta del usuario. */
@@ -5,13 +6,16 @@ export const PROJECT_EXTENSION = '.pnpcards';
 export const PROJECT_MIME = 'application/x-pnpcards';
 
 const FORMAT = 'pnp-cards';
-const VERSION = 1;
+/** 2: reverso común (`back`) y cartas sin reverso (`noBack`). */
+const VERSION = 2;
 
 /** Carta del proyecto: ruta dentro de la carpeta de imágenes (y nombre); '' = en blanco. */
 export interface ProjectCardRef {
   path: string;
   name: string;
   copies: number;
+  /** Solo si es true: la carta no lleva reverso. */
+  noBack?: true;
 }
 
 export interface ProjectFile {
@@ -20,6 +24,8 @@ export interface ProjectFile {
   folder: string;
   settings: LayoutSettings;
   cards: ProjectCardRef[];
+  /** Imagen del reverso común, en la misma carpeta que las cartas. */
+  back: ImageRef | null;
 }
 
 export type ProjectErrorCode = 'invalid' | 'newer-version';
@@ -40,7 +46,13 @@ export function serializeProject(project: ProjectFile): string {
       name: project.name,
       folder: project.folder,
       settings: project.settings,
-      cards: project.cards.map(({ path, name, copies }) => ({ path, name, copies })),
+      cards: project.cards.map(({ path, name, copies, noBack }) => ({
+        path,
+        name,
+        copies,
+        ...(noBack ? { noBack } : {}),
+      })),
+      back: project.back ? { path: project.back.path, name: project.back.name } : null,
     },
     null,
     2,
@@ -48,6 +60,12 @@ export function serializeProject(project: ProjectFile): string {
 }
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
+
+function readBack(value: unknown): ImageRef | null {
+  const back = value as Record<string, unknown> | null | undefined;
+  const name = str(back?.name);
+  return name ? { path: str(back?.path), name } : null;
+}
 
 export function parseProject(text: string): ProjectFile {
   let json: Record<string, unknown>;
@@ -76,7 +94,9 @@ export function parseProject(text: string): ProjectFile {
         path: str(c?.path),
         name: str(c?.name),
         copies: Number.isInteger(copies) && copies > 0 ? copies : 1,
+        ...(c?.noBack === true ? { noBack: true as const } : {}),
       };
     }),
+    back: readBack(json.back),
   };
 }

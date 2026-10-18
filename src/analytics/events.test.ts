@@ -37,7 +37,7 @@ describe('eventPaths', () => {
         crop: true,
         cutLines: false,
         bleed: true,
-        duplex: false,
+        backs: true,
       }),
     ).toEqual([
       'pdf-generado',
@@ -46,6 +46,7 @@ describe('eventPaths', () => {
       'pdf-generado/distribucion/manual',
       'pdf-generado/opcion/recorte',
       'pdf-generado/opcion/margen-de-corte',
+      'pdf-generado/opcion/reversos',
     ]);
   });
 

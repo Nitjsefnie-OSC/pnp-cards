@@ -61,13 +61,17 @@ describe('parseBsk', () => {
     });
   });
 
-  it('lee la colocación, el orden y la doble cara', () => {
+  it('lee la colocación y el orden', () => {
     expect(project.settings).toMatchObject({
       placement: 'separated',
       marginMm: 5,
       rightToLeft: true,
-      duplex: true,
     });
+  });
+
+  it('no activa los reversos con la doble cara manual del original', () => {
+    expect(project.settings.backs.enabled).toBe(false);
+    expect(project.settings).not.toHaveProperty('duplex');
   });
 
   it('lee el tamaño forzado aunque use coma decimal', () => {
@@ -108,13 +112,12 @@ describe('parseBsk', () => {
     ]);
   });
 
-  it('lee los proyectos sin versión: sin grosor de línea ni doble cara', () => {
+  it('lee los proyectos sin versión: sin grosor de línea', () => {
     const old = parseBsk(
       BSK_V4.replace('<version>4</version>', '')
         .replace('<col_doblecara>1</col_doblecara>', '')
         .replace('<cor_lin_ancho>6</cor_lin_ancho>', ''),
     );
-    expect(old.settings.duplex).toBe(false);
     expect(old.settings.cutLines.widthHundredthsMm).toBe(
       DEFAULT_SETTINGS.cutLines.widthHundredthsMm,
     );

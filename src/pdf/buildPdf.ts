@@ -24,11 +24,23 @@ export interface PdfCard {
   heightPx: number;
   dpi: Dpi | null;
   copies: number;
+  /** La carta no lleva reverso (con los reversos activados). */
+  noBack?: boolean;
+}
+
+/** Imagen del reverso común: se ajusta a cada hueco, así que no importan sus ppp. */
+export interface PdfBack {
+  data: Blob;
+  format: 'jpeg' | 'png';
+  widthPx: number;
+  heightPx: number;
 }
 
 export interface BuildInput {
   settings: LayoutSettings;
   cards: PdfCard[];
+  /** Obligatorio con los reversos activados. */
+  back?: PdfBack | null;
   title?: string;
 }
 
@@ -49,10 +61,11 @@ export async function buildPdf(
   input: BuildInput,
   onProgress?: ProgressHandler,
 ): Promise<Uint8Array> {
-  const { settings, cards } = input;
+  const { settings, cards, back = null } = input;
   const plan = planDocument(
     settings,
     cards.map((c) => ({ ...c, blank: c.data === null })),
+    back,
   );
 
   const doc = await PDFDocument.create();
@@ -60,15 +73,14 @@ export async function buildPdf(
   doc.setProducer('PnP Cards (pdf-lib)');
   if (input.title) doc.setTitle(input.title);
 
-  const embedded = new Map<number, PDFImage>();
-  async function image(index: number): Promise<PDFImage | null> {
-    const card = cards[index];
-    if (!card.data) return null;
-    let img = embedded.get(index);
+  const embedded = new Map<PdfCard | PdfBack, PDFImage>();
+  async function image(source: PdfCard | PdfBack): Promise<PDFImage | null> {
+    if (!source.data) return null;
+    let img = embedded.get(source);
     if (!img) {
-      const bytes = new Uint8Array(await card.data.arrayBuffer());
-      img = card.format === 'jpeg' ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
-      embedded.set(index, img);
+      const bytes = new Uint8Array(await source.data.arrayBuffer());
+      img = source.format === 'jpeg' ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
+      embedded.set(source, img);
     }
     return img;
   }
@@ -85,8 +97,11 @@ export async function buildPdf(
       page.drawRectangle({ ...r, color: bleedColor });
     }
 
+    // En una página de reversos, cada hueco lleva la imagen del reverso con su propio recorte.
+    const isBack = planned.side === 'back';
     for (const { card, placement, crop, rotation } of planned.items) {
-      const img = await image(card);
+      const source = isBack ? back! : cards[card];
+      const img = await image(source);
       if (img && rotation !== undefined) {
         // Plantilla: se recorta al hueco y se gira el sistema de coordenadas; dentro, la carta
         // se dibuja sin girar (y con su recorte, si lo hay) de 0,0 a su tamaño.
@@ -100,17 +115,18 @@ export async function buildPdf(
           endPath(),
           concatTransformationMatrix(a, b, c, d, e, f),
         );
-        page.drawImage(img, crop ? imageDrawRect(local, crop, cards[card]) : local);
+        page.drawImage(img, crop ? imageDrawRect(local, crop, source) : local);
         page.pushOperators(popGraphicsState());
       } else if (img && crop) {
         // Se dibuja la imagen entera y una máscara del tamaño del hueco oculta lo recortado.
         const { x, y, width, height } = placement;
         page.pushOperators(pushGraphicsState(), rectangle(x, y, width, height), clip(), endPath());
-        page.drawImage(img, imageDrawRect(placement, crop, cards[card]));
+        page.drawImage(img, imageDrawRect(placement, crop, source));
         page.pushOperators(popGraphicsState());
       } else if (img) {
         page.drawImage(img, placement);
       }
+      if (isBack) continue;
       done += 1;
       onProgress?.(done, plan.total);
     }

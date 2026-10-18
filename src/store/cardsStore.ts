@@ -26,6 +26,8 @@ export interface CardImage {
    * guardar, pero no se imprime hasta que se encuentre.
    */
   missing?: boolean;
+  /** La carta no lleva reverso (con los reversos activados). */
+  noBack?: boolean;
   copies: number;
 }
 
@@ -42,11 +44,15 @@ interface CardsState {
   name: string;
   folder: ImageFolder | null;
   cards: CardImage[];
+  /** Imagen del reverso común (no es una carta: no tiene copias ni va en la lista). */
+  back: NewImage | null;
   /** Última carta quitada, para poder deshacerlo. */
   lastRemoved: { card: CardImage; index: number } | null;
   addImages: (images: NewImage[]) => void;
   addBlank: () => void;
   setCopies: (id: string, copies: number) => void;
+  setNoBack: (id: string, noBack: boolean) => void;
+  setBack: (back: NewImage | null) => void;
   remove: (id: string) => void;
   /** Pone la imagen encontrada en una carta que faltaba, con sus mismas copias. */
   replaceImage: (id: string, image: NewImage) => void;
@@ -60,6 +66,7 @@ interface CardsState {
     name: string,
     cards: (NewImage & { copies: number })[],
     folder: ImageFolder | null,
+    back?: NewImage | null,
   ) => void;
   /** Proyecto nuevo: sin nombre ni cartas. */
   reset: () => void;
@@ -70,19 +77,25 @@ export const totalCards = (cards: CardImage[]) => cards.reduce((n, c) => n + c.c
 /** Cartas que van al PDF: todas menos las que faltan. */
 export const printableCards = (cards: CardImage[]) => cards.filter((c) => !c.missing);
 
-const revoke = (card: CardImage) => {
-  if (card.thumbUrl) URL.revokeObjectURL(card.thumbUrl);
+/** El reverso común, si se puede imprimir (está elegido y se ha encontrado). */
+export const printableBack = (back: NewImage | null) =>
+  back?.blob && !back.missing ? (back as NewImage & { blob: Blob }) : null;
+
+const revoke = (image: { thumbUrl: string | null }) => {
+  if (image.thumbUrl) URL.revokeObjectURL(image.thumbUrl);
 };
 
 const revokeAll = (s: CardsState) => {
   s.cards.forEach(revoke);
   if (s.lastRemoved) revoke(s.lastRemoved.card);
+  if (s.back) revoke(s.back);
 };
 
 export const useCardsStore = create<CardsState>()((set) => ({
   name: '',
   folder: null,
   cards: [],
+  back: null,
   lastRemoved: null,
 
   addImages: (images) =>
@@ -122,6 +135,15 @@ export const useCardsStore = create<CardsState>()((set) => ({
         c.id === id ? { ...c, copies: Math.max(1, Math.floor(copies) || 1) } : c,
       ),
     })),
+
+  setNoBack: (id, noBack) =>
+    set((s) => ({ cards: s.cards.map((c) => (c.id === id ? { ...c, noBack } : c)) })),
+
+  setBack: (back) =>
+    set((s) => {
+      if (s.back && s.back !== back) revoke(s.back);
+      return { back };
+    }),
 
   remove: (id) =>
     set((s) => {
@@ -176,13 +198,14 @@ export const useCardsStore = create<CardsState>()((set) => ({
 
   setFolder: (folder) => set({ folder }),
 
-  load: (name, cards, folder) =>
+  load: (name, cards, folder, back = null) =>
     set((s) => {
       revokeAll(s);
       return {
         name,
         folder,
         cards: cards.map((c) => ({ ...c, id: crypto.randomUUID() })),
+        back,
         lastRemoved: null,
       };
     }),
@@ -190,6 +213,6 @@ export const useCardsStore = create<CardsState>()((set) => ({
   reset: () =>
     set((s) => {
       revokeAll(s);
-      return { name: '', folder: null, cards: [], lastRemoved: null };
+      return { name: '', folder: null, cards: [], back: null, lastRemoved: null };
     }),
 }));

@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore, type CardImage } from '../../store/cardsStore';
+import { useSettingsStore } from '../../store/settingsStore';
 import { CardInfo } from './CardInfo';
 import { loadImage } from './loadImages';
 import styles from './CardTile.module.css';
@@ -85,6 +86,7 @@ export const CardTile = memo(function CardTile({
     isDragging,
   } = useSortable({ id: card.id });
   const name = card.blob || card.missing ? card.name : t('cards.blankName');
+  const withoutBack = useSettingsStore((s) => s.settings.backs.enabled) && card.noBack;
 
   return (
     <li
@@ -149,6 +151,7 @@ export const CardTile = memo(function CardTile({
           </span>
         ) : null}
       </div>
+      {withoutBack ? <span className={styles.noBack}>{t('cardInfo.noBack')}</span> : null}
       {/* Información y quitar, sobre la esquina de la miniatura. */}
       <div className={styles.tools}>
         <CardInfo card={card} name={name} position={position} total={total} />

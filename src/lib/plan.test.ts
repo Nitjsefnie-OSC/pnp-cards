@@ -5,6 +5,8 @@ const dpi300 = { x: 300, y: 300 };
 const big: CardSpec = { widthPx: 744, heightPx: 1039, dpi: dpi300, blank: false, copies: 1 };
 const small: CardSpec = { widthPx: 372, heightPx: 520, dpi: dpi300, blank: false, copies: 1 };
 const blank: CardSpec = { widthPx: 0, heightPx: 0, dpi: null, blank: true, copies: 1 };
+/** Reverso cuadrado, para ver cómo se recorta. */
+const square = { widthPx: 1000, heightPx: 1000 };
 
 function settings(over: Partial<LayoutSettings> = {}): LayoutSettings {
   return { ...DEFAULT_SETTINGS, ...over };
@@ -99,6 +101,84 @@ describe('planDocument', () => {
     expect(planDocument(settings(), [big]).pages[0].cutLines).toBeNull();
   });
 
+  describe('con reversos', () => {
+    const long = settings({ backs: { enabled: true, flip: 'long' } });
+    const short = settings({ backs: { enabled: true, flip: 'short' } });
+
+    it('detrás de cada página de cartas va una de reversos con los mismos huecos', () => {
+      const plan = planDocument(
+        long,
+        [
+          { ...big, copies: 7 },
+          { ...small, copies: 3 },
+        ],
+        square,
+      );
+      expect(plan.pages.map((p) => p.side)).toEqual(['front', 'back', 'front', 'back']);
+      expect(plan.pages.map((p) => p.number)).toEqual([1, 2, 3, 4]);
+      expect(plan.pages[1].items.map((i) => i.card)).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1]);
+      expect(plan.pages[3].items.map((i) => i.card)).toEqual([1]);
+      // Los reversos no son cartas.
+      expect(plan.total).toBe(10);
+    });
+
+    it('por el borde largo, cada reverso va en espejo horizontal de su carta', () => {
+      const [front, back] = planDocument(long, [{ ...big, copies: 2 }], square).pages;
+      // Primera carta: 8 mm desde la izquierda; su reverso, 8 mm desde la derecha:
+      // 595 − 22,677 − 178,56 = 393,763.
+      expect(front.items[0].placement.x).toBeCloseTo(22.677, 3);
+      expect(back.items[0].placement.x).toBeCloseTo(393.763, 3);
+      expect(back.items[0].placement.y).toBeCloseTo(front.items[0].placement.y, 6);
+      // Segunda carta: 22,677 + 178,56 + 6,983 = 208,22 → 595 − 208,22 − 178,56 = 208,22.
+      expect(back.items[1].placement.x).toBeCloseTo(208.22, 2);
+      expect(back.items[0].rotation).toBeUndefined();
+    });
+
+    it('por el borde corto, cada reverso va en espejo vertical y girado media vuelta', () => {
+      const [front, back] = planDocument(short, [big], square).pages;
+      // Primera fila: 842 − 22,677 − 249,36 = 569,963 desde abajo; su reverso, a 22,677.
+      expect(front.items[0].placement.y).toBeCloseTo(569.963, 3);
+      expect(back.items[0].placement.y).toBeCloseTo(22.677, 3);
+      expect(back.items[0].placement.x).toBeCloseTo(22.677, 3);
+      expect(back.items[0].rotation).toBe(180);
+    });
+
+    it('recorta el reverso centrado para que llene el hueco sin deformarse', () => {
+      const back = planDocument(long, [big], square).pages[1];
+      // 178,56 / 249,36 = 0,716 → del cuadrado de 1000 px se ven 716 × 1000.
+      expect(back.items[0].crop).toEqual({ x: 142, y: 0, width: 716, height: 1000 });
+    });
+
+    it('las cartas en blanco y las marcadas sin reverso dejan su hueco vacío', () => {
+      const plan = planDocument(long, [big, blank, { ...small, noBack: true }, big], square);
+      expect(plan.pages[1].items.map((i) => i.card)).toEqual([0, 3]);
+      // El reverso de la cuarta carta va en espejo de su hueco (el cuarto, abajo a la izquierda).
+      expect(plan.pages[1].items[1].placement.x).toBeCloseTo(393.763, 3);
+    });
+
+    it('lleva margen de corte pero no líneas de corte', () => {
+      const s = settings({
+        backs: { enabled: true, flip: 'long' },
+        bleed: { enabled: true, mm: 2, color: '#fff' },
+        cutLines: { enabled: true, style: 'normal', color: '#000', widthHundredthsMm: 4 },
+      });
+      const back = planDocument(s, [{ ...big, copies: 2 }], square).pages[1];
+      expect(back.bleed).toHaveLength(8);
+      expect(back.cutLines).toBeNull();
+    });
+
+    it('sin imagen de reverso no se puede generar', () => {
+      expect(() => planDocument(long, [big], null)).toThrow(
+        expect.objectContaining({ code: 'no-back' }),
+      );
+    });
+
+    it('sin reversos activados, las páginas son todas de cartas', () => {
+      const plan = planDocument(settings(), [{ ...big, copies: 10 }], square);
+      expect(plan.pages.map((p) => p.side)).toEqual(['front', 'front']);
+    });
+  });
+
   describe('con recorte', () => {
     const cropped = settings({
       crop: { enabled: true, widthMm: 63, heightMm: 88, centered: true, x: 0, y: 0 },
@@ -189,15 +269,38 @@ describe('planDocument', () => {
       );
     });
 
-    it('a doble cara, en las páginas pares refleja los huecos para que los dorsos coincidan', () => {
-      const s = settings({ mode: 'template', template, duplex: true });
-      const [front, back] = planDocument(s, [{ ...big, copies: 4 }]).pages;
-      // Hueco 1: 10 mm desde la izquierda en el anverso; en el dorso, 10 mm desde la derecha.
+    it('con reversos por el borde largo, refleja los huecos y el giro', () => {
+      const s = settings({ mode: 'template', template, backs: { enabled: true, flip: 'long' } });
+      const [front, back] = planDocument(s, [{ ...big, copies: 2 }], square).pages;
+      // Hueco 1: 10 mm desde la izquierda en las cartas; en los reversos, 10 mm desde la derecha.
       expect(front.items[0].placement.x).toBeCloseTo(28.346, 3);
       expect(back.items[0].placement.x).toBeCloseTo(113.386, 3);
+      // 100 − 10 − 70 = 20 mm.
+      expect(back.items[1].placement.x).toBeCloseTo(56.693, 3);
       // Un giro de 90° se convierte en 270° al dar la vuelta a la hoja.
       expect(front.items[1].rotation).toBe(90);
       expect(back.items[1].rotation).toBe(270);
+    });
+
+    it('con reversos por el borde corto, refleja en vertical y gira media vuelta', () => {
+      const s = settings({ mode: 'template', template, backs: { enabled: true, flip: 'short' } });
+      const back = planDocument(s, [{ ...big, copies: 2 }], square).pages[1];
+      // Hueco 1: 10 mm desde arriba en las cartas; en los reversos, 10 mm desde abajo.
+      expect(back.items[0].placement.x).toBeCloseTo(28.346, 3);
+      expect(back.items[0].placement.y).toBeCloseTo(28.346, 3);
+      expect(back.items[0].rotation).toBe(180);
+      // Hueco 2: de 20 mm desde abajo pasa a 80 mm; su giro de 90° se queda en 90°.
+      expect(back.items[1].placement.y).toBeCloseTo(226.772, 3);
+      expect(back.items[1].rotation).toBe(90);
+    });
+
+    it('recorta el reverso a la forma del hueco sin girar', () => {
+      const s = settings({ mode: 'template', template, backs: { enabled: true, flip: 'long' } });
+      const back = planDocument(s, [{ ...big, copies: 2 }], square).pages[1];
+      // Hueco 1: 50 × 70 mm → del cuadrado de 1000 px se ven 714 × 1000 (5/7).
+      expect(back.items[0].crop).toEqual({ x: 143, y: 0, width: 714, height: 1000 });
+      // Hueco 2: 70 × 50 mm girado 90° → la carta sin girar también mide 50 × 70.
+      expect(back.items[1].crop).toEqual({ x: 143, y: 0, width: 714, height: 1000 });
     });
 
     it('de derecha a izquierda refleja los huecos en todas las páginas', () => {

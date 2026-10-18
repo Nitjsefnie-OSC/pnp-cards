@@ -5,7 +5,7 @@ import { downloadUrl as download } from '../../components/download';
 import { formatSize } from '../../components/formatSize';
 import { safeFileName } from '../../lib/filename';
 import { resolveGrid } from '../../lib/layout';
-import { printableCards, totalCards, useCardsStore } from '../../store/cardsStore';
+import { printableBack, printableCards, totalCards, useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import {
   generatePdf as defaultGeneratePdf,
@@ -26,9 +26,11 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
   const { t, i18n } = useTranslation();
   const total = useCardsStore((s) => totalCards(printableCards(s.cards)));
   const perPage = useSettingsStore((s) => resolveGrid(s.settings).perPage);
+  // Con reversos, cada página de cartas lleva detrás otra de reversos.
+  const sides = useSettingsStore((s) => (s.settings.backs.enabled ? 2 : 1));
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const abortRef = useRef<AbortController | null>(null);
-  const pages = Math.ceil(total / perPage);
+  const pages = Math.ceil(total / perPage) * sides;
   const readyUrl = status.kind === 'ready' ? status.url : null;
 
   // Libera el PDF anterior al generar otro o al salir de la pantalla.
@@ -40,6 +42,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
 
   async function generate() {
     const cards = printableCards(useCardsStore.getState().cards);
+    const back = printableBack(useCardsStore.getState().back);
     const { settings, openAfter } = useSettingsStore.getState();
     const projectName = useCardsStore.getState().name.trim();
     const fileName = projectName ? `${safeFileName(projectName)}.pdf` : t('cards.fileName');
@@ -61,7 +64,14 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
             heightPx: c.heightPx,
             dpi: c.dpi,
             copies: c.copies,
+            noBack: c.noBack,
           })),
+          back: back && {
+            data: back.blob,
+            format: back.format,
+            widthPx: back.widthPx,
+            heightPx: back.heightPx,
+          },
         },
         {
           signal: controller.signal,
@@ -73,22 +83,25 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
       );
       download(url, fileName);
       if (tab) tab.location.href = url;
+      const pages =
+        Math.ceil(totalCards(cards) / resolveGrid(settings).perPage) *
+        (settings.backs.enabled ? 2 : 1);
       track({
         name: 'pdf-generado',
-        pages: Math.ceil(totalCards(cards) / resolveGrid(settings).perPage),
+        pages,
         cards: totalCards(cards),
         layout: settings.mode,
         crop: settings.crop.enabled,
         cutLines: settings.cutLines.enabled,
         bleed: settings.bleed.enabled,
-        duplex: settings.duplex,
+        backs: settings.backs.enabled,
       });
       setStatus({
         kind: 'ready',
         url,
         fileName,
         bytes: pdf.byteLength,
-        pages: Math.ceil(totalCards(cards) / resolveGrid(settings).perPage),
+        pages,
       });
     } catch (err) {
       tab?.close();
@@ -102,6 +115,8 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
         setStatus({ kind: 'error', message: t('cards.errorBlank') });
       } else if (err instanceof TaskError && err.code === 'no-template') {
         setStatus({ kind: 'error', message: t('cards.errorTemplate') });
+      } else if (err instanceof TaskError && err.code === 'no-back') {
+        setStatus({ kind: 'error', message: t('cards.errorNoBack') });
       } else if (err instanceof TaskError && err.code === 'empty') {
         setStatus({ kind: 'error', message: t('cards.errorEmpty') });
       } else {

@@ -136,7 +136,6 @@ export function templateFromLayout(
   const { placements } = layoutPage(
     base,
     Array.from({ length: grid.perPage }, () => size),
-    1,
   );
   return {
     id: crypto.randomUUID(),

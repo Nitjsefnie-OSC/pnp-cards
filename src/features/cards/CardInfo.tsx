@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { formatSize } from '../../components/formatSize';
 import { cardFit } from '../../lib/cardInfo';
-import type { CardImage } from '../../store/cardsStore';
+import { useCardsStore, type CardImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import styles from './CardTile.module.css';
 
@@ -120,6 +120,16 @@ function InfoContent({
         ) : null}
         <Row label={t('cardInfo.copies')}>{card.copies}</Row>
       </dl>
+      {settings.backs.enabled ? (
+        <label className={styles.infoCheck}>
+          <input
+            type="checkbox"
+            checked={card.noBack ?? false}
+            onChange={(e) => useCardsStore.getState().setNoBack(card.id, e.target.checked)}
+          />
+          {t('cardInfo.noBack')}
+        </label>
+      ) : null}
       <p className={styles.infoPosition}>{t('cardInfo.title', { position, total })}</p>
     </>
   );
