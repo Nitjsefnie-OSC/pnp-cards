@@ -1,0 +1,104 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+  background: var(--mat);
+  color: #eef5f1;
+  border-bottom: 3px solid var(--accent);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.mark {
+  width: 28px;
+  height: 28px;
+  fill: var(--paper);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.name {
+  font-family: var(--font-label);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: none;
+}
+
+.link {
+  font-family: var(--font-label);
+  font-size: 1.0625rem;
+  padding: var(--space-3) var(--space-3) calc(var(--space-3) - 3px);
+  color: #cfe3d9;
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+}
+
+.link:hover {
+  color: #ffffff;
+}
+
+.active {
+  color: #ffffff;
+  border-bottom-color: var(--paper);
+}
+
+.prefs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.prefs select {
+  background: transparent;
+  border: 1px solid var(--mat-line-strong);
+  border-radius: var(--radius-s);
+  color: #eef5f1;
+  padding: 2px var(--space-1);
+}
+
+.prefs option {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 760px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 0 var(--space-3);
+  }
+
+  .brand {
+    flex: 1;
+  }
+
+  .nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+}

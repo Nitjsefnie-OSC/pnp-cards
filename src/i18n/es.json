@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "PnP Cards",
+    "tagline": "Cartas print and play listas para imprimir"
+  },
+  "nav": {
+    "cards": "Cartas",
+    "merge": "Unir PDF",
+    "split": "Dividir imagen",
+    "pdfToImages": "PDF a imágenes",
+    "extractImages": "Extraer imágenes",
+    "templates": "Plantillas",
+    "menu": "Herramientas"
+  },
+  "theme": {
+    "label": "Tema",
+    "system": "Automático",
+    "light": "Claro",
+    "dark": "Oscuro"
+  },
+  "language": {
+    "label": "Idioma"
+  },
+  "common": {
+    "comingSoon": "Esta herramienta llegará en una próxima versión."
+  }
+}

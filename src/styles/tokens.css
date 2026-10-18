@@ -1,0 +1,55 @@
+/* Paleta "mesa de corte": alfombrilla verde, papel, tinta y magenta de registro. */
+:root {
+  --mat: #1e5b47;
+  --mat-line: #3f8a6f;
+  --mat-line-strong: #6fb397;
+  --paper: #fafaf7;
+  --ink: #1c2127;
+  --register: #c4006f;
+  --steel: #66727c;
+
+  --bg: #eef1ee;
+  --surface: #ffffff;
+  --surface-2: #f4f6f3;
+  --border: #d3dbd5;
+  --text: var(--ink);
+  --text-muted: #56626b;
+  --accent: var(--register);
+  --accent-text: #ffffff;
+  --focus: #0a66d6;
+  --danger: #b3261e;
+  --ok: #1e7a4f;
+
+  --font-body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+  --font-label: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f2a21;
+  --surface: #163a2e;
+  --surface-2: #1b4436;
+  --border: #2d5a4a;
+  --text: #e6efe9;
+  --text-muted: #a5bbb0;
+  --paper: #f3f4f0;
+  --mat: #123d30;
+  --mat-line: #2b6b55;
+  --mat-line-strong: #4e9a7d;
+  --accent: #ff4fa8;
+  --accent-text: #1a0010;
+  --focus: #7cb8ff;
+  --danger: #ff8a80;
+  --ok: #7fd3a6;
+  color-scheme: dark;
+}
