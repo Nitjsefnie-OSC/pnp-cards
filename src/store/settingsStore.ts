@@ -12,7 +12,10 @@ interface SettingsState {
   update: (patch: Partial<LayoutSettings>) => void;
   setOpenAfter: (open: boolean) => void;
   setPreviewWidth: (width: number) => void;
-  /** Sustituye toda la configuración (al abrir un proyecto). */
+  /**
+   * Sustituye toda la configuración (al abrir un proyecto). Se completa con los valores por
+   * defecto: las sesiones y los recientes guardados por versiones anteriores no la tienen entera.
+   */
   replace: (settings: LayoutSettings) => void;
   reset: () => void;
 }
@@ -28,7 +31,7 @@ export const useSettingsStore = create<SettingsState>()(
       update: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
       setOpenAfter: (openAfter) => set({ openAfter }),
       setPreviewWidth: (previewWidth) => set({ previewWidth }),
-      replace: (settings) => set({ settings }),
+      replace: (settings) => set({ settings: mergeSettings(settings) }),
       reset: () => set({ settings: DEFAULT_SETTINGS, openAfter: true }),
     }),
     {

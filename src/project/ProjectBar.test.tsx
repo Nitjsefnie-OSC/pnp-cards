@@ -2,7 +2,7 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import i18n from '../i18n';
-import { parseProject, serializeProject } from '../lib/project';
+import { parseProject, serializeProject, type ProjectFile } from '../lib/project';
 import { DEFAULT_SETTINGS } from '../lib/settings';
 import { useCardsStore, type ImageFolder } from '../store/cardsStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -358,6 +358,30 @@ describe('sesión', () => {
     ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Elegir carpeta…' }));
     await waitFor(() => expect(useCardsStore.getState().name).toBe('Mazmorra'));
+  });
+
+  it('recupera una sesión guardada por una versión anterior, con la configuración antigua', async () => {
+    const user = userEvent.setup();
+    const storage = createMemoryStorage();
+    // Así queda en IndexedDB una sesión de la versión 1: con `duplex`, sin `backs` ni `back`.
+    const oldSettings: Partial<typeof DEFAULT_SETTINGS> = { ...DEFAULT_SETTINGS };
+    delete oldSettings.backs;
+    await storage.saveSession({
+      project: {
+        name: 'Antigua',
+        folder: 'cartas',
+        settings: { ...oldSettings, duplex: true } as unknown as typeof DEFAULT_SETTINGS,
+        cards: [{ path: 'orco.png', name: 'orco.png', copies: 2 }],
+      } as unknown as ProjectFile,
+      folder: { name: 'cartas', handle: null },
+    });
+    fake.pickFolder.mockResolvedValue(folderWith('cartas', ['orco.png']));
+    renderPage(storage);
+
+    await user.click(await screen.findByRole('button', { name: 'Elegir carpeta…' }));
+    expect(await screen.findByText('Has abierto Antigua.')).toBeInTheDocument();
+    expect(screen.getByText('orco.png')).toBeInTheDocument();
+    expect(useSettingsStore.getState().settings).toEqual(DEFAULT_SETTINGS);
   });
 
   it('guarda la sesión como JSON y carpeta, sin imágenes', async () => {
