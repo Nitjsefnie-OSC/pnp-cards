@@ -38,7 +38,7 @@
     "loading": "Loading {{count}} images…",
     "failed": "Could not read: {{names}}",
     "blankName": "Blank",
-    "copies": "Copies",
+    "copies": "Number of copies",
     "copiesOf": "Copies of {{name}}",
     "remove": "Remove {{name}}",
     "drag": "Move {{name}}",
@@ -72,7 +72,9 @@
     "findNamed": "Find image for {{name}}",
     "missingWarning_one": "{{count}} image can’t be found and won’t be printed. Find it or remove it.",
     "missingWarning_other": "{{count}} images can’t be found and won’t be printed. Find them or remove them.",
-    "errorTemplate": "Choose a template with at least one slot under Layout."
+    "errorTemplate": "Choose a template with at least one slot under Layout.",
+    "copiesLess": "Remove a copy of {{name}}",
+    "copiesMore": "Add a copy of {{name}}"
   },
   "settings": {
     "page": "Page",
@@ -387,5 +389,31 @@
     "removeConfirm": "Delete the “{{name}}” template?",
     "hint": "Drag the slots to move them and their corners to resize them (to the millimetre). With a slot selected, the arrow keys move it 1 mm (Shift: 10 mm).",
     "outside": "Some slots go off the page."
+  },
+  "cardInfo": {
+    "info": "Information about {{name}}",
+    "title": "Card {{position}} of {{total}}",
+    "close": "Close",
+    "file": "File",
+    "path": "Path",
+    "format": "Format",
+    "converted": "{{format}}, converted to PNG when loaded",
+    "pixels": "Size",
+    "pixelsValue": "{{w}} × {{h}} px",
+    "resolution": "Resolution",
+    "dpiValue": "{{dpi}} dpi",
+    "noDpi": "Not stated: 72 dpi is used",
+    "physical": "Physical size",
+    "mmValue": "{{w}} × {{h}} mm",
+    "pdf": "In the PDF",
+    "same": "Same as its physical size",
+    "scaled": "{{w}} × {{h}} mm, at {{percent}}%",
+    "distorted": "{{w}} × {{h}} mm, distorted ({{px}}% × {{py}}%)",
+    "cropped": "Cropped to {{w}} × {{h}} mm",
+    "slot": "The size of its template slot",
+    "weight": "File size",
+    "copies": "Copies",
+    "blank": "Blank image: the PDF leaves a gap the size of the previous card.",
+    "missing": "This image can’t be found in the project folder."
   }
 }

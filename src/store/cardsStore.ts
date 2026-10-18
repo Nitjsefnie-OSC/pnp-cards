@@ -17,6 +17,10 @@ export interface CardImage {
   heightPx: number;
   dpi: Dpi | null;
   thumbUrl: string | null;
+  /** Formato del archivo original ('jpeg', 'png', 'webp', 'tiff'…), antes de convertirlo. */
+  sourceFormat?: string;
+  /** Peso del archivo original, en bytes. */
+  fileBytes?: number;
   /**
    * La imagen no se encontró al abrir el proyecto: se conserva (ruta y copias) para no perderla al
    * guardar, pero no se imprime hasta que se encuentre.

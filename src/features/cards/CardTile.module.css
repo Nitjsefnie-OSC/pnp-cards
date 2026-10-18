@@ -105,28 +105,67 @@
   color: var(--danger);
 }
 
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .copies {
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
   gap: 2px;
-  font-family: var(--font-label);
-  font-size: 1.125rem;
+  min-width: 0;
 }
 
-.copies input {
-  width: 4em;
-  padding: 2px var(--space-1);
+.stepper input {
+  flex: 1;
+}
+
+.copiesLabel {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* − [n] + en una sola pieza. */
+.stepper {
+  display: flex;
+  align-items: stretch;
+  height: 2rem;
+}
+
+.stepper button {
+  width: 1.75rem;
+  padding: 0;
   border: 1px solid var(--border);
-  border-radius: var(--radius-s);
+  background: var(--surface-2);
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stepper button:first-child {
+  border-radius: var(--radius-s) 0 0 var(--radius-s);
+}
+
+.stepper button:last-child {
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+}
+
+.stepper button:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.stepper button:disabled {
+  color: var(--text-muted);
+  opacity: 0.5;
+  cursor: default;
+}
+
+.stepper input {
+  width: 2.75em;
+  min-width: 0;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--border);
+  border-left: 0;
+  border-right: 0;
   background: var(--surface);
-  font-family: var(--font-body);
   font-size: 1rem;
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
@@ -153,4 +192,127 @@
   height: 14px;
   stroke: currentColor;
   stroke-width: 2;
+}
+
+.tile {
+  position: relative;
+}
+
+.infoButton {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  margin-left: auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.infoButton:hover,
+.infoButton[aria-expanded='true'] {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.infoButton svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.infoPanel {
+  position: fixed;
+  z-index: 20;
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
+  font-size: 0.875rem;
+}
+
+.infoPanel p {
+  margin: 0 0 var(--space-2);
+}
+
+.infoList {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.infoList dt {
+  color: var(--text-muted);
+}
+
+.infoList dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.infoWarning {
+  color: var(--danger);
+}
+
+.infoPosition {
+  margin: var(--space-2) 0 0 !important;
+  color: var(--text-muted);
+}
+
+.infoClose {
+  margin-top: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tools {
+  position: absolute;
+  top: calc(var(--space-2) + 4px);
+  right: calc(var(--space-2) + 4px);
+  display: flex;
+  gap: 2px;
+}
+
+.tools .remove,
+.tools .infoButton {
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+}
+
+.tools .infoButton:hover,
+.tools .infoButton[aria-expanded='true'] {
+  background: var(--surface);
+}
+
+/* En pantallas estrechas, la información sale como un panel abajo del todo. */
+@media (max-width: 560px) {
+  .infoPanel {
+    position: fixed;
+    top: auto;
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: var(--space-4);
+    width: auto;
+    max-height: 70dvh;
+    overflow-y: auto;
+  }
 }

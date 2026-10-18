@@ -89,6 +89,9 @@ export async function loadImage(file: File, path = file.name): Promise<NewImage>
     return {
       name: file.name,
       path,
+      sourceFormat:
+        detected === 'other' ? file.type.replace('image/', '') || 'desconocido' : detected,
+      fileBytes: file.size,
       blob,
       format,
       widthPx: bitmap.width,

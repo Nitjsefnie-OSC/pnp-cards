@@ -38,7 +38,7 @@
     "loading": "Cargando {{count}} imágenes…",
     "failed": "No se han podido leer: {{names}}",
     "blankName": "En blanco",
-    "copies": "Copias",
+    "copies": "Número de copias",
     "copiesOf": "Copias de {{name}}",
     "remove": "Quitar {{name}}",
     "drag": "Mover {{name}}",
@@ -72,7 +72,9 @@
     "findNamed": "Buscar imagen de {{name}}",
     "missingWarning_one": "{{count}} imagen no se encuentra y no se imprimirá. Búscala o quítala de la lista.",
     "missingWarning_other": "{{count}} imágenes no se encuentran y no se imprimirán. Búscalas o quítalas de la lista.",
-    "errorTemplate": "Elige en Distribución una plantilla que tenga algún hueco."
+    "errorTemplate": "Elige en Distribución una plantilla que tenga algún hueco.",
+    "copiesLess": "Quitar una copia de {{name}}",
+    "copiesMore": "Añadir una copia de {{name}}"
   },
   "settings": {
     "page": "Página",
@@ -387,5 +389,31 @@
     "removeConfirm": "¿Borrar la plantilla «{{name}}»?",
     "hint": "Arrastra los huecos para moverlos y sus esquinas para cambiar el tamaño (al milímetro). Con un hueco elegido, las flechas lo mueven 1 mm (con Mayús, 10 mm).",
     "outside": "Hay huecos que se salen de la página."
+  },
+  "cardInfo": {
+    "info": "Información de {{name}}",
+    "title": "Carta {{position}} de {{total}}",
+    "close": "Cerrar",
+    "file": "Archivo",
+    "path": "Ruta",
+    "format": "Formato",
+    "converted": "{{format}}, convertida a PNG al cargarla",
+    "pixels": "Tamaño",
+    "pixelsValue": "{{w}} × {{h}} px",
+    "resolution": "Resolución",
+    "dpiValue": "{{dpi}} ppp",
+    "noDpi": "No la indica: se usan 72 ppp",
+    "physical": "Tamaño físico",
+    "mmValue": "{{w}} × {{h}} mm",
+    "pdf": "En el PDF",
+    "same": "Igual que su tamaño físico",
+    "scaled": "{{w}} × {{h}} mm, al {{percent}} %",
+    "distorted": "{{w}} × {{h}} mm, deformada ({{px}} % × {{py}} %)",
+    "cropped": "Recortada a {{w}} × {{h}} mm",
+    "slot": "Del tamaño de su hueco en la plantilla",
+    "weight": "Peso",
+    "copies": "Copias",
+    "blank": "Imagen en blanco: en el PDF queda un hueco del tamaño de la carta anterior.",
+    "missing": "No se encuentra esta imagen en la carpeta del proyecto."
   }
 }

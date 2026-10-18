@@ -1,44 +1,79 @@
-import { memo, useState } from 'react';
+import { memo, useId, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore, type CardImage } from '../../store/cardsStore';
+import { CardInfo } from './CardInfo';
 import { loadImage } from './loadImages';
 import styles from './CardTile.module.css';
 
-/** Deja el campo vacío mientras se escribe; solo guarda enteros positivos. */
-function CopiesInput({ id, copies, label }: { id: string; copies: number; label: string }) {
+/**
+ * Número de copias: botones − y + y un campo que deja escribir libremente (solo guarda enteros
+ * positivos).
+ */
+function CopiesInput({ id, copies, name }: { id: string; copies: number; name: string }) {
+  const { t } = useTranslation();
+  const inputId = useId();
   const [text, setText] = useState(String(copies));
   const [last, setLast] = useState(copies);
   if (copies !== last) {
     setLast(copies);
     setText(String(copies));
   }
+  const set = (n: number) => useCardsStore.getState().setCopies(id, n);
 
   return (
-    <label className={styles.copies}>
-      <span aria-hidden="true">×</span>
-      <input
-        type="text"
-        inputMode="numeric"
-        autoComplete="off"
-        value={text}
-        aria-label={label}
-        onChange={(e) => {
-          setText(e.target.value);
-          const n = Number(e.target.value);
-          if (Number.isInteger(n) && n >= 1) {
-            setLast(n);
-            useCardsStore.getState().setCopies(id, n);
-          }
-        }}
-        onBlur={() => setText(String(copies))}
-      />
-    </label>
+    <div className={styles.copies}>
+      <label htmlFor={inputId} className={styles.copiesLabel}>
+        {t('cards.copies')}
+      </label>
+      <div className={styles.stepper}>
+        <button
+          type="button"
+          aria-label={t('cards.copiesLess', { name })}
+          disabled={copies <= 1}
+          onClick={() => set(copies - 1)}
+        >
+          −
+        </button>
+        <input
+          id={inputId}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={text}
+          aria-label={t('cards.copiesOf', { name })}
+          onChange={(e) => {
+            setText(e.target.value);
+            const n = Number(e.target.value);
+            if (Number.isInteger(n) && n >= 1) {
+              setLast(n);
+              set(n);
+            }
+          }}
+          onBlur={() => setText(String(copies))}
+        />
+        <button
+          type="button"
+          aria-label={t('cards.copiesMore', { name })}
+          onClick={() => set(copies + 1)}
+        >
+          +
+        </button>
+      </div>
+    </div>
   );
 }
 
-export const CardTile = memo(function CardTile({ card }: { card: CardImage }) {
+export const CardTile = memo(function CardTile({
+  card,
+  position,
+  total,
+}: {
+  card: CardImage;
+  position: number;
+  total: number;
+}) {
   const { t } = useTranslation();
   const {
     attributes,
@@ -114,8 +149,9 @@ export const CardTile = memo(function CardTile({ card }: { card: CardImage }) {
           </span>
         ) : null}
       </div>
-      <div className={styles.actions}>
-        <CopiesInput id={card.id} copies={card.copies} label={t('cards.copiesOf', { name })} />
+      {/* Información y quitar, sobre la esquina de la miniatura. */}
+      <div className={styles.tools}>
+        <CardInfo card={card} name={name} position={position} total={total} />
         <button
           type="button"
           className={styles.remove}
@@ -128,6 +164,7 @@ export const CardTile = memo(function CardTile({ card }: { card: CardImage }) {
           </svg>
         </button>
       </div>
+      <CopiesInput id={card.id} copies={card.copies} name={name} />
     </li>
   );
 });

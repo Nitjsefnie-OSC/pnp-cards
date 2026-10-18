@@ -199,8 +199,8 @@ export function CardTray({
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={cards.map((c) => c.id)} strategy={rectSortingStrategy}>
             <ul className={styles.grid}>
-              {cards.map((card) => (
-                <CardTile key={card.id} card={card} />
+              {cards.map((card, i) => (
+                <CardTile key={card.id} card={card} position={i + 1} total={cards.length} />
               ))}
             </ul>
           </SortableContext>

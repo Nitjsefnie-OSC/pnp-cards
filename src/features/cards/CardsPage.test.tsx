@@ -69,6 +69,56 @@ describe('CardTray', () => {
     expect(within(tile).getByText('En blanco')).toBeInTheDocument();
   });
 
+  it('los botones − y + quitan y añaden copias; − no baja de una', async () => {
+    const user = userEvent.setup();
+    useCardsStore.getState().addImages([fakeImage('a.png')]);
+    render(<CardTray />);
+
+    expect(screen.getByText('Número de copias')).toBeInTheDocument();
+    const minus = screen.getByRole('button', { name: 'Quitar una copia de a.png' });
+    const plus = screen.getByRole('button', { name: 'Añadir una copia de a.png' });
+    expect(minus).toBeDisabled();
+
+    await user.click(plus);
+    await user.click(plus);
+    expect(screen.getByLabelText('Copias de a.png')).toHaveValue('3');
+    await user.click(minus);
+    expect(useCardsStore.getState().cards[0].copies).toBe(2);
+  });
+
+  it('muestra la información de cada carta y se cierra con Esc', async () => {
+    const user = userEvent.setup();
+    useCardsStore.getState().addImages([
+      {
+        ...fakeImage('héroe con un nombre largo.png'),
+        sourceFormat: 'webp',
+        fileBytes: 2_400_000,
+      },
+      fakeImage('b.png', null),
+    ]);
+    render(<CardTray />);
+
+    const button = screen.getByRole('button', {
+      name: 'Información de héroe con un nombre largo.png',
+    });
+    await user.click(button);
+    const panel = screen.getByRole('dialog', { name: /Información de héroe/ });
+    expect(panel).toHaveTextContent('WebP, convertida a PNG al cargarla');
+    expect(panel).toHaveTextContent('744 × 1039 px');
+    expect(panel).toHaveTextContent('300 ppp');
+    expect(panel).toHaveTextContent('63,0 × 88,0 mm');
+    expect(panel).toHaveTextContent('Igual que su tamaño físico');
+    expect(panel).toHaveTextContent('2,4 MB');
+    expect(panel).toHaveTextContent('Carta 1 de 2');
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(button).toHaveFocus();
+
+    await user.click(screen.getByRole('button', { name: 'Información de b.png' }));
+    expect(screen.getByRole('dialog')).toHaveTextContent('No la indica: se usan 72 ppp');
+  });
+
   it('avisa de las imágenes que no se han podido leer', async () => {
     const user = userEvent.setup();
     const loadImages = async () => ({ images: [], failed: ['roto.png'] });
