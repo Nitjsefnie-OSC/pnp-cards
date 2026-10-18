@@ -22,13 +22,25 @@ export function Layout() {
 
   return (
     <div className={styles.shell}>
+      <a
+        className={styles.skip}
+        href="#main"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById('main')?.focus();
+        }}
+      >
+        {t('app.skip')}
+      </a>
       <header className={styles.header}>
         <div className={styles.brand}>
           <svg className={styles.mark} viewBox="0 0 32 32" aria-hidden="true">
             <rect x="9" y="7" width="14" height="18" rx="1.5" />
             <path d="M9 2v3M23 2v3M9 27v3M23 27v3M2 7h4M26 7h4M2 25h4M26 25h4" />
           </svg>
-          <span className={styles.name}>{t('app.name')}</span>
+          <span className={styles.name} translate="no">
+            {t('app.name')}
+          </span>
         </div>
         <nav className={styles.nav} aria-label={t('nav.menu')}>
           {TOOLS.map((tool) => (
@@ -68,7 +80,7 @@ export function Layout() {
           </label>
         </div>
       </header>
-      <main className={styles.main}>
+      <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
     </div>

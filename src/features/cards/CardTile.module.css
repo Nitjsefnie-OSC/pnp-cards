@@ -1,0 +1,128 @@
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 260px;
+  touch-action: manipulation;
+}
+
+.tile[data-dragging] {
+  position: relative;
+  z-index: 1;
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: var(--surface-2);
+  cursor: grab;
+  touch-action: none;
+}
+
+.handle:active {
+  cursor: grabbing;
+}
+
+.handle img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.blank {
+  width: 62%;
+  aspect-ratio: 63 / 88;
+  border: 1.5px dashed var(--steel);
+  border-radius: 3px;
+  background: var(--paper);
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: 0.875rem;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dpi {
+  flex: none;
+  font-family: var(--font-label);
+  color: var(--text-muted);
+}
+
+.dpi[data-missing] {
+  color: var(--danger);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.copies {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-label);
+  font-size: 1.125rem;
+}
+
+.copies input {
+  width: 4em;
+  padding: 2px var(--space-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.remove {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.remove:hover {
+  background: var(--surface-2);
+  color: var(--danger);
+}
+
+.remove svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+}

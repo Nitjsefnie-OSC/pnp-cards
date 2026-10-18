@@ -10,6 +10,9 @@ export function useApplyTheme() {
     const apply = () => {
       const dark = theme === 'dark' || (theme === 'system' && media.matches);
       document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', dark ? '#123d30' : '#1e5b47');
     };
     apply();
     media.addEventListener('change', apply);

@@ -1,13 +1,14 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ComingSoon } from './components/ComingSoon';
+import { CardsPage } from './features/cards/CardsPage';
 
 export function App() {
   return (
     <HashRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<ComingSoon titleKey="nav.cards" />} />
+          <Route index element={<CardsPage />} />
           <Route path="merge" element={<ComingSoon titleKey="nav.merge" />} />
           <Route path="split" element={<ComingSoon titleKey="nav.split" />} />
           <Route path="pdf-to-images" element={<ComingSoon titleKey="nav.pdfToImages" />} />

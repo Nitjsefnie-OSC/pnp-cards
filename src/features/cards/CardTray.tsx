@@ -1,0 +1,176 @@
+import { useRef, useState, type DragEvent } from 'react';
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { useTranslation } from 'react-i18next';
+import { totalCards, useCardsStore } from '../../store/cardsStore';
+import { CardTile } from './CardTile';
+import { loadImages as defaultLoadImages, type LoadResult } from './loadImages';
+import styles from './CardTray.module.css';
+
+const hasFiles = (e: DragEvent) => e.dataTransfer.types.includes('Files');
+
+export function CardTray({
+  loadImages = defaultLoadImages,
+}: {
+  loadImages?: (files: File[]) => Promise<LoadResult>;
+}) {
+  const { t } = useTranslation();
+  const cards = useCardsStore((s) => s.cards);
+  const lastRemoved = useCardsStore((s) => s.lastRemoved);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(0);
+  const [failed, setFailed] = useState<string[]>([]);
+  const [dropping, setDropping] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  async function add(files: File[]) {
+    if (files.length === 0) return;
+    setLoading(files.length);
+    setFailed([]);
+    try {
+      const result = await loadImages(files);
+      useCardsStore.getState().addImages(result.images);
+      setFailed(result.failed);
+    } finally {
+      setLoading(0);
+    }
+  }
+
+  function onDragEnd({ active, over }: DragEndEvent) {
+    if (over && active.id !== over.id) {
+      useCardsStore.getState().move(String(active.id), String(over.id));
+    }
+  }
+
+  const total = totalCards(cards);
+
+  return (
+    <section
+      className={styles.tray}
+      data-dropping={dropping || undefined}
+      onDragOver={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        setDropping(true);
+      }}
+      onDragLeave={(e) => {
+        if (e.currentTarget === e.target) setDropping(false);
+      }}
+      onDrop={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        setDropping(false);
+        void add([...e.dataTransfer.files]);
+      }}
+    >
+      <div className={styles.toolbar}>
+        <button
+          type="button"
+          className={styles.primary}
+          onClick={() => inputRef.current?.click()}
+          disabled={loading > 0}
+        >
+          {t('cards.add')}
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*,.tif,.tiff"
+          multiple
+          hidden
+          data-testid="file-input"
+          onChange={(e) => {
+            void add([...(e.target.files ?? [])]);
+            e.target.value = '';
+          }}
+        />
+        <button
+          type="button"
+          className={styles.secondary}
+          onClick={() => useCardsStore.getState().addBlank()}
+          disabled={cards.length === 0}
+        >
+          {t('cards.blank')}
+        </button>
+        {cards.length > 0 ? (
+          <button
+            type="button"
+            className={styles.link}
+            onClick={() => {
+              if (window.confirm(t('cards.clearConfirm'))) useCardsStore.getState().clear();
+            }}
+          >
+            {t('cards.clear')}
+          </button>
+        ) : null}
+        <p className={styles.count} aria-live="polite">
+          {cards.length > 0
+            ? `${t('cards.files', { count: cards.length })} / ${t('cards.total', { count: total })}`
+            : null}
+        </p>
+      </div>
+
+      {lastRemoved ? (
+        <p className={styles.undo} role="status">
+          {t('cards.removed', { name: lastRemoved.card.name || t('cards.blankName') })}
+          <button
+            type="button"
+            className={styles.link}
+            onClick={() => useCardsStore.getState().undoRemove()}
+          >
+            {t('cards.undo')}
+          </button>
+        </p>
+      ) : null}
+      {loading > 0 ? (
+        <p className={styles.status} role="status">
+          {t('cards.loading', { count: loading })}
+        </p>
+      ) : null}
+      {failed.length > 0 ? (
+        <p className={styles.error} role="alert">
+          {t('cards.failed', { names: failed.join(', ') })}
+        </p>
+      ) : null}
+
+      {cards.length === 0 ? (
+        <div className={styles.empty}>
+          <p>{t('cards.empty')}</p>
+          <p className={styles.hint}>{t('cards.emptyHint')}</p>
+        </div>
+      ) : (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <SortableContext items={cards.map((c) => c.id)} strategy={rectSortingStrategy}>
+            <ul className={styles.grid}>
+              {cards.map((card) => (
+                <CardTile key={card.id} card={card} />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
+      )}
+
+      {dropping ? (
+        <div className={styles.dropOverlay} aria-hidden="true">
+          {t('cards.dropHere')}
+        </div>
+      ) : null}
+    </section>
+  );
+}

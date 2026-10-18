@@ -1,0 +1,152 @@
+.page {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 380px;
+  grid-template-areas: 'settings cards preview';
+  height: 100%;
+}
+
+.tabs {
+  display: none;
+}
+
+.settings {
+  grid-area: settings;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+
+.cards {
+  grid-area: cards;
+  overflow-y: auto;
+}
+
+.preview {
+  grid-area: preview;
+  overflow-y: auto;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+}
+
+.warning {
+  margin: var(--space-4) var(--space-4) 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  max-width: 80ch;
+}
+
+.print {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* La alfombrilla de corte: cuadrícula de 10 mm con líneas de 1 cm marcadas cada 5. */
+.mat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: var(--space-5);
+  background-color: var(--mat);
+  background-image:
+    linear-gradient(var(--mat-line-strong) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mat-line-strong) 1px, transparent 1px),
+    linear-gradient(var(--mat-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mat-line) 1px, transparent 1px);
+  background-size:
+    80px 80px,
+    80px 80px,
+    16px 16px,
+    16px 16px;
+  color: #dcebe3;
+  text-align: center;
+}
+
+.mat p {
+  max-width: 28ch;
+}
+
+.printBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.pages {
+  font-family: var(--font-label);
+  font-size: 1.125rem;
+}
+
+.generate {
+  padding: var(--space-3) var(--space-5);
+  border: 0;
+  border-radius: var(--radius-s);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.generate:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.generate:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (max-width: 1100px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: 'tabs' 'panel';
+  }
+
+  .tabs {
+    grid-area: tabs;
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    flex: 1;
+    padding: var(--space-3);
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: none;
+    font-family: var(--font-label);
+    font-size: 1.125rem;
+    cursor: pointer;
+  }
+
+  .tab:hover {
+    background: var(--surface-2);
+  }
+
+  .tab[aria-selected='true'] {
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .settings,
+  .cards,
+  .preview {
+    grid-area: panel;
+    display: none;
+    border: 0;
+  }
+
+  .settings[data-active],
+  .cards[data-active],
+  .preview[data-active] {
+    display: block;
+  }
+}
