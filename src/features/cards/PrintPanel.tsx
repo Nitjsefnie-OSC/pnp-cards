@@ -85,6 +85,8 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
         setStatus({ kind: 'cancelled' });
       } else if (err instanceof TaskError && err.code === 'blank-without-size') {
         setStatus({ kind: 'error', message: t('cards.errorBlank') });
+      } else if (err instanceof TaskError && err.code === 'no-template') {
+        setStatus({ kind: 'error', message: t('cards.errorTemplate') });
       } else if (err instanceof TaskError && err.code === 'empty') {
         setStatus({ kind: 'error', message: t('cards.errorEmpty') });
       } else {

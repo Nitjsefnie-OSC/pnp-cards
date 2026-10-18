@@ -1,6 +1,7 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { planDocument, PlanError, type DocumentPlan, type PlannedItem } from '../../lib/plan';
+import { slotLocalSize, slotSvgMatrix } from '../../lib/template';
 import { printableCards, useCardsStore, type CardImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import styles from './PagePreview.module.css';
@@ -41,23 +42,28 @@ function PreviewCard({
     return <rect x={x} y={y} width={width} height={height} className={styles.blank} />;
   }
   const crop = item.crop ?? { x: 0, y: 0, width: card.widthPx, height: card.heightPx };
-  return (
+  const picture = (w: number, h: number, px = 0, py = 0) => (
     <svg
-      x={x}
-      y={y}
-      width={width}
-      height={height}
+      x={px}
+      y={py}
+      width={w}
+      height={h}
       viewBox={`${crop.x} ${crop.y} ${crop.width} ${crop.height}`}
       preserveAspectRatio="none"
     >
       <image
-        href={card.thumbUrl}
+        href={card.thumbUrl!}
         width={card.widthPx}
         height={card.heightPx}
         preserveAspectRatio="none"
       />
     </svg>
   );
+  if (item.rotation === undefined) return picture(width, height, x, y);
+  // Plantilla: la carta se dibuja sin girar y la matriz la lleva a su hueco, como en el PDF.
+  const local = slotLocalSize(item.placement, item.rotation);
+  const matrix = slotSvgMatrix(item.placement, item.rotation, pageHeight);
+  return <g transform={`matrix(${matrix.join(' ')})`}>{picture(local.width, local.height)}</g>;
 }
 
 export function PagePreview() {
@@ -73,7 +79,13 @@ export function PagePreview() {
   if ('error' in result) {
     return (
       <p className={styles.message} role="alert">
-        {t(result.error.code === 'empty' ? 'cards.errorEmpty' : 'cards.errorBlank')}
+        {t(
+          result.error.code === 'empty'
+            ? 'cards.errorEmpty'
+            : result.error.code === 'no-template'
+              ? 'cards.errorTemplate'
+              : 'cards.errorBlank',
+        )}
       </p>
     );
   }

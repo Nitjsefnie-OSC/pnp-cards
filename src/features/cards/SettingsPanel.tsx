@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, ColorField, FieldRow, RadioGroup, Section } from '../../components/form/Fields';
 import { NumberField } from '../../components/form/NumberField';
 import type { CutLineStyle, LayoutMode, PaperSize, Placement } from '../../lib/settings';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useTemplatesStore } from '../templates/templatesStore';
 import { CropDialog } from './CropDialog';
 import styles from './SettingsPanel.module.css';
 
@@ -16,6 +18,8 @@ export function SettingsPanel() {
   const reset = useSettingsStore((st) => st.reset);
   const mm = t('settings.mm');
   const [cropOpen, setCropOpen] = useState(false);
+  const templates = useTemplatesStore((st) => st.templates);
+  const templateId = useId();
   const cropW = s.crop.widthMm > 0 ? s.crop.widthMm : t('crop.full');
   const cropH = s.crop.heightMm > 0 ? s.crop.heightMm : t('crop.full');
 
@@ -30,8 +34,42 @@ export function SettingsPanel() {
             { value: 'vertical9', label: t('settings.vertical9') },
             { value: 'horizontal8', label: t('settings.horizontal8') },
             { value: 'manual', label: t('settings.manual') },
+            { value: 'template', label: t('settings.template') },
           ]}
         />
+        {s.mode === 'template' ? (
+          <FieldRow>
+            {templates.length === 0 ? (
+              <p className={styles.hint}>{t('settings.noTemplates')}</p>
+            ) : (
+              <div className={styles.select}>
+                <label htmlFor={templateId}>{t('settings.chooseTemplate')}</label>
+                <select
+                  id={templateId}
+                  value={s.template?.id ?? ''}
+                  onChange={(e) =>
+                    update({ template: templates.find((tp) => tp.id === e.target.value) ?? null })
+                  }
+                >
+                  {s.template ? null : <option value="">{t('settings.templateMissing')}</option>}
+                  {s.template && !templates.some((tp) => tp.id === s.template!.id) ? (
+                    <option value={s.template.id}>
+                      {t('settings.projectTemplate', { name: s.template.name })}
+                    </option>
+                  ) : null}
+                  {templates.map((tp) => (
+                    <option key={tp.id} value={tp.id}>
+                      {tp.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <Link to="/templates" className={styles.reset}>
+              {t('settings.editTemplates')}
+            </Link>
+          </FieldRow>
+        ) : null}
         {s.mode === 'manual' ? (
           <FieldRow>
             <NumberField
@@ -187,16 +225,21 @@ export function SettingsPanel() {
         />
         {s.cutLines.enabled ? (
           <FieldRow>
-            <RadioGroup<CutLineStyle>
-              legend={t('settings.style')}
-              value={s.cutLines.style}
-              onChange={(style) => update({ cutLines: { ...s.cutLines, style } })}
-              options={[
-                { value: 'normal', label: t('settings.normal') },
-                { value: 'full', label: t('settings.full') },
-                { value: 'cross', label: t('settings.cross') },
-              ]}
-            />
+            {/* Con plantilla, cada hueco lleva sus marcas en las esquinas. */}
+            {s.mode === 'template' ? (
+              <p className={styles.hint}>{t('settings.templateMarks')}</p>
+            ) : (
+              <RadioGroup<CutLineStyle>
+                legend={t('settings.style')}
+                value={s.cutLines.style}
+                onChange={(style) => update({ cutLines: { ...s.cutLines, style } })}
+                options={[
+                  { value: 'normal', label: t('settings.normal') },
+                  { value: 'full', label: t('settings.full') },
+                  { value: 'cross', label: t('settings.cross') },
+                ]}
+              />
+            )}
             <ColorField
               label={t('settings.color')}
               value={s.cutLines.color}

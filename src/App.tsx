@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import { ComingSoon } from './components/ComingSoon';
 import { CardsPage } from './features/cards/CardsPage';
 import { useSessionAutosave } from './project/useSessionAutosave';
 
@@ -16,6 +15,9 @@ const ExtractImagesPage = lazy(() =>
   import('./features/extractImages/ExtractImagesPage').then((m) => ({
     default: m.ExtractImagesPage,
   })),
+);
+const TemplatesPage = lazy(() =>
+  import('./features/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
 );
 const PdfToImagesPage = lazy(() =>
   import('./features/pdfToImages/PdfToImagesPage').then((m) => ({ default: m.PdfToImagesPage })),
@@ -65,7 +67,14 @@ export function App() {
               </Suspense>
             }
           />
-          <Route path="templates" element={<ComingSoon titleKey="nav.templates" />} />
+          <Route
+            path="templates"
+            element={
+              <Suspense fallback={null}>
+                <TemplatesPage />
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
     </HashRouter>

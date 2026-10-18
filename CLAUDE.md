@@ -32,6 +32,10 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   `pdfClient.ts`. Los errores llegan como `TaskError` (`code` y `detail`).
 - `src/pdf/pdfjs.ts` — pdf.js se carga bajo demanda (`loadPdfjs`, worker con `?url`); las
   herramientas secundarias se cargan con `React.lazy` para no engordar la carga inicial.
+- Plantillas: modelo y geometría en `src/lib/template.ts` (huecos en mm desde arriba a la izquierda,
+  giro antihorario; `slotMatrix` para el PDF y `slotSvgMatrix` para la vista previa). La plantilla
+  en uso se copia en `settings.template` (viaja con el proyecto); la lista vive en
+  `features/templates/templatesStore.ts` (localStorage) y sincroniza esa copia al editarla.
 - `src/project/` — proyectos. El `.pnpcards` es solo JSON (`src/lib/project.ts`): configuración y,
   por carta, ruta relativa a su carpeta, nombre y copias. Las imágenes NO se guardan en ningún sitio
   (ni en el archivo ni en IndexedDB): al abrir se pide la carpeta (`folder.ts`: File System Access

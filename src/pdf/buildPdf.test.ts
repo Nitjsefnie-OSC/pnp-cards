@@ -111,4 +111,23 @@ describe('buildPdf', () => {
     // re = rectángulo, W n = usarlo como máscara de recorte.
     expect(pageContent(doc, 0)).toMatch(/re\s+W\s+n/);
   });
+
+  it('con plantilla, gira la carta en su hueco sin volver a codificarla', async () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      mode: 'template' as const,
+      template: {
+        id: 't',
+        name: 'x',
+        pageMm: { width: 100, height: 100 },
+        slots: [{ id: 'a', xMm: 10, yMm: 10, widthMm: 40, heightMm: 30, rotation: 90 as const }],
+      },
+    };
+    const doc = await PDFDocument.load(await buildPdf({ settings, cards: [card(jpg, 'jpeg', 1)] }));
+    expect(imageStreams(doc)[0].getContents()).toEqual(jpg);
+    const content = pageContent(doc, 0);
+    // Recorte al hueco y matriz de giro de 90°: 0 1 -1 0 e f cm.
+    expect(content).toMatch(/re\s+W\s+n/);
+    expect(content).toMatch(/\b0 1 -1 0 [\d.]+ [\d.]+ cm/);
+  });
 });

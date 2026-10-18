@@ -23,6 +23,24 @@
   border-color: var(--steel);
 }
 
+.select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.select label {
+  color: var(--text-muted);
+}
+
+.select select {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background-color: var(--surface);
+  color: var(--text);
+}
+
 .footer {
   display: flex;
   flex-direction: column;

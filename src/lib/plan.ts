@@ -3,7 +3,9 @@ import { cardSize, type Size } from './cardSize';
 import { CROP_DPI, cropRect, type PxRect } from './crop';
 import { cutLines, type CutLines } from './cutLines';
 import type { Dpi } from './dpi';
-import { layoutPage, resolveGrid, type Placement } from './layout';
+import { isMirrored, layoutPage, resolveGrid, type Placement } from './layout';
+import { slotBox, slotCropMarks, type Rotation, type Template } from './template';
+import { mmToPt } from './units';
 import type { LayoutSettings } from './settings';
 
 export interface CardSpec {
@@ -20,6 +22,8 @@ export interface PlannedItem {
   placement: Placement;
   /** Parte de la imagen que se ve (en píxeles), o null si se ve entera. */
   crop: PxRect | null;
+  /** Solo con plantilla: giro de la carta dentro de su hueco (`placement`). */
+  rotation?: Rotation;
 }
 
 export interface PlannedPage {
@@ -38,7 +42,7 @@ export interface DocumentPlan {
   clampedCards: number[];
 }
 
-export type PlanErrorCode = 'empty' | 'blank-without-size';
+export type PlanErrorCode = 'empty' | 'blank-without-size' | 'no-template';
 
 export class PlanError extends Error {
   constructor(readonly code: PlanErrorCode) {
@@ -75,6 +79,58 @@ function cardSizes(settings: LayoutSettings, cards: CardSpec[], crops: (PxRect |
   });
 }
 
+/** Separación y largo de las marcas de corte de los huecos de una plantilla (pt). */
+const MARK_GAP = 1;
+const MARK_LENGTH = 12;
+
+/** Al dar la vuelta a la hoja, un giro a la izquierda pasa a ser a la derecha. */
+const MIRRORED_ROTATION: Record<Rotation, Rotation> = { 0: 0, 90: 270, 180: 180, 270: 90 };
+
+/**
+ * Con plantilla, cada carta va a su hueco (estirada a su tamaño y con su giro), en orden. A doble
+ * cara (páginas pares) o de derecha a izquierda, los huecos se reflejan en horizontal.
+ */
+function planTemplate(
+  settings: LayoutSettings,
+  template: Template,
+  sequence: number[],
+  crops: (PxRect | null)[],
+): PlannedPage[] {
+  const { page } = resolveGrid(settings);
+  const perPage = Math.max(1, template.slots.length);
+  const lines = settings.cutLines;
+  const gap = MARK_GAP + (settings.bleed.enabled ? mmToPt(settings.bleed.mm) : 0);
+  const pages: PlannedPage[] = [];
+  for (let start = 0; start < sequence.length; start += perPage) {
+    const pageCards = sequence.slice(start, start + perPage);
+    const mirrored = isMirrored(settings, pages.length + 1);
+    const items = pageCards.map((card, i) => {
+      const box = slotBox(template.slots[i], page.height);
+      const rotation = template.slots[i].rotation;
+      return {
+        card,
+        placement: mirrored ? { ...box, x: page.width - box.x - box.width } : box,
+        crop: crops[card],
+        rotation: mirrored ? MIRRORED_ROTATION[rotation] : rotation,
+      };
+    });
+    const boxes = items.map((i) => i.placement);
+    pages.push({
+      number: pages.length + 1,
+      size: page,
+      items,
+      bleed: bleedRects(boxes, settings),
+      cutLines: lines.enabled
+        ? {
+            lineWidth: mmToPt(lines.widthHundredthsMm / 100),
+            segments: boxes.flatMap((b) => slotCropMarks(b, gap, MARK_LENGTH)),
+          }
+        : null,
+    });
+  }
+  return pages;
+}
+
 /** Plan completo del PDF: qué carta va en cada hueco de cada página, con sus cortes. */
 export function planDocument(settings: LayoutSettings, cards: CardSpec[]): DocumentPlan {
   const sequence = cards.flatMap((c, i) => Array.from({ length: Math.max(0, c.copies) }, () => i));
@@ -87,6 +143,16 @@ export function planDocument(settings: LayoutSettings, cards: CardSpec[]): Docum
     if (clamped) clampedCards.push(i);
     return rect;
   });
+  if (settings.mode === 'template') {
+    const template = settings.template;
+    if (!template || template.slots.length === 0) throw new PlanError('no-template');
+    return {
+      pages: planTemplate(settings, template, sequence, crops),
+      total: sequence.length,
+      clampedCards,
+    };
+  }
+
   const sizes = cardSizes(settings, cards, crops);
   const { perPage } = resolveGrid(settings);
   const reference = sizes[sequence[0]];

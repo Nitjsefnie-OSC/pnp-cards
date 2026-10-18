@@ -16,7 +16,11 @@ function DpiWarning() {
   const { t } = useTranslation();
   const missing = useCardsStore((s) => s.cards.some((c) => c.blob && !c.dpi));
   const sized = useSettingsStore(
-    (s) => s.settings.forceWidth || s.settings.forceHeight || s.settings.crop.enabled,
+    (s) =>
+      s.settings.forceWidth ||
+      s.settings.forceHeight ||
+      s.settings.crop.enabled ||
+      s.settings.mode === 'template',
   );
   if (!missing || sized) return null;
   return (

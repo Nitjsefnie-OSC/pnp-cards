@@ -22,9 +22,6 @@
   "language": {
     "label": "Language"
   },
-  "common": {
-    "comingSoon": "This tool is coming in a future version."
-  },
   "cards": {
     "tabs": {
       "cards": "Cards",
@@ -74,7 +71,8 @@
     "find": "Find…",
     "findNamed": "Find image for {{name}}",
     "missingWarning_one": "{{count}} image can’t be found and won’t be printed. Find it or remove it.",
-    "missingWarning_other": "{{count}} images can’t be found and won’t be printed. Find them or remove them."
+    "missingWarning_other": "{{count}} images can’t be found and won’t be printed. Find them or remove them.",
+    "errorTemplate": "Choose a template with at least one slot under Layout."
   },
   "settings": {
     "page": "Page",
@@ -117,7 +115,14 @@
     "openAfter": "Open the PDF when done",
     "reset": "Reset settings",
     "mm": "mm",
-    "hundredthsMm": "1/100 mm"
+    "hundredthsMm": "1/100 mm",
+    "template": "Template",
+    "chooseTemplate": "Template",
+    "noTemplates": "You don’t have any templates yet.",
+    "editTemplates": "Edit templates",
+    "templateMissing": "Choose a template.",
+    "templateMarks": "With a template, each slot gets crop marks at its corners.",
+    "projectTemplate": "{{name}} (from the project)"
   },
   "preview": {
     "page": "Page {{page}} of {{pages}}",
@@ -342,5 +347,45 @@
     "unreadable": "{{name}} can’t be read: it’s damaged.",
     "encrypted": "{{name}} is password-protected and can’t be read.",
     "errorUnknown": "The images couldn’t be extracted ({{message}})."
+  },
+  "templates": {
+    "title": "Templates",
+    "intro": "Place the slots wherever you like: each card fills one slot, in the order of their numbers. To use it, choose “Template” in the Cards layout.",
+    "list": "Your templates",
+    "newBlank": "New blank",
+    "fromLayout": "From the current layout",
+    "import": "Import…",
+    "importFailed": "{{name}} isn’t a PnP Cards template.",
+    "empty": "Create a blank template or one from the layout you use in Cards.",
+    "defaultName": "Template {{n}}",
+    "fromLayoutName": "Cards layout",
+    "name": "Name",
+    "page": "Page",
+    "width": "Width",
+    "height": "Height",
+    "mm": "mm",
+    "letter": "Letter",
+    "swap": "Rotate the page",
+    "slots_one": "{{count}} slot",
+    "slots_other": "{{count}} slots",
+    "slot": "Slot {{n}}",
+    "slotLabel": "Slot {{n}}: {{w}} × {{h}} mm, rotated {{r}}°",
+    "addSlot": "Add slot",
+    "x": "X",
+    "y": "Y",
+    "rotation": "Card rotation",
+    "duplicate": "Duplicate",
+    "earlier": "Earlier",
+    "later": "Later",
+    "removeSlot": "Remove slot",
+    "noSlot": "Choose a slot to edit it, or add one.",
+    "use": "Use in Cards",
+    "inUse": "In use in Cards",
+    "used": "Cards now uses “{{name}}”.",
+    "export": "Export",
+    "remove": "Delete template",
+    "removeConfirm": "Delete the “{{name}}” template?",
+    "hint": "Drag the slots to move them and their corners to resize them (to the millimetre). With a slot selected, the arrow keys move it 1 mm (Shift: 10 mm).",
+    "outside": "Some slots go off the page."
   }
 }

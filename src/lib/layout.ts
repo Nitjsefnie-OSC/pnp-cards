@@ -47,6 +47,21 @@ export function resolveGrid(settings: LayoutSettings): Grid {
   if (settings.mode === 'vertical9') {
     return { page: A4, columns: 3, rows: 3, perPage: 9, margin };
   }
+  if (settings.mode === 'template' && settings.template) {
+    const { pageMm, slots } = settings.template;
+    const page = { width: mmToPt(pageMm.width), height: mmToPt(pageMm.height) };
+    return {
+      page,
+      columns: Math.max(1, slots.length),
+      rows: 1,
+      perPage: Math.max(1, slots.length),
+      margin,
+    };
+  }
+  if (settings.mode === 'template') {
+    // Sin plantilla elegida, como la distribución por defecto.
+    return { page: A4, columns: 3, rows: 3, perPage: 9, margin };
+  }
   if (settings.mode === 'horizontal8') {
     return { page: rotate(A4), columns: 4, rows: 2, perPage: 8, margin };
   }

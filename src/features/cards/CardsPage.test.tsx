@@ -1,11 +1,13 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import i18n from '../../i18n';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { CardTray } from './CardTray';
 import { CardsPage } from './CardsPage';
 import { SettingsPanel } from './SettingsPanel';
+import { useTemplatesStore } from '../templates/templatesStore';
 
 function fakeImage(name: string, dpi: NewImage['dpi'] = { x: 300, y: 300 }): NewImage {
   return {
@@ -99,7 +101,7 @@ describe('CardsPage', () => {
   it('avisa de imágenes sin ppp hasta que se fuerza el tamaño', async () => {
     const user = userEvent.setup();
     useCardsStore.getState().addImages([fakeImage('a.png', null)]);
-    render(<CardsPage />);
+    render(<CardsPage />, { wrapper: MemoryRouter });
     expect(screen.getByText(/no indican su resolución/)).toBeInTheDocument();
 
     await user.click(screen.getByText('Tamaño de la carta'));
@@ -112,13 +114,54 @@ describe('CardsPage', () => {
       crop: { enabled: true, widthMm: 63, heightMm: 88, centered: true, x: 0, y: 0 },
     });
     useCardsStore.getState().addImages([fakeImage('a.png', null)]);
-    render(<CardsPage />);
+    render(<CardsPage />, { wrapper: MemoryRouter });
     expect(screen.queryByText(/no indican su resolución/)).not.toBeInTheDocument();
+  });
+
+  it('no avisa de los ppp con plantilla, porque cada hueco fija el tamaño', () => {
+    useSettingsStore.getState().update({
+      mode: 'template',
+      template: {
+        id: 't',
+        name: 'x',
+        pageMm: { width: 210, height: 297 },
+        slots: [{ id: 's', xMm: 0, yMm: 0, widthMm: 63, heightMm: 88, rotation: 0 }],
+      },
+    });
+    useCardsStore.getState().addImages([fakeImage('a.png', null)]);
+    render(<CardsPage />, { wrapper: MemoryRouter });
+    expect(screen.queryByText(/no indican su resolución/)).not.toBeInTheDocument();
+  });
+
+  it('muestra la plantilla del proyecto aunque no esté entre las guardadas', () => {
+    useSettingsStore.getState().update({
+      mode: 'template',
+      template: {
+        id: 'de-otro-equipo',
+        name: 'Caja',
+        pageMm: { width: 210, height: 297 },
+        slots: [{ id: 's', xMm: 0, yMm: 0, widthMm: 63, heightMm: 88, rotation: 0 }],
+      },
+    });
+    useTemplatesStore.setState({
+      templates: [{ id: 'otra', name: 'Otra', pageMm: { width: 210, height: 297 }, slots: [] }],
+    });
+    render(<CardsPage />, { wrapper: MemoryRouter });
+    expect(screen.getByRole('combobox', { name: 'Plantilla' })).toHaveDisplayValue(
+      'Caja (del proyecto)',
+    );
+  });
+
+  it('en modo plantilla sin plantilla, explica qué falta en vez de generar otra cosa', () => {
+    useSettingsStore.getState().update({ mode: 'template', template: null });
+    useCardsStore.getState().addImages([fakeImage('a.png')]);
+    render(<CardsPage />, { wrapper: MemoryRouter });
+    expect(screen.getByRole('alert')).toHaveTextContent('Elige en Distribución una plantilla');
   });
 
   it('calcula las páginas según la distribución', () => {
     useCardsStore.getState().addImages([fakeImage('a x10.png')]);
-    render(<CardsPage />);
+    render(<CardsPage />, { wrapper: MemoryRouter });
     expect(screen.getByText('2 páginas')).toBeInTheDocument();
   });
 });

@@ -1,6 +1,7 @@
 import {
   PDFDocument,
   clip,
+  concatTransformationMatrix,
   endPath,
   popGraphicsState,
   pushGraphicsState,
@@ -12,6 +13,7 @@ import {
 import { imageDrawRect } from '../lib/crop';
 import type { Dpi } from '../lib/dpi';
 import { planDocument } from '../lib/plan';
+import { slotLocalSize, slotMatrix } from '../lib/template';
 import type { LayoutSettings } from '../lib/settings';
 
 export interface PdfCard {
@@ -83,9 +85,24 @@ export async function buildPdf(
       page.drawRectangle({ ...r, color: bleedColor });
     }
 
-    for (const { card, placement, crop } of planned.items) {
+    for (const { card, placement, crop, rotation } of planned.items) {
       const img = await image(card);
-      if (img && crop) {
+      if (img && rotation !== undefined) {
+        // Plantilla: se recorta al hueco y se gira el sistema de coordenadas; dentro, la carta
+        // se dibuja sin girar (y con su recorte, si lo hay) de 0,0 a su tamaño.
+        const { x, y, width, height } = placement;
+        const local = { x: 0, y: 0, ...slotLocalSize(placement, rotation) };
+        const [a, b, c, d, e, f] = slotMatrix(placement, rotation);
+        page.pushOperators(
+          pushGraphicsState(),
+          rectangle(x, y, width, height),
+          clip(),
+          endPath(),
+          concatTransformationMatrix(a, b, c, d, e, f),
+        );
+        page.drawImage(img, crop ? imageDrawRect(local, crop, cards[card]) : local);
+        page.pushOperators(popGraphicsState());
+      } else if (img && crop) {
         // Se dibuja la imagen entera y una máscara del tamaño del hueco oculta lo recortado.
         const { x, y, width, height } = placement;
         page.pushOperators(pushGraphicsState(), rectangle(x, y, width, height), clip(), endPath());

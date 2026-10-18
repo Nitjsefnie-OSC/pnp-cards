@@ -22,9 +22,6 @@
   "language": {
     "label": "Idioma"
   },
-  "common": {
-    "comingSoon": "Esta herramienta llegará en una próxima versión."
-  },
   "cards": {
     "tabs": {
       "cards": "Cartas",
@@ -74,7 +71,8 @@
     "find": "Buscar…",
     "findNamed": "Buscar imagen de {{name}}",
     "missingWarning_one": "{{count}} imagen no se encuentra y no se imprimirá. Búscala o quítala de la lista.",
-    "missingWarning_other": "{{count}} imágenes no se encuentran y no se imprimirán. Búscalas o quítalas de la lista."
+    "missingWarning_other": "{{count}} imágenes no se encuentran y no se imprimirán. Búscalas o quítalas de la lista.",
+    "errorTemplate": "Elige en Distribución una plantilla que tenga algún hueco."
   },
   "settings": {
     "page": "Página",
@@ -117,7 +115,14 @@
     "openAfter": "Abrir el PDF al terminar",
     "reset": "Restablecer ajustes",
     "mm": "mm",
-    "hundredthsMm": "1/100 mm"
+    "hundredthsMm": "1/100 mm",
+    "template": "Plantilla",
+    "chooseTemplate": "Plantilla",
+    "noTemplates": "Todavía no tienes plantillas.",
+    "editTemplates": "Editar plantillas",
+    "templateMissing": "Elige una plantilla.",
+    "templateMarks": "Con plantilla, cada hueco lleva marcas de corte en sus esquinas.",
+    "projectTemplate": "{{name}} (del proyecto)"
   },
   "preview": {
     "page": "Página {{page}} de {{pages}}",
@@ -342,5 +347,45 @@
     "unreadable": "{{name}} no se puede leer: está dañado.",
     "encrypted": "{{name}} está protegido con contraseña y no se puede leer.",
     "errorUnknown": "No se han podido extraer las imágenes ({{message}})."
+  },
+  "templates": {
+    "title": "Plantillas",
+    "intro": "Coloca los huecos donde quieras: cada carta ocupa un hueco, en el orden de sus números. Para usarla, elige «Plantilla» en la distribución de Cartas.",
+    "list": "Tus plantillas",
+    "newBlank": "Nueva en blanco",
+    "fromLayout": "Desde la distribución actual",
+    "import": "Importar…",
+    "importFailed": "{{name}} no es una plantilla de PnP Cards.",
+    "empty": "Crea una plantilla en blanco o a partir de la distribución que usas en Cartas.",
+    "defaultName": "Plantilla {{n}}",
+    "fromLayoutName": "Distribución de Cartas",
+    "name": "Nombre",
+    "page": "Página",
+    "width": "Ancho",
+    "height": "Alto",
+    "mm": "mm",
+    "letter": "Carta",
+    "swap": "Girar la página",
+    "slots_one": "{{count}} hueco",
+    "slots_other": "{{count}} huecos",
+    "slot": "Hueco {{n}}",
+    "slotLabel": "Hueco {{n}}: {{w}} × {{h}} mm, giro {{r}}°",
+    "addSlot": "Añadir hueco",
+    "x": "X",
+    "y": "Y",
+    "rotation": "Giro de la carta",
+    "duplicate": "Duplicar",
+    "earlier": "Antes",
+    "later": "Después",
+    "removeSlot": "Quitar hueco",
+    "noSlot": "Elige un hueco para editarlo, o añade uno.",
+    "use": "Usar en Cartas",
+    "inUse": "En uso en Cartas",
+    "used": "Cartas usa ahora «{{name}}».",
+    "export": "Exportar",
+    "remove": "Borrar plantilla",
+    "removeConfirm": "¿Borrar la plantilla «{{name}}»?",
+    "hint": "Arrastra los huecos para moverlos y sus esquinas para cambiar el tamaño (al milímetro). Con un hueco elegido, las flechas lo mueven 1 mm (con Mayús, 10 mm).",
+    "outside": "Hay huecos que se salen de la página."
   }
 }

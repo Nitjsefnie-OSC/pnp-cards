@@ -70,6 +70,11 @@ tu carpeta, organizadas como tú quieras.
   JPEG normales salen tal cual; el resto (CMYK, colores invertidos, transparencias…) se decodifica
   para que los colores salgan como en el PDF. Las repetidas se guardan una vez con « xN» en el
   nombre, se pueden ignorar las pequeñas y eliges cuáles descargar en `.zip` o pasar a Cartas.
+- **Plantillas**: coloca los huecos donde quieras en un editor visual (al milímetro, con giro de
+  0/90/180/270°) y elige «Plantilla» en la distribución de Cartas: cada carta ocupa un hueco, en
+  orden. Lleva margen y marcas de corte por hueco, respeta la doble cara, se guarda en el
+  navegador y se exporta o importa como `.pnptemplate`. Puedes empezar desde la distribución que
+  ya usas.
 
 ## Desarrollo
 

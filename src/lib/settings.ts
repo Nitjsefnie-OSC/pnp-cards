@@ -1,4 +1,6 @@
-export type LayoutMode = 'vertical9' | 'horizontal8' | 'manual';
+import { normalizeTemplate, type Template } from './template';
+
+export type LayoutMode = 'vertical9' | 'horizontal8' | 'manual' | 'template';
 export type PaperSize = 'A4' | 'A3' | 'custom';
 export type Placement = 'separated' | 'together';
 export type CutLineStyle = 'normal' | 'full' | 'cross';
@@ -44,6 +46,8 @@ export interface LayoutSettings {
     widthHundredthsMm: number;
   };
   bleed: { enabled: boolean; mm: number; color: string };
+  /** Plantilla en uso en el modo «template» (una copia, para que viaje con el proyecto). */
+  template: Template | null;
 }
 
 /** Valores por defecto de PDFCartas (My Project/Settings.settings). */
@@ -65,6 +69,7 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   crop: { enabled: false, widthMm: 0, heightMm: 0, centered: true, x: 0, y: 0 },
   cutLines: { enabled: false, style: 'normal', color: '#000000', widthHundredthsMm: 4 },
   bleed: { enabled: false, mm: 2, color: '#ffffff' },
+  template: null,
 };
 
 export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] };
@@ -79,5 +84,8 @@ export function mergeSettings(saved: DeepPartial<LayoutSettings> | undefined): L
     crop: { ...d.crop, ...saved?.crop },
     cutLines: { ...d.cutLines, ...saved?.cutLines },
     bleed: { ...d.bleed, ...saved?.bleed },
+    template: saved?.template
+      ? normalizeTemplate(saved.template as unknown as Record<string, unknown>, saved.template.id)
+      : null,
   };
 }
