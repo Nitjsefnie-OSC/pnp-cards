@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { confirmAction } from '../../components/confirmAction';
 import { useShallow } from 'zustand/react/shallow';
 import { downloadBlob } from '../../components/download';
 import { NumberField } from '../../components/form/NumberField';
@@ -352,8 +353,12 @@ export function TemplatesPage() {
                   type="button"
                   className={styles.link}
                   onClick={() => {
-                    if (window.confirm(t('templates.removeConfirm', { name: template.name })))
-                      actions.remove(template.id);
+                    void confirmAction({
+                      title: t('templates.removeTitle', { name: template.name }),
+                      message: t('templates.removeMessage'),
+                      confirmLabel: t('templates.remove'),
+                      danger: true,
+                    }).then((ok) => ok && actions.remove(template.id));
                   }}
                 >
                   {t('templates.remove')}

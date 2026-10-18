@@ -22,6 +22,8 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      // Confirmaciones con confirmAction (ventana de la app), nunca alert/confirm/prompt.
+      'no-alert': 'error',
     },
   },
 );

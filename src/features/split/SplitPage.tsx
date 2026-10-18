@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { confirmAction } from '../../components/confirmAction';
 import { useNavigate } from 'react-router-dom';
 import { downloadUrl } from '../../components/download';
 import { NumberField } from '../../components/form/NumberField';
@@ -221,7 +222,11 @@ export function SplitPage({
               className={styles.link}
               disabled={running}
               onClick={() => {
-                if (window.confirm(t('split.clearConfirm'))) actions.clear();
+                void confirmAction({
+                  title: t('split.clearTitle'),
+                  confirmLabel: t('split.clear'),
+                  danger: true,
+                }).then((ok) => ok && actions.clear());
               }}
             >
               {t('split.clear')}

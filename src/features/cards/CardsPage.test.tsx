@@ -6,6 +6,7 @@ import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { CardTray } from './CardTray';
 import { CardsPage } from './CardsPage';
+import { ConfirmHost } from '../../components/ConfirmHost';
 import { SettingsPanel } from './SettingsPanel';
 import { useTemplatesStore } from '../templates/templatesStore';
 
@@ -117,6 +118,31 @@ describe('CardTray', () => {
 
     await user.click(screen.getByRole('button', { name: 'Información de b.png' }));
     expect(screen.getByRole('dialog')).toHaveTextContent('No la indica: se usan 72 ppp');
+  });
+
+  it('«Quitar todas» pide confirmación en una ventana de la app', async () => {
+    const user = userEvent.setup();
+    useCardsStore.getState().addImages([fakeImage('a.png'), fakeImage('b.png')]);
+    render(
+      <>
+        <CardTray />
+        <ConfirmHost />
+      </>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Quitar todas' }));
+    const dialog = screen.getByRole('alertdialog', { name: '¿Quitar todas las cartas?' });
+    expect(within(dialog).getByRole('button', { name: 'Cancelar' })).toHaveFocus();
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(useCardsStore.getState().cards).toHaveLength(2);
+
+    await user.click(screen.getByRole('button', { name: 'Quitar todas' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Quitar todas' }),
+    );
+    expect(useCardsStore.getState().cards).toHaveLength(0);
   });
 
   it('avisa de las imágenes que no se han podido leer', async () => {

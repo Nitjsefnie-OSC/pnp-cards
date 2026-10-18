@@ -18,6 +18,7 @@
   --accent-text: #ffffff;
   --focus: #0a66d6;
   --danger: #b3261e;
+  --danger-text: #ffffff;
   --ok: #1e7a4f;
 
   --font-body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
@@ -50,6 +51,7 @@
   --accent-text: #1a0010;
   --focus: #7cb8ff;
   --danger: #ff8a80;
+  --danger-text: #2a0000;
   --ok: #7fd3a6;
   color-scheme: dark;
 }

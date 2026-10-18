@@ -8,8 +8,8 @@ import { useProjectStorage } from './storageContext';
 interface Props {
   open: boolean;
   onClose: () => void;
-  /** Abre un proyecto reciente; devuelve false si el usuario no quiere sustituir el actual. */
-  onOpen: (entry: RecentProject) => boolean;
+  /** Abre un proyecto reciente; false si el usuario no quiere sustituir el actual. */
+  onOpen: (entry: RecentProject) => Promise<boolean>;
 }
 
 /** Últimos proyectos abiertos o guardados (solo el JSON y la carpeta, sin imágenes). */
@@ -70,9 +70,7 @@ export function RecentDialog({ open, onClose, onOpen }: Props) {
                 <button
                   type="button"
                   className={styles.secondary}
-                  onClick={() => {
-                    if (onOpen(r)) onClose();
-                  }}
+                  onClick={() => void onOpen(r).then((ok) => ok && onClose())}
                 >
                   {t('recent.open')}
                 </button>

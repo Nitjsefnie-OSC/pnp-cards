@@ -54,6 +54,8 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
 ## Convenciones
 
 - Estilos con CSS Modules (`*.module.css`) usando las variables de `tokens.css`; nada de colores sueltos.
+- Para confirmar, `confirmAction()` (`src/components/confirmAction.ts`, ventana de la app montada en el
+  Layout con `<ConfirmHost />`); nunca `alert`/`confirm`/`prompt` (ESLint `no-alert`).
 - Todo texto visible pasa por `t()`; se añaden las claves en `es.json` y `en.json` a la vez.
 - Textos de la interfaz en sentence case, sin mayúsculas sostenidas.
 - TDD en `src/lib`: test que falla primero, valores esperados calculados a mano a partir de las

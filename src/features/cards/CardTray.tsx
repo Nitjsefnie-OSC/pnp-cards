@@ -14,6 +14,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { useTranslation } from 'react-i18next';
+import { confirmAction } from '../../components/confirmAction';
 import type { FolderFile } from '../../lib/imageMatch';
 import { pickFolder as defaultPickFolder, type PickedFolder } from '../../project/folder';
 import { isProjectFile } from '../../project/useProjectActions';
@@ -148,7 +149,12 @@ export function CardTray({
             type="button"
             className={styles.link}
             onClick={() => {
-              if (window.confirm(t('cards.clearConfirm'))) useCardsStore.getState().clear();
+              void confirmAction({
+                title: t('cards.clearTitle'),
+                message: t('cards.clearMessage'),
+                confirmLabel: t('cards.clear'),
+                danger: true,
+              }).then((ok) => ok && useCardsStore.getState().clear());
             }}
           >
             {t('cards.clear')}

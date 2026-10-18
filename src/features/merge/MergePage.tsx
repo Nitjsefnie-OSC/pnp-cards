@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
+import { confirmAction } from '../../components/confirmAction';
 import { downloadUrl } from '../../components/download';
 import { formatSize } from '../../components/formatSize';
 import { inspectPdf, type PdfInfo } from '../../pdf/pdfjs';
@@ -181,8 +182,13 @@ export function MergePage({
     });
   }
 
-  function clear() {
-    if (!window.confirm(t('merge.clearConfirm'))) return;
+  async function clear() {
+    const ok = await confirmAction({
+      title: t('merge.clearTitle'),
+      confirmLabel: t('merge.clear'),
+      danger: true,
+    });
+    if (!ok) return;
     for (const i of items) if (i.info?.thumbUrl) URL.revokeObjectURL(i.info.thumbUrl);
     setItems([]);
     setStatus({ kind: 'idle' });
@@ -284,7 +290,12 @@ export function MergePage({
             }}
           />
           {items.length > 0 ? (
-            <button type="button" className={styles.link} disabled={running} onClick={clear}>
+            <button
+              type="button"
+              className={styles.link}
+              disabled={running}
+              onClick={() => void clear()}
+            >
               {t('merge.clear')}
             </button>
           ) : null}

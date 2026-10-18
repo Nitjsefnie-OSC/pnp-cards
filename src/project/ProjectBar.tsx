@@ -35,7 +35,7 @@ export function ProjectBar({ actions }: { actions: Actions }) {
           onChange={(e) => useCardsStore.getState().setName(e.target.value)}
         />
         <div className={styles.buttons}>
-          <button type="button" onClick={actions.newProject} disabled={actions.busy}>
+          <button type="button" onClick={() => void actions.newProject()} disabled={actions.busy}>
             {t('project.new')}
           </button>
           <button type="button" onClick={() => inputRef.current?.click()} disabled={actions.busy}>

@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../i18n';
 import { useUiStore, type ThemePreference } from '../store/uiStore';
+import { ConfirmHost } from './ConfirmHost';
 import { useApplyTheme } from './useApplyTheme';
 import styles from './Layout.module.css';
 
@@ -83,6 +84,7 @@ export function Layout() {
       <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
+      <ConfirmHost />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   serializeProject,
   type ProjectFile,
 } from '../lib/project';
+import { confirmAction } from '../components/confirmAction';
 import { useCardsStore, type ImageFolder } from '../store/cardsStore';
 import { pickFolder, reopenFolder, type PickedFolder } from './folder';
 import { bskToProject, currentProject, openProjectWithFolder } from './projectIO';
@@ -60,14 +61,21 @@ export function useProjectActions() {
   const [pending, setPending] = useState<PendingProject | null>(null);
   const [busy, setBusy] = useState(false);
 
+  /** Con cartas en la lista, pregunta antes de sustituir el proyecto. */
   const confirmReplace = useCallback(
-    (text: string) => useCardsStore.getState().cards.length === 0 || window.confirm(text),
-    [],
+    async (kind: 'open' | 'new') =>
+      useCardsStore.getState().cards.length === 0 ||
+      confirmAction({
+        title: t(kind === 'open' ? 'project.replaceTitle' : 'project.newTitle'),
+        message: t('project.unsavedMessage'),
+        confirmLabel: t(kind === 'open' ? 'project.openConfirm' : 'project.newConfirmLabel'),
+      }),
+    [t],
   );
 
   const openFile = useCallback(
     async (file: File) => {
-      if (!confirmReplace(t('project.replaceConfirm'))) return;
+      if (!(await confirmReplace('open'))) return;
       let project: ProjectFile;
       try {
         const text = await file.text();
@@ -93,13 +101,13 @@ export function useProjectActions() {
   );
 
   const openRecent = useCallback(
-    (entry: RecentProject) => {
-      if (!confirmReplace(t('project.replaceConfirm'))) return false;
+    async (entry: RecentProject) => {
+      if (!(await confirmReplace('open'))) return false;
       setMessage(null);
       setPending({ project: entry.project, knownFolder: entry.folder, restoring: false });
       return true;
     },
-    [confirmReplace, t],
+    [confirmReplace],
   );
 
   /** Termina de abrir el proyecto pendiente con la carpeta (o las imágenes) indicadas. */
@@ -181,11 +189,11 @@ export function useProjectActions() {
     setMessage({ text: t('project.savedFile', { name: fileName }), tone: 'info' });
   }, [storage, t]);
 
-  const newProject = useCallback(() => {
-    if (!confirmReplace(t('project.newConfirm'))) return;
+  const newProject = useCallback(async () => {
+    if (!(await confirmReplace('new'))) return;
     useCardsStore.getState().reset();
     setMessage(null);
-  }, [confirmReplace, t]);
+  }, [confirmReplace]);
 
   // Ofrece seguir con la última sesión: necesita un clic para volver a leer la carpeta.
   useEffect(() => {

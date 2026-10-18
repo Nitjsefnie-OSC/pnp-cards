@@ -1,10 +1,11 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import i18n from '../i18n';
 import { parseProject, serializeProject } from '../lib/project';
 import { DEFAULT_SETTINGS } from '../lib/settings';
 import { useCardsStore, type ImageFolder } from '../store/cardsStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { ConfirmHost } from '../components/ConfirmHost';
 import { CardsPage } from '../features/cards/CardsPage';
 import type { PickedFolder } from './folder';
 import { createMemoryStorage, type ProjectStorage } from './storage';
@@ -67,6 +68,7 @@ function renderPage(storage: ProjectStorage = createMemoryStorage()) {
   render(
     <StorageContext value={storage}>
       <CardsPage />
+      <ConfirmHost />
     </StorageContext>,
   );
   return storage;
@@ -81,7 +83,6 @@ beforeEach(() => {
   useSettingsStore.getState().reset();
   URL.createObjectURL = vi.fn(() => 'blob:x');
   URL.revokeObjectURL = vi.fn();
-  vi.spyOn(window, 'confirm').mockReturnValue(true);
 });
 
 describe('abrir un proyecto', () => {
@@ -107,6 +108,46 @@ describe('abrir un proyecto', () => {
       ['orco.png', 2],
     ]);
     expect(useSettingsStore.getState().settings.mode).toBe('horizontal8');
+  });
+
+  it('con cartas en la lista, pregunta antes de sustituir el proyecto', async () => {
+    const user = userEvent.setup();
+    useCardsStore.getState().load(
+      'Actual',
+      [
+        {
+          name: 'a.png',
+          path: 'a.png',
+          blob: png('a.png'),
+          format: 'png',
+          widthPx: 1,
+          heightPx: 1,
+          dpi: null,
+          thumbUrl: null,
+          copies: 1,
+        },
+      ],
+      null,
+    );
+    renderPage();
+    await user.upload(
+      screen.getByTestId('project-input'),
+      new File([projectJson], 'Mazmorra.pnpcards'),
+    );
+    const dialog = await screen.findByRole('alertdialog', { name: '¿Abrir otro proyecto?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByText(/El proyecto usa 2 imágenes/)).not.toBeInTheDocument();
+
+    await user.upload(
+      screen.getByTestId('project-input'),
+      new File([projectJson], 'Mazmorra.pnpcards'),
+    );
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Abrir proyecto',
+      }),
+    );
+    expect(await screen.findByText(/El proyecto usa 2 imágenes/)).toBeInTheDocument();
   });
 
   it('dice qué imágenes no ha encontrado en la carpeta', async () => {

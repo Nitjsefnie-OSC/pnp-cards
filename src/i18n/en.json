@@ -31,7 +31,6 @@
     "add": "Add images",
     "blank": "Blank image",
     "clear": "Remove all",
-    "clearConfirm": "Remove all cards from the list?",
     "empty": "Drop your card images here or press “Add images”.",
     "emptyHint": "JPG, PNG, WebP or TIFF. A name ending in “ x3” adds 3 copies.",
     "dropHere": "Drop the images to add them",
@@ -74,7 +73,9 @@
     "missingWarning_other": "{{count}} images can’t be found and won’t be printed. Find them or remove them.",
     "errorTemplate": "Choose a template with at least one slot under Layout.",
     "copiesLess": "Remove a copy of {{name}}",
-    "copiesMore": "Add a copy of {{name}}"
+    "copiesMore": "Add a copy of {{name}}",
+    "clearTitle": "Remove all cards?",
+    "clearMessage": "The list will be empty. You can add the images again whenever you like."
   },
   "settings": {
     "page": "Page",
@@ -163,14 +164,17 @@
     "new": "New",
     "open": "Open…",
     "save": "Save file",
-    "replaceConfirm": "Replace the current project? Anything you haven’t saved will be lost.",
-    "newConfirm": "Start a new project? Anything you haven’t saved will be lost.",
     "opened": "You opened {{name}}.",
     "savedFile": "You saved {{name}}.",
     "invalid": "{{name}} isn’t a PnP Cards or PDFCartas project.",
     "newer": "{{name}} was saved with a newer version of PnP Cards. Reload the page to update it.",
     "recent": "Recent…",
-    "saveFailed": "The project couldn’t be saved. Try another folder."
+    "saveFailed": "The project couldn’t be saved. Try another folder.",
+    "replaceTitle": "Open another project?",
+    "newTitle": "Start a new project?",
+    "unsavedMessage": "Anything you haven’t saved in the current project will be lost.",
+    "openConfirm": "Open project",
+    "newConfirmLabel": "Start over"
   },
   "folder": {
     "title": "Open “{{name}}”",
@@ -208,7 +212,6 @@
     "intro": "Combine several PDFs into one, in list order. Drag to change the order.",
     "add": "Add PDFs",
     "clear": "Remove all",
-    "clearConfirm": "Remove all PDFs from the list?",
     "empty": "Drop the PDFs you want to merge here or press “Add PDFs”.",
     "reading": "Reading…",
     "pages_one": "{{count}} page",
@@ -232,14 +235,14 @@
     "errorUnknown": "The PDFs couldn’t be merged ({{message}}).",
     "dropHere": "Drop the PDFs to add them",
     "notPdf_one": "{{names}} isn’t a PDF and wasn’t added.",
-    "notPdf_other": "{{names}} aren’t PDFs and weren’t added."
+    "notPdf_other": "{{names}} aren’t PDFs and weren’t added.",
+    "clearTitle": "Remove all PDFs from the list?"
   },
   "split": {
     "title": "Split image",
     "intro": "Cut sheets with several cards into one image per card. Adjust the area, rows and columns; parts are saved as PNG, with no loss of quality.",
     "add": "Add images",
     "clear": "Remove all",
-    "clearConfirm": "Remove all images from the list?",
     "empty": "Drop the sheets you want to split here or press “Add images”.",
     "dropHere": "Drop the images to add them",
     "loading": "Loading {{count}} images…",
@@ -275,7 +278,8 @@
     "addToCards": "Add to Cards",
     "adding": "Adding to Cards…",
     "fileName": "parts.zip",
-    "errorUnknown": "The images couldn’t be split ({{message}})."
+    "errorUnknown": "The images couldn’t be split ({{message}}).",
+    "clearTitle": "Remove all images from the list?"
   },
   "pdfToImages": {
     "title": "PDF to images",
@@ -386,9 +390,10 @@
     "used": "Cards now uses “{{name}}”.",
     "export": "Export",
     "remove": "Delete template",
-    "removeConfirm": "Delete the “{{name}}” template?",
     "hint": "Drag the slots to move them and their corners to resize them (to the millimetre). With a slot selected, the arrow keys move it 1 mm (Shift: 10 mm).",
-    "outside": "Some slots go off the page."
+    "outside": "Some slots go off the page.",
+    "removeTitle": "Delete the “{{name}}” template?",
+    "removeMessage": "It is deleted from this browser. Projects that use it keep their copy."
   },
   "cardInfo": {
     "info": "Information about {{name}}",
@@ -415,5 +420,8 @@
     "copies": "Copies",
     "blank": "Blank image: the PDF leaves a gap the size of the previous card.",
     "missing": "This image can’t be found in the project folder."
+  },
+  "confirm": {
+    "cancel": "Cancel"
   }
 }

@@ -31,7 +31,6 @@
     "add": "Añadir imágenes",
     "blank": "Imagen en blanco",
     "clear": "Quitar todas",
-    "clearConfirm": "¿Quitar todas las cartas de la lista?",
     "empty": "Arrastra aquí las imágenes de tus cartas o pulsa «Añadir imágenes».",
     "emptyHint": "JPG, PNG, WebP o TIFF. Si el nombre acaba en « x3», se añaden 3 copias.",
     "dropHere": "Suelta las imágenes para añadirlas",
@@ -74,7 +73,9 @@
     "missingWarning_other": "{{count}} imágenes no se encuentran y no se imprimirán. Búscalas o quítalas de la lista.",
     "errorTemplate": "Elige en Distribución una plantilla que tenga algún hueco.",
     "copiesLess": "Quitar una copia de {{name}}",
-    "copiesMore": "Añadir una copia de {{name}}"
+    "copiesMore": "Añadir una copia de {{name}}",
+    "clearTitle": "¿Quitar todas las cartas?",
+    "clearMessage": "La lista se queda vacía. Puedes volver a añadir las imágenes cuando quieras."
   },
   "settings": {
     "page": "Página",
@@ -163,14 +164,17 @@
     "new": "Nuevo",
     "open": "Abrir…",
     "save": "Guardar archivo",
-    "replaceConfirm": "¿Sustituir el proyecto actual? Lo que no hayas guardado se perderá.",
-    "newConfirm": "¿Empezar un proyecto nuevo? Lo que no hayas guardado se perderá.",
     "opened": "Has abierto {{name}}.",
     "savedFile": "Has guardado {{name}}.",
     "invalid": "{{name}} no es un proyecto de PnP Cards ni de PDFCartas.",
     "newer": "{{name}} se guardó con una versión más nueva de PnP Cards. Recarga la página para actualizarla.",
     "recent": "Recientes…",
-    "saveFailed": "No se ha podido guardar el proyecto. Prueba en otra carpeta."
+    "saveFailed": "No se ha podido guardar el proyecto. Prueba en otra carpeta.",
+    "replaceTitle": "¿Abrir otro proyecto?",
+    "newTitle": "¿Empezar un proyecto nuevo?",
+    "unsavedMessage": "Lo que no hayas guardado del proyecto actual se perderá.",
+    "openConfirm": "Abrir proyecto",
+    "newConfirmLabel": "Empezar de nuevo"
   },
   "folder": {
     "title": "Abrir «{{name}}»",
@@ -208,7 +212,6 @@
     "intro": "Junta varios PDF en uno, en el orden de la lista. Arrastra para cambiar el orden.",
     "add": "Añadir PDF",
     "clear": "Quitar todos",
-    "clearConfirm": "¿Quitar todos los PDF de la lista?",
     "empty": "Arrastra aquí los PDF que quieras unir o pulsa «Añadir PDF».",
     "reading": "Leyendo…",
     "pages_one": "{{count}} página",
@@ -232,14 +235,14 @@
     "errorUnknown": "No se han podido unir los PDF ({{message}}).",
     "dropHere": "Suelta los PDF para añadirlos",
     "notPdf_one": "{{names}} no es un PDF y no se ha añadido.",
-    "notPdf_other": "{{names}} no son PDF y no se han añadido."
+    "notPdf_other": "{{names}} no son PDF y no se han añadido.",
+    "clearTitle": "¿Quitar todos los PDF de la lista?"
   },
   "split": {
     "title": "Dividir imagen",
     "intro": "Corta las hojas con varias cartas en una imagen por carta. Ajusta la zona y las filas y columnas; las partes se guardan en PNG, sin pérdida de calidad.",
     "add": "Añadir imágenes",
     "clear": "Quitar todas",
-    "clearConfirm": "¿Quitar todas las imágenes de la lista?",
     "empty": "Arrastra aquí las hojas que quieras dividir o pulsa «Añadir imágenes».",
     "dropHere": "Suelta las imágenes para añadirlas",
     "loading": "Cargando {{count}} imágenes…",
@@ -275,7 +278,8 @@
     "addToCards": "Añadir a Cartas",
     "adding": "Añadiendo a Cartas…",
     "fileName": "partes.zip",
-    "errorUnknown": "No se han podido dividir las imágenes ({{message}})."
+    "errorUnknown": "No se han podido dividir las imágenes ({{message}}).",
+    "clearTitle": "¿Quitar todas las imágenes de la lista?"
   },
   "pdfToImages": {
     "title": "PDF a imágenes",
@@ -386,9 +390,10 @@
     "used": "Cartas usa ahora «{{name}}».",
     "export": "Exportar",
     "remove": "Borrar plantilla",
-    "removeConfirm": "¿Borrar la plantilla «{{name}}»?",
     "hint": "Arrastra los huecos para moverlos y sus esquinas para cambiar el tamaño (al milímetro). Con un hueco elegido, las flechas lo mueven 1 mm (con Mayús, 10 mm).",
-    "outside": "Hay huecos que se salen de la página."
+    "outside": "Hay huecos que se salen de la página.",
+    "removeTitle": "¿Borrar la plantilla «{{name}}»?",
+    "removeMessage": "Se borra de este navegador. Los proyectos que la usan conservan su copia."
   },
   "cardInfo": {
     "info": "Información de {{name}}",
@@ -415,5 +420,8 @@
     "copies": "Copias",
     "blank": "Imagen en blanco: en el PDF queda un hueco del tamaño de la carta anterior.",
     "missing": "No se encuentra esta imagen en la carpeta del proyecto."
+  },
+  "confirm": {
+    "cancel": "Cancelar"
   }
 }

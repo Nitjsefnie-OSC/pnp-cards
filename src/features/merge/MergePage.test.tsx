@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import i18n from '../../i18n';
 import { UnreadablePdfError, type PdfInfo } from '../../pdf/pdfjs';
 import { TaskError, type MergePdfs, type TaskOptions } from '../../workers/pdfClient';
+import { ConfirmHost } from '../../components/ConfirmHost';
 import { MergePage } from './MergePage';
 
 const pdf = (name: string) => new File(['%PDF-1.7'], name, { type: 'application/pdf' });
@@ -132,11 +133,17 @@ describe('Unir PDF', () => {
 
   it('quita todos los PDF de la lista', async () => {
     const user = userEvent.setup();
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    render(<MergePage inspect={inspect} />);
+    render(
+      <>
+        <MergePage inspect={inspect} />
+        <ConfirmHost />
+      </>,
+    );
     await user.upload(screen.getByTestId('pdf-input'), [pdf('a.pdf'), pdf('b.pdf')]);
     await screen.findByText('En total, 10 páginas');
     await user.click(screen.getByRole('button', { name: 'Quitar todos' }));
+    const dialog = screen.getByRole('alertdialog', { name: '¿Quitar todos los PDF de la lista?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Quitar todos' }));
     expect(within(document.body).getByText(/Arrastra aquí los PDF/)).toBeInTheDocument();
   });
 });
