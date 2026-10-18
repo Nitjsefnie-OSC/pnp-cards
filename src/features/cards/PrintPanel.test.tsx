@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import i18n from '../../i18n';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
-import { PdfError, type GenerateOptions, type GeneratePdf } from '../../workers/pdfClient';
+import { TaskError, type TaskOptions, type GeneratePdf } from '../../workers/pdfClient';
 import { PrintPanel } from './PrintPanel';
 
 const image: NewImage = {
@@ -19,7 +19,7 @@ const image: NewImage = {
 
 /** Generador controlable desde el test. */
 function controllable() {
-  let options: GenerateOptions = {};
+  let options: TaskOptions = {};
   let resolve!: (pdf: Uint8Array) => void;
   let reject!: (err: unknown) => void;
   const generate = vi.fn<GeneratePdf>((_input, opts) => {
@@ -98,7 +98,7 @@ describe('PrintPanel', () => {
     render(<PrintPanel generatePdf={gen.generate} />);
 
     await user.click(screen.getByRole('button', { name: 'Generar PDF' }));
-    await gen.fail(new PdfError('blank-without-size', 'blank-without-size'));
+    await gen.fail(new TaskError('blank-without-size', 'blank-without-size'));
     expect(screen.getByRole('alert')).toHaveTextContent('fuerza el ancho y el alto');
   });
 

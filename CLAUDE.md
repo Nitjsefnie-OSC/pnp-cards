@@ -26,8 +26,12 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   página. Lo usan el PDF y la vista previa, así que nunca difieren.
 - `src/pdf/` — construcción de PDF con pdf-lib (`buildPdf`: cada imagen se incrusta una vez; JPG/PNG
   sin recodificar). Sin APIs de DOM ni de worker, para poder probarlo en entorno node.
-- `src/workers/` — `pdf.worker.ts` ejecuta `buildPdf`; `pdfClient.ts` (`generatePdf`) lo lanza con
-  progreso y cancela con `terminate()` al abortar la señal.
+- `src/workers/` — un worker por tarea larga (`pdf.worker.ts` genera cartas, `merge.worker.ts` une
+  PDF). En el worker, `serveTask` atiende la tarea; en la página, `runWorker` la lanza con
+  progreso y la cancela con `terminate()` al abortar la señal. Los clientes están en
+  `pdfClient.ts`. Los errores llegan como `TaskError` (`code` y `detail`).
+- `src/pdf/pdfjs.ts` — pdf.js se carga bajo demanda (`loadPdfjs`, worker con `?url`); las
+  herramientas secundarias se cargan con `React.lazy` para no engordar la carga inicial.
 - `src/project/` — proyectos. El `.pnpcards` es solo JSON (`src/lib/project.ts`): configuración y,
   por carta, ruta relativa a su carpeta, nombre y copias. Las imágenes NO se guardan en ningún sitio
   (ni en el archivo ni en IndexedDB): al abrir se pide la carpeta (`folder.ts`: File System Access

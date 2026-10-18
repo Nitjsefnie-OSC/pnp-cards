@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { downloadUrl as download } from '../../components/download';
+import { formatSize } from '../../components/formatSize';
 import { safeFileName } from '../../lib/filename';
 import { resolveGrid } from '../../lib/layout';
 import { printableCards, totalCards, useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import {
   generatePdf as defaultGeneratePdf,
-  PdfError,
+  TaskError,
   type GeneratePdf,
 } from '../../workers/pdfClient';
 import { PagePreview } from './PagePreview';
@@ -82,9 +83,9 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
       tab?.close();
       if (err instanceof DOMException && err.name === 'AbortError') {
         setStatus({ kind: 'cancelled' });
-      } else if (err instanceof PdfError && err.code === 'blank-without-size') {
+      } else if (err instanceof TaskError && err.code === 'blank-without-size') {
         setStatus({ kind: 'error', message: t('cards.errorBlank') });
-      } else if (err instanceof PdfError && err.code === 'empty') {
+      } else if (err instanceof TaskError && err.code === 'empty') {
         setStatus({ kind: 'error', message: t('cards.errorEmpty') });
       } else {
         setStatus({
@@ -99,12 +100,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
     }
   }
 
-  const size = (bytes: number) =>
-    new Intl.NumberFormat(i18n.resolvedLanguage, {
-      style: 'unit',
-      unit: bytes >= 1e6 ? 'megabyte' : 'kilobyte',
-      maximumFractionDigits: 1,
-    }).format(bytes >= 1e6 ? bytes / 1e6 : bytes / 1e3);
+  const size = (bytes: number) => formatSize(bytes, i18n.resolvedLanguage);
 
   const running = status.kind === 'running';
 

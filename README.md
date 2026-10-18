@@ -54,6 +54,12 @@ tu carpeta, organizadas como tú quieras.
 - Los proyectos **`.bsk` de PDFCartas** se abren igual: eliges la carpeta y se buscan las
   imágenes.
 
+## Otras herramientas
+
+- **Unir PDF**: añade varios PDF, ordénalos arrastrándolos (o con el teclado) y únelos en uno.
+  Muestra la portada y las páginas de cada uno, y avisa de los que están dañados o protegidos con
+  contraseña.
+
 ## Desarrollo
 
 Requiere Node.js 22 o superior.
