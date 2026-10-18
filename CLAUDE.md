@@ -12,14 +12,22 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
 - `npm test` — tests con Vitest (una pasada); `npm run test:watch` en modo watch
 - `npm run lint` — ESLint; `npm run format` / `npm run format:check` — Prettier
 - `npx vitest run src/lib/layout.test.ts` — un solo archivo de tests
+- Los tests que usan pdf-lib con archivos (`src/pdf/*.test.ts`) llevan `// @vitest-environment node`;
+  las imágenes de prueba están en `src/test/fixtures/`.
+- Los componentes reciben las dependencias del navegador por props (`loadImages`, `generatePdf`)
+  para poder probarlos en jsdom.
 
 ## Arquitectura
 
 - `src/lib/` — lógica pura sin React ni DOM: unidades, maquetación, líneas de corte, sangrado,
   ppp, recorte, división, nombres de archivo, formato de proyecto. Todo con tests.
   Coordenadas en puntos PDF (1/72"), origen abajo a la izquierda, como iText y pdf-lib.
-- `src/workers/` — Web Worker que genera el PDF con pdf-lib (progreso y cancelación por mensajes).
-- `src/pdf/` — utilidades de PDF que se ejecutan en el hilo principal (unir, rasterizar con pdfjs).
+  `plan.ts` (`planDocument`) reúne todo: qué carta va en cada hueco, margen y líneas de corte por
+  página. Lo usan el PDF y la vista previa, así que nunca difieren.
+- `src/pdf/` — construcción de PDF con pdf-lib (`buildPdf`: cada imagen se incrusta una vez; JPG/PNG
+  sin recodificar). Sin APIs de DOM ni de worker, para poder probarlo en entorno node.
+- `src/workers/` — `pdf.worker.ts` ejecuta `buildPdf`; `pdfClient.ts` (`generatePdf`) lo lanza con
+  progreso y cancela con `terminate()` al abortar la señal.
 - `src/store/` — Zustand. La configuración se persiste en localStorage con `persist`;
   las cartas (con sus blobs) no.
 - `src/features/<herramienta>/` — componentes de cada herramienta (ruta en HashRouter).

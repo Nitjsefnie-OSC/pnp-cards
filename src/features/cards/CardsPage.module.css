@@ -69,13 +69,65 @@
   max-width: 28ch;
 }
 
+.printArea {
+  border-top: 1px solid var(--border);
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.status:empty {
+  display: none;
+}
+
+.progress {
+  width: 100%;
+  height: 8px;
+  accent-color: var(--accent);
+}
+
+.links {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.links a,
+.linkButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.error {
+  color: var(--danger);
+}
+
 .printBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-4);
-  border-top: 1px solid var(--border);
+}
+
+.cancel {
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel:hover {
+  border-color: var(--steel);
 }
 
 .pages {

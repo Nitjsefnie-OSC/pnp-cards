@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { resolveGrid } from '../../lib/layout';
-import { totalCards, useCardsStore } from '../../store/cardsStore';
+import { useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { CardTray } from './CardTray';
+import { PrintPanel } from './PrintPanel';
 import { SettingsPanel } from './SettingsPanel';
 import styles from './CardsPage.module.css';
 
@@ -19,29 +19,6 @@ function DpiWarning() {
     <p className={styles.warning} role="status">
       {t('cards.noDpi')}
     </p>
-  );
-}
-
-function PrintPanel() {
-  const { t } = useTranslation();
-  const total = useCardsStore((s) => totalCards(s.cards));
-  const perPage = useSettingsStore((s) => resolveGrid(s.settings).perPage);
-  const pages = Math.ceil(total / perPage);
-
-  return (
-    <div className={styles.print}>
-      <div className={styles.mat}>
-        <p>{t('cards.previewSoon')}</p>
-      </div>
-      <div className={styles.printBar}>
-        <span className={styles.pages}>
-          {total > 0 ? t('cards.pages', { count: pages }) : null}
-        </span>
-        <button type="button" className={styles.generate} disabled>
-          {t('cards.generate')}
-        </button>
-      </div>
-    </div>
   );
 }
 
