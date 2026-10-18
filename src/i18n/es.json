@@ -69,7 +69,12 @@
     "errorUnknown": "No se ha podido generar el PDF ({{message}}). Prueba con menos imágenes o revisa que no estén dañadas.",
     "addFolder": "Añadir carpeta",
     "ignoredWithProject_one": "Se ha abierto el proyecto; la otra imagen soltada no se ha añadido.",
-    "ignoredWithProject_other": "Se ha abierto el proyecto; las otras {{count}} imágenes soltadas no se han añadido."
+    "ignoredWithProject_other": "Se ha abierto el proyecto; las otras {{count}} imágenes soltadas no se han añadido.",
+    "missing": "No se encuentra",
+    "find": "Buscar…",
+    "findNamed": "Buscar imagen de {{name}}",
+    "missingWarning_one": "{{count}} imagen no se encuentra y no se imprimirá. Búscala o quítala de la lista.",
+    "missingWarning_other": "{{count}} imágenes no se encuentran y no se imprimirán. Búscalas o quítalas de la lista."
   },
   "settings": {
     "page": "Página",

@@ -37,6 +37,7 @@ export function CardTray({
   const { t } = useTranslation();
   const cards = useCardsStore((s) => s.cards);
   const lastRemoved = useCardsStore((s) => s.lastRemoved);
+  const missingCount = cards.filter((c) => c.missing).length;
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
@@ -173,6 +174,11 @@ export function CardTray({
         </p>
       ) : null}
       {notice ? <p className={styles.status}>{notice}</p> : null}
+      {missingCount > 0 ? (
+        <p className={styles.error} role="status">
+          {t('cards.missingWarning', { count: missingCount })}
+        </p>
+      ) : null}
       {loading > 0 ? (
         <p className={styles.status} role="status">
           {t('cards.loading', { count: loading })}

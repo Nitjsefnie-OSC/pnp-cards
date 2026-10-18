@@ -121,7 +121,12 @@ describe('abrir un proyecto', () => {
     await user.click(await screen.findByRole('button', { name: 'Elegir carpeta…' }));
 
     expect(await screen.findByText('No se han encontrado: heroes/elfo.png')).toBeInTheDocument();
-    expect(useCardsStore.getState().cards).toHaveLength(2);
+    // La carta que falta se conserva (ruta y copias) para no perderla al guardar.
+    expect(useCardsStore.getState().cards.map((c) => [c.path, c.copies, !!c.missing])).toEqual([
+      ['heroes/elfo.png', 3, true],
+      ['', 1, false],
+      ['orco.png', 2, false],
+    ]);
   });
 
   it('también se pueden elegir las imágenes sueltas', async () => {

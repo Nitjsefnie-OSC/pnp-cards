@@ -95,4 +95,40 @@ describe('cardsStore', () => {
     expect(store().folder).toBeNull();
     expect(store().cards).toEqual([]);
   });
+
+  it('una carta que falta guarda su ruta y sus copias, sin imagen', () => {
+    store().load(
+      'x',
+      [{ ...image('elfo.png'), path: 'heroes/elfo.png', blob: null, missing: true, copies: 3 }],
+      null,
+    );
+    expect(store().cards[0]).toMatchObject({ path: 'heroes/elfo.png', missing: true, copies: 3 });
+  });
+
+  it('al encontrar la imagen de una carta que falta, la sustituye y conserva copias y ruta', () => {
+    store().load(
+      'x',
+      [{ ...image('elfo.png'), path: 'heroes/elfo.png', blob: null, missing: true, copies: 3 }],
+      null,
+    );
+    const id = store().cards[0].id;
+    store().replaceImage(id, image('elfo.png'));
+    expect(store().cards[0]).toMatchObject({
+      id,
+      path: 'heroes/elfo.png',
+      copies: 3,
+      missing: false,
+    });
+    expect(store().cards[0].blob).not.toBeNull();
+  });
+
+  it('si la imagen encontrada tiene otro nombre, usa su nombre como ruta', () => {
+    store().load(
+      'x',
+      [{ ...image('elfo.png'), path: 'heroes/elfo.png', blob: null, missing: true, copies: 1 }],
+      null,
+    );
+    store().replaceImage(store().cards[0].id, image('elfo-v2.png'));
+    expect(store().cards[0]).toMatchObject({ name: 'elfo-v2.png', path: 'elfo-v2.png' });
+  });
 });

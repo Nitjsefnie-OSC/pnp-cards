@@ -59,7 +59,10 @@ export async function openProjectWithFolder(project: ProjectFile, picked: Picked
       cards.push(blankCard(ref.copies));
       continue;
     }
-    if (!file) continue;
+    if (!file) {
+      cards.push({ ...blankCard(ref.copies), name: ref.name, path: ref.path, missing: true });
+      continue;
+    }
     try {
       // Se conserva la ruta del proyecto, para que al guardarlo no cambie.
       cards.push({ ...(await loadImage(file, ref.path || ref.name)), copies: ref.copies });

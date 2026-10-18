@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { downloadUrl as download } from '../../components/download';
 import { safeFileName } from '../../lib/filename';
 import { resolveGrid } from '../../lib/layout';
-import { totalCards, useCardsStore } from '../../store/cardsStore';
+import { printableCards, totalCards, useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import {
   generatePdf as defaultGeneratePdf,
@@ -22,7 +22,7 @@ type Status =
 
 export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?: GeneratePdf }) {
   const { t, i18n } = useTranslation();
-  const total = useCardsStore((s) => totalCards(s.cards));
+  const total = useCardsStore((s) => totalCards(printableCards(s.cards)));
   const perPage = useSettingsStore((s) => resolveGrid(s.settings).perPage);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const abortRef = useRef<AbortController | null>(null);
@@ -37,7 +37,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
   }, [readyUrl]);
 
   async function generate() {
-    const { cards } = useCardsStore.getState();
+    const cards = printableCards(useCardsStore.getState().cards);
     const { settings, openAfter } = useSettingsStore.getState();
     const projectName = useCardsStore.getState().name.trim();
     const fileName = projectName ? `${safeFileName(projectName)}.pdf` : t('cards.fileName');

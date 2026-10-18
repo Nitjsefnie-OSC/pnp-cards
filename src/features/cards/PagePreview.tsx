@@ -1,14 +1,13 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { planDocument, PlanError, type DocumentPlan, type PlannedItem } from '../../lib/plan';
-import { useCardsStore, type CardImage } from '../../store/cardsStore';
+import { printableCards, useCardsStore, type CardImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import styles from './PagePreview.module.css';
 
 type PlanResult = { plan: DocumentPlan } | { error: PlanError } | null;
 
-function usePlan(): PlanResult {
-  const cards = useCardsStore((s) => s.cards);
+function usePlan(cards: CardImage[]): PlanResult {
   const settings = useSettingsStore((s) => s.settings);
   return useMemo(() => {
     if (cards.length === 0) return null;
@@ -63,8 +62,9 @@ function PreviewCard({
 
 export function PagePreview() {
   const { t } = useTranslation();
-  const result = usePlan();
-  const cards = useCardsStore((s) => s.cards);
+  const all = useCardsStore((s) => s.cards);
+  const cards = useMemo(() => printableCards(all), [all]);
+  const result = usePlan(cards);
   const bleedColor = useSettingsStore((s) => s.settings.bleed.color);
   const lineColor = useSettingsStore((s) => s.settings.cutLines.color);
   const [requested, setRequested] = useState(0);

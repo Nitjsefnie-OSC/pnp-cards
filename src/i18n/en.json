@@ -69,7 +69,12 @@
     "errorUnknown": "The PDF could not be created ({{message}}). Try fewer images or check that none are damaged.",
     "addFolder": "Add folder",
     "ignoredWithProject_one": "The project was opened; the other dropped image wasn’t added.",
-    "ignoredWithProject_other": "The project was opened; the other {{count}} dropped images weren’t added."
+    "ignoredWithProject_other": "The project was opened; the other {{count}} dropped images weren’t added.",
+    "missing": "Not found",
+    "find": "Find…",
+    "findNamed": "Find image for {{name}}",
+    "missingWarning_one": "{{count}} image can’t be found and won’t be printed. Find it or remove it.",
+    "missingWarning_other": "{{count}} images can’t be found and won’t be printed. Find them or remove them."
   },
   "settings": {
     "page": "Page",

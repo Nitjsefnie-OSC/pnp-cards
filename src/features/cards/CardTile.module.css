@@ -52,6 +52,34 @@
   background: var(--paper);
 }
 
+/* Carta cuya imagen no se ha encontrado al abrir el proyecto. */
+.missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62%;
+  aspect-ratio: 63 / 88;
+  padding: var(--space-2);
+  border: 2px dashed var(--danger);
+  border-radius: 3px;
+  color: var(--danger);
+  font-family: var(--font-label);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.find {
+  flex: none;
+  color: var(--text);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.find:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 .meta {
   display: flex;
   align-items: baseline;

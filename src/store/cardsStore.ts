@@ -17,6 +17,11 @@ export interface CardImage {
   heightPx: number;
   dpi: Dpi | null;
   thumbUrl: string | null;
+  /**
+   * La imagen no se encontró al abrir el proyecto: se conserva (ruta y copias) para no perderla al
+   * guardar, pero no se imprime hasta que se encuentre.
+   */
+  missing?: boolean;
   copies: number;
 }
 
@@ -39,6 +44,8 @@ interface CardsState {
   addBlank: () => void;
   setCopies: (id: string, copies: number) => void;
   remove: (id: string) => void;
+  /** Pone la imagen encontrada en una carta que faltaba, con sus mismas copias. */
+  replaceImage: (id: string, image: NewImage) => void;
   undoRemove: () => void;
   move: (id: string, overId: string) => void;
   clear: () => void;
@@ -55,6 +62,9 @@ interface CardsState {
 }
 
 export const totalCards = (cards: CardImage[]) => cards.reduce((n, c) => n + c.copies, 0);
+
+/** Cartas que van al PDF: todas menos las que faltan. */
+export const printableCards = (cards: CardImage[]) => cards.filter((c) => !c.missing);
 
 const revoke = (card: CardImage) => {
   if (card.thumbUrl) URL.revokeObjectURL(card.thumbUrl);
@@ -120,6 +130,17 @@ export const useCardsStore = create<CardsState>()((set) => ({
         lastRemoved: { card: s.cards[index], index },
       };
     }),
+
+  replaceImage: (id, image) =>
+    set((s) => ({
+      cards: s.cards.map((c) => {
+        if (c.id !== id) return c;
+        revoke(c);
+        // Si es la misma imagen se conserva su ruta en la carpeta del proyecto.
+        const path = image.name === c.name ? c.path : image.path;
+        return { ...image, id, path, copies: c.copies, missing: false };
+      }),
+    })),
 
   undoRemove: () =>
     set((s) => {

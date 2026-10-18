@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore, type CardImage } from '../../store/cardsStore';
+import { loadImage } from './loadImages';
 import styles from './CardTile.module.css';
 
 /** Deja el campo vacío mientras se escribe; solo guarda enteros positivos. */
@@ -48,7 +49,7 @@ export const CardTile = memo(function CardTile({ card }: { card: CardImage }) {
     transition,
     isDragging,
   } = useSortable({ id: card.id });
-  const name = card.blob ? card.name : t('cards.blankName');
+  const name = card.blob || card.missing ? card.name : t('cards.blankName');
 
   return (
     <li
@@ -65,7 +66,11 @@ export const CardTile = memo(function CardTile({ card }: { card: CardImage }) {
         {...attributes}
         {...listeners}
       >
-        {card.thumbUrl ? (
+        {card.missing ? (
+          <span className={styles.missing} title={card.path}>
+            {t('cards.missing')}
+          </span>
+        ) : card.thumbUrl ? (
           <img
             src={card.thumbUrl}
             alt=""
@@ -82,6 +87,25 @@ export const CardTile = memo(function CardTile({ card }: { card: CardImage }) {
         <span className={styles.name} title={name}>
           {name}
         </span>
+        {card.missing ? (
+          <label className={styles.find}>
+            {t('cards.find')}
+            <input
+              type="file"
+              accept="image/*,.tif,.tiff"
+              className="visually-hidden"
+              aria-label={t('cards.findNamed', { name })}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = '';
+                if (file)
+                  void loadImage(file)
+                    .then((img) => useCardsStore.getState().replaceImage(card.id, img))
+                    .catch(() => {});
+              }}
+            />
+          </label>
+        ) : null}
         {card.blob ? (
           <span className={styles.dpi} data-missing={!card.dpi || undefined}>
             {card.dpi
