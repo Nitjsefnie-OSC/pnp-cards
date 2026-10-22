@@ -19,6 +19,8 @@ jobs:
   # Se vuelve a comprobar y compilar: es el main ya mergeado lo que se publica.
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # para crear la etiqueta de la versión
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,10 +30,24 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+      # Versión CalVer AAAA.MM.DD (hora de Madrid); si ya se publicó ese día, AAAA.MM.DD.2, .3…
+      # Se cuenta con las etiquetas vAAAA.MM.DD* que deja cada despliegue.
+      - id: version
+        run: |
+          day=$(TZ=Europe/Madrid date +%Y.%m.%d)
+          count=$(git ls-remote --tags origin | grep -cE "refs/tags/v${day//./\.}(\.[0-9]+)?$" || true)
+          version=$day
+          if [ "$count" -gt 0 ]; then version="$day.$((count + 1))"; fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - run: npm run build
         env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
           # Código de GoatCounter (Settings → Variables). Sin él, no se envían estadísticas.
           VITE_GOATCOUNTER_CODE: ${{ vars.GOATCOUNTER_CODE }}
+      - name: Etiquetar la versión
+        run: |
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

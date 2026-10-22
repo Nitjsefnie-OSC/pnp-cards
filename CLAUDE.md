@@ -79,3 +79,8 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   (`base: '/pnp-cards/'` en `vite.config.ts`).
 - CI: `.github/workflows/ci.yml` comprueba cada PR (lint, tests y build; su job `build` es el
   check exigido para mergear); `deploy.yml` vuelve a compilar `main` al mergear y lo publica.
+- Versión con CalVer `AAAA.MM.DD` (fecha de Madrid del despliegue; `.2`, `.3`… si hay varios el
+  mismo día). La calcula `deploy.yml` contando las etiquetas `vAAAA.MM.DD*`, compila con
+  `APP_VERSION` (→ `__APP_VERSION__`, que se ve en el pie y en el título de la app instalada) y
+  deja la etiqueta `v<versión>`. `package.json` no lleva versión: las PR no la tocan, así que dos
+  PR a la vez nunca chocan ni repiten número. En local y en las PR se ve «dev».

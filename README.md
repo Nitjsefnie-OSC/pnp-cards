@@ -12,7 +12,8 @@ casilla para desactivarlas están en «Privacidad».
 
 **Se puede instalar** como una aplicación más (Chrome o Edge en el ordenador: botón «Instalar»
 de la cabecera) y, una vez cargada, **funciona sin conexión**. Cuando hay una versión nueva, la
-app te avisa y se actualiza al pulsar «Actualizar».
+app te avisa y se actualiza al pulsar «Actualizar». La versión (en el pie de página) es la fecha
+de publicación, p. ej. «2026.10.22».
 
 ## Cómo se usa
 
