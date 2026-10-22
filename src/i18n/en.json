@@ -14,7 +14,7 @@
     "templates": "Templates",
     "menu": "Tools",
     "donate": "Donate",
-    "donateHint": "Support the project with a donation on Ko-fi",
+    "donateHint": "Support the project with a PayPal donation",
     "newTab": "opens in a new tab"
   },
   "theme": {

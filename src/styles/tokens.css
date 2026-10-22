@@ -7,6 +7,9 @@
   --ink: #1c2127;
   --register: #c4006f;
   --steel: #66727c;
+  /* Colores de marca de PayPal, solo para su icono en «Donar». */
+  --paypal-dark: #003087;
+  --paypal-light: #009cde;
 
   --bg: #eef1ee;
   --surface: #ffffff;

@@ -25,9 +25,9 @@ describe('Layout', () => {
     expect(screen.getByRole('link', { name: 'Privacidad' })).toHaveAttribute('href', '/privacy');
   });
 
-  it('enlaza a Ko-fi en otra pestaña', () => {
+  it('enlaza a PayPal.Me en otra pestaña', () => {
     const donate = screen.getByRole('link', { name: 'Donar (se abre en otra pestaña)' });
-    expect(donate).toHaveAttribute('href', 'https://ko-fi.com/onzebol');
+    expect(donate).toHaveAttribute('href', 'https://paypal.me/Onzebol');
     expect(donate).toHaveAttribute('target', '_blank');
     expect(donate).toHaveAttribute('rel', 'noopener noreferrer');
   });
