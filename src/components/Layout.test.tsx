@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import i18n from '../i18n';
-import pkg from '../../package.json';
 import { Layout } from './Layout';
 
 beforeAll(() => i18n.changeLanguage('es'));
@@ -19,9 +18,9 @@ describe('Layout', () => {
     );
   });
 
-  it('muestra en el pie la versión de package.json y el enlace a Privacidad', () => {
+  it('muestra en el pie la versión y el enlace a Privacidad', () => {
     const footer = screen.getByRole('contentinfo');
-    expect(footer).toHaveTextContent(`Versión ${pkg.version}`);
+    expect(footer).toHaveTextContent(`Versión ${__APP_VERSION__}`);
     expect(screen.getByRole('link', { name: 'Privacidad' })).toHaveAttribute('href', '/privacy');
   });
 
