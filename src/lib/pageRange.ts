@@ -22,6 +22,24 @@ export function parsePageRange(text: string, pageCount: number): number[] | null
   return [...pages].sort((x, y) => x - y);
 }
 
+/**
+ * Texto de rango para unas páginas, al revés que `parsePageRange`: «1-3, 5». Todas las páginas
+ * del documento dan el texto vacío.
+ */
+export function formatPageRange(pages: number[], pageCount: number): string {
+  const sorted = [...new Set(pages)].sort((a, b) => a - b);
+  if (sorted.length === pageCount && sorted.every((p, i) => p === i + 1)) return '';
+  const parts: string[] = [];
+  let start = sorted[0];
+  for (let i = 1; i <= sorted.length; i++) {
+    if (sorted[i] === sorted[i - 1] + 1) continue;
+    const end = sorted[i - 1];
+    parts.push(start === end ? `${start}` : `${start}-${end}`);
+    start = sorted[i];
+  }
+  return parts.join(', ');
+}
+
 /** Tamaño en píxeles de una página (en puntos PDF) a los ppp dados. */
 export function pagePixels(size: { width: number; height: number }, dpi: number) {
   return {

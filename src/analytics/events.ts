@@ -23,7 +23,6 @@ export type AnalyticsEvent =
   | { name: 'carpeta-añadida' }
   | { name: 'unir-pdf' }
   | { name: 'dividir-imagen' }
-  | { name: 'pdf-a-imagenes' }
   | { name: 'extraer-imagenes'; mode: 'imagenes' | 'paginas' };
 
 export function pagesBucket(n: number) {

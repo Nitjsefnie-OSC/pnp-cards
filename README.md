@@ -72,13 +72,13 @@ tu carpeta, organizadas como tú quieras.
   pulsa «Quitar el margen»), las filas y las columnas; con varias hojas puedes usar los mismos
   ajustes para todas. Las partes se guardan en PNG, sin pérdida y con los ppp de la hoja, en un
   `.zip`, y con «Añadir a Cartas» pasan directamente a la lista de cartas.
-- **PDF a imágenes**: convierte las páginas de un PDF (todas o un rango como «1-3, 5») en JPG
-  al 95 % o PNG sin pérdida, a 150, 300, 600 ppp u otra resolución. Las imágenes llevan sus ppp,
-  se descargan en un `.zip` y se pueden pasar a Cartas o a Dividir imagen.
 - **Extraer imágenes**: saca las imágenes incrustadas en un PDF a su resolución original. Los
   JPEG normales salen tal cual; el resto (CMYK, colores invertidos, transparencias…) se decodifica
   para que los colores salgan como en el PDF. Las repetidas se guardan una vez con « xN» en el
   nombre, se pueden ignorar las pequeñas y eliges cuáles descargar en `.zip` o pasar a Cartas.
+  Con «Páginas completas» convierte cada página en una imagen (JPG al 95 % o PNG sin pérdida, a
+  150, 300, 600 ppp u otra resolución, con sus ppp): eliges las páginas en sus miniaturas o con un
+  rango como «1-3, 5», y se pueden pasar a Cartas o a Dividir imagen.
 - **Plantillas**: coloca los huecos donde quieras en un editor visual (al milímetro, con giro de
   0/90/180/270°) y elige «Plantilla» en la distribución de Cartas: cada carta ocupa un hueco, en
   orden. Lleva margen y marcas de corte por hueco, admite reversos, se guarda en el

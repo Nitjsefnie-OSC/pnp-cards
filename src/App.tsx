@@ -1,7 +1,8 @@
-import { lazy, Suspense } from 'react';
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { CardsPage } from './features/cards/CardsPage';
+import { useExtractStore } from './features/extractImages/extractStore';
 import { useAnalytics } from './analytics/useAnalytics';
 import { useSessionAutosave } from './project/useSessionAutosave';
 
@@ -20,13 +21,16 @@ const ExtractImagesPage = lazy(() =>
 const TemplatesPage = lazy(() =>
   import('./features/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
 );
-const PdfToImagesPage = lazy(() =>
-  import('./features/pdfToImages/PdfToImagesPage').then((m) => ({ default: m.PdfToImagesPage })),
-);
 
 const PrivacyPage = lazy(() =>
   import('./features/privacy/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
 );
+
+/** «PDF a imágenes» ahora es el modo «Páginas completas» de Extraer imágenes. */
+function PdfToImagesRedirect() {
+  useEffect(() => useExtractStore.getState().setMode('pages'), []);
+  return <Navigate to="/extract-images" replace />;
+}
 
 /** Tareas de fondo de la app: guardado de la sesión y estadísticas anónimas. */
 function Background() {
@@ -58,14 +62,7 @@ export function App() {
               </Suspense>
             }
           />
-          <Route
-            path="pdf-to-images"
-            element={
-              <Suspense fallback={null}>
-                <PdfToImagesPage />
-              </Suspense>
-            }
-          />
+          <Route path="pdf-to-images" element={<PdfToImagesRedirect />} />
           <Route
             path="extract-images"
             element={

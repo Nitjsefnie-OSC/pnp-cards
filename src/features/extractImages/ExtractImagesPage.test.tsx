@@ -9,6 +9,7 @@ import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { TaskError, type AnalyzePdfImages } from '../../workers/pdfClient';
 import { useSplitStore } from '../split/splitStore';
 import { useExtractStore } from './extractStore';
+import type { RenderThumbs } from './PagePicker';
 import { ExtractImagesPage } from './ExtractImagesPage';
 
 const analysis: Analysis = {
@@ -34,6 +35,11 @@ const pageImages: PageImage[] = [1, 2, 3].map((n) => ({
 
 const inspect = async () => ({ pages: 4, thumbUrl: null, firstPage: { width: 595, height: 842 } });
 
+/** Miniaturas al momento: «blob:pag-N» para cada una de las 4 páginas. */
+const renderThumbs: RenderThumbs = async (_file, { onThumb }) => {
+  for (let n = 1; n <= 4; n++) onThumb(n, `blob:pag-${n}`);
+};
+
 const toImages = async (images: ExtractedImage[]): Promise<NewImage[]> =>
   images.map((i) => ({
     name: i.name,
@@ -58,6 +64,7 @@ function renderPage(props: Partial<Parameters<typeof ExtractImagesPage>[0]> = {}
               renderImages={async () => extracted}
               inspect={inspect}
               rasterize={async () => pageImages}
+              renderThumbs={renderThumbs}
               toImages={toImages}
               zip={async () => new Blob(['zip'])}
               {...props}
@@ -165,6 +172,63 @@ describe('Extraer imágenes', () => {
   });
 
   describe('páginas completas', () => {
+    async function openPages() {
+      const user = userEvent.setup();
+      const rasterize = vi.fn(async (_f: Blob, _n: string, _o: RasterOptions) => pageImages);
+      renderPage({ rasterize });
+      await user.upload(screen.getByTestId('pdf-input'), pdf);
+      await screen.findByText('4 páginas');
+      await user.click(screen.getByLabelText('Páginas completas'));
+      return { user, rasterize };
+    }
+
+    it('enseña una miniatura de cada página, todas elegidas', async () => {
+      await openPages();
+      const picker = screen.getByRole('region', { name: 'Páginas del PDF' });
+      expect([...picker.querySelectorAll('img')].map((i) => i.getAttribute('src'))).toEqual([
+        'blob:pag-1',
+        'blob:pag-2',
+        'blob:pag-3',
+        'blob:pag-4',
+      ]);
+      expect(within(picker).getAllByRole('checkbox', { checked: true })).toHaveLength(4);
+      expect(within(picker).getByText('4 de 4 elegidas')).toBeInTheDocument();
+    });
+
+    it('marcar y desmarcar miniaturas rellena el rango, y extrae esas páginas', async () => {
+      const { user, rasterize } = await openPages();
+      await user.click(screen.getByLabelText('Página 3'));
+      expect(screen.getByLabelText('Páginas')).toHaveValue('1-2, 4');
+      await user.click(screen.getByLabelText('Página 1'));
+      expect(screen.getByLabelText('Páginas')).toHaveValue('2, 4');
+      expect(screen.getByText('2 de 4 elegidas')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Extraer páginas' }));
+      await screen.findByText('3 páginas extraídas');
+      expect(rasterize.mock.calls[0][2].pages).toEqual([2, 4]);
+    });
+
+    it('escribir un rango marca sus miniaturas', async () => {
+      const { user } = await openPages();
+      await user.type(screen.getByLabelText('Páginas'), '2-3');
+      expect(screen.getByLabelText('Página 1')).not.toBeChecked();
+      expect(screen.getByLabelText('Página 2')).toBeChecked();
+      expect(screen.getByLabelText('Página 3')).toBeChecked();
+      expect(screen.getByLabelText('Página 4')).not.toBeChecked();
+    });
+
+    it('sin ninguna página elegida pide elegir y no deja extraer', async () => {
+      const { user } = await openPages();
+      const picker = screen.getByRole('region', { name: 'Páginas del PDF' });
+      await user.click(within(picker).getByRole('button', { name: 'Desmarcar todas' }));
+      expect(screen.getByText('Elige al menos una página.')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Extraer páginas' })).toBeDisabled();
+
+      await user.click(within(picker).getByRole('button', { name: 'Marcar todas' }));
+      expect(screen.getByLabelText('Páginas')).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Extraer páginas' })).toBeEnabled();
+    });
+
     it('dibuja las páginas del rango con el formato y la resolución elegidos', async () => {
       const user = userEvent.setup();
       const rasterize = vi.fn(async (_f: Blob, _n: string, _o: RasterOptions) => pageImages);

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { downloadBlob } from '../../components/download';
 import { Checkbox, RadioGroup } from '../../components/form/Fields';
 import { zipFiles } from '../../components/zipFiles';
-import { inspectPdf, type PdfInfo } from '../../pdf/pdfjs';
+import { inspectPdf, renderPageThumbnails, type PdfInfo } from '../../pdf/pdfjs';
 import { rasterizePdf, type PageImage, type RasterOptions } from '../../pdf/rasterize';
 import { renderExtracted, type ExtractedImage } from '../../pdf/renderExtracted';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
@@ -17,8 +17,9 @@ import {
 } from '../../workers/pdfClient';
 import type { Analysis } from '../../pdf/extractImages';
 import { loadImage } from '../cards/loadImages';
-import { RasterFields } from '../pdfToImages/RasterFields';
-import { useRasterSettings } from '../pdfToImages/useRasterSettings';
+import { PagePicker, type RenderThumbs } from './PagePicker';
+import { RasterFields } from './RasterFields';
+import { useRasterSettings } from './useRasterSettings';
 import { useSplitStore } from '../split/splitStore';
 import { useExtractStore, type ExtractMode } from './extractStore';
 import styles from './ExtractImagesPage.module.css';
@@ -65,6 +66,7 @@ export function ExtractImagesPage({
   toImages = extractedToImages,
   inspect = inspectPdf,
   rasterize = rasterizePdf,
+  renderThumbs = renderPageThumbnails,
 }: {
   analyze?: AnalyzePdfImages;
   renderImages?: (
@@ -76,6 +78,7 @@ export function ExtractImagesPage({
   toImages?: (images: ExtractedImage[]) => Promise<NewImage[]>;
   inspect?: (file: Blob) => Promise<PdfInfo>;
   rasterize?: (file: Blob, baseName: string, options: RasterOptions) => Promise<PageImage[]>;
+  renderThumbs?: RenderThumbs;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -95,7 +98,7 @@ export function ExtractImagesPage({
     status.kind === 'analyzing' || status.kind === 'rendering' || status.kind === 'drawing';
   const running = working || status.kind === 'preparing';
   const pagesMode = mode === 'pages';
-  const canExtract = !pagesMode || (info.kind === 'ready' && raster.pages !== null);
+  const canExtract = !pagesMode || (info.kind === 'ready' && !!raster.pages?.length);
   const images = status.kind === 'ready' ? status.images : [];
   const chosen = images.filter((i) => !excluded.has(i.name));
 
@@ -350,6 +353,15 @@ export function ExtractImagesPage({
             </div>
           </div>
         )}
+
+        {file && pagesMode && info.kind === 'ready' ? (
+          <PagePicker
+            file={file}
+            pageCount={info.info.pages}
+            settings={raster}
+            renderThumbs={renderThumbs}
+          />
+        ) : null}
 
         <div aria-live="polite" className={styles.status}>
           {working ? (

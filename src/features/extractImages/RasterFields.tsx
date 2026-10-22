@@ -35,17 +35,17 @@ export function RasterFields({
   return (
     <>
       <RadioGroup<RasterFormat>
-        legend={t('pdfToImages.format')}
+        legend={t('extract.format')}
         value={s.format}
         onChange={changed(s.setFormat)}
         options={[
-          { value: 'jpeg', label: t('pdfToImages.jpeg') },
-          { value: 'png', label: t('pdfToImages.png') },
+          { value: 'jpeg', label: t('extract.jpeg') },
+          { value: 'png', label: t('extract.png') },
         ]}
       />
 
       <fieldset className={styles.dpi}>
-        <legend>{t('pdfToImages.resolution')}</legend>
+        <legend>{t('extract.resolution')}</legend>
         <div className={styles.segmented}>
           {[...PRESETS.map(String), 'custom'].map((value) => (
             <label key={value} data-checked={s.preset === value || undefined}>
@@ -56,45 +56,45 @@ export function RasterFields({
                 checked={s.preset === value}
                 onChange={() => changed(s.setPreset)(value)}
               />
-              {value === 'custom' ? t('pdfToImages.custom') : value}
+              {value === 'custom' ? t('extract.custom') : value}
             </label>
           ))}
-          <span className={styles.unit}>{t('pdfToImages.dpi')}</span>
+          <span className={styles.unit}>{t('extract.dpi')}</span>
         </div>
         {s.preset === 'custom' ? (
           <NumberField
-            label={t('pdfToImages.resolution')}
+            label={t('extract.resolution')}
             value={s.customDpi}
             min={36}
             max={1200}
             integer
-            unit={t('pdfToImages.dpi')}
+            unit={t('extract.dpi')}
             onChange={changed(s.setCustomDpi)}
           />
         ) : null}
       </fieldset>
 
       <div className={styles.range}>
-        <label htmlFor={rangeId}>{t('pdfToImages.range')}</label>
+        <label htmlFor={rangeId}>{t('extract.range')}</label>
         <input
           id={rangeId}
           value={s.range}
-          placeholder={t('pdfToImages.rangeHint')}
+          placeholder={t('extract.rangeHint')}
           autoComplete="off"
           spellCheck={false}
           aria-invalid={s.pages === null || undefined}
           onChange={(e) => changed(s.setRange)(e.target.value)}
         />
         {s.pages === null ? (
-          <p className={styles.error}>{t('pdfToImages.rangeInvalid', { count: pageCount })}</p>
+          <p className={styles.error}>{t('extract.rangeInvalid', { count: pageCount })}</p>
         ) : null}
       </div>
 
       {s.size ? (
         <p className={styles.info}>
-          {t('pdfToImages.size', { w: s.size.width, h: s.size.height })}
+          {t('extract.pageSize', { w: s.size.width, h: s.size.height })}
           {s.size.width * s.size.height > BIG_PAGE ? (
-            <span className={styles.warning}> {t('pdfToImages.big')}</span>
+            <span className={styles.warning}> {t('extract.big')}</span>
           ) : null}
         </p>
       ) : null}

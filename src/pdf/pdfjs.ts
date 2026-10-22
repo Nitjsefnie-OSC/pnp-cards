@@ -61,3 +61,37 @@ export async function inspectPdf(file: Blob, thumbHeight = 160): Promise<PdfInfo
     void doc.loadingTask.destroy();
   }
 }
+
+/**
+ * Dibuja una miniatura de cada página, de una en una, y la entrega en cuanto está (URL de un Blob
+ * que libera quien la recibe). Se para al abortar `signal`.
+ */
+export async function renderPageThumbnails(
+  file: Blob,
+  {
+    height = 180,
+    signal,
+    onThumb,
+  }: { height?: number; signal?: AbortSignal; onThumb: (page: number, url: string) => void },
+): Promise<void> {
+  const pdfjs = await loadPdfjs();
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+  try {
+    for (let n = 1; n <= doc.numPages && !signal?.aborted; n++) {
+      const page = await doc.getPage(n);
+      const base = page.getViewport({ scale: 1 });
+      const viewport = page.getViewport({ scale: height / base.height });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
+      await page.render({ canvas, canvasContext: canvas.getContext('2d')!, viewport }).promise;
+      page.cleanup();
+      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/jpeg', 0.8));
+      canvas.width = 0;
+      canvas.height = 0;
+      if (blob && !signal?.aborted) onThumb(n, URL.createObjectURL(blob));
+    }
+  } finally {
+    void doc.loadingTask.destroy();
+  }
+}

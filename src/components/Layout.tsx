@@ -12,7 +12,6 @@ const TOOLS = [
   { to: '/', key: 'cards' },
   { to: '/merge', key: 'merge' },
   { to: '/split', key: 'split' },
-  { to: '/pdf-to-images', key: 'pdfToImages' },
   { to: '/extract-images', key: 'extractImages' },
   { to: '/templates', key: 'templates' },
 ] as const;
