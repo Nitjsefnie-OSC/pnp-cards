@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, ColorField, FieldRow, RadioGroup, Section } from '../../components/form/Fields';
 import { NumberField } from '../../components/form/NumberField';
+import {
+  CARD_PRESETS,
+  cardSizeChoice,
+  presetSettings,
+  type CardPresetId,
+  type CardSizeChoice,
+} from '../../lib/cardPresets';
 import type { CutLineStyle, LayoutMode, PaperSize, Placement } from '../../lib/settings';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useTemplatesStore } from '../templates/templatesStore';
@@ -23,6 +30,29 @@ export function SettingsPanel() {
   const templateId = useId();
   const cropW = s.crop.widthMm > 0 ? s.crop.widthMm : t('crop.full');
   const cropH = s.crop.heightMm > 0 ? s.crop.heightMm : t('crop.full');
+  const sizeId = useId();
+  // «Personalizado» elegido a mano se mantiene aunque las medidas coincidan con un tamaño.
+  const [customChosen, setCustomChosen] = useState(false);
+  const derivedSize = cardSizeChoice(s);
+  const sizeChoice: CardSizeChoice =
+    customChosen && derivedSize !== 'image' ? 'custom' : derivedSize;
+
+  function chooseSize(value: string) {
+    setCustomChosen(value === 'custom');
+    if (value === 'image') {
+      update({ forceWidth: false, forceHeight: false });
+    } else if (value === 'custom') {
+      // Parte de las medidas actuales; si no hay ninguna, de póker.
+      const keep = s.cardWidthMm > 0 && s.cardHeightMm > 0;
+      update({
+        forceWidth: true,
+        forceHeight: true,
+        ...(keep ? {} : { cardWidthMm: 63, cardHeightMm: 88 }),
+      });
+    } else {
+      update(presetSettings(value as CardPresetId));
+    }
+  }
 
   return (
     <div className={styles.panel}>
@@ -156,38 +186,77 @@ export function SettingsPanel() {
       </Section>
 
       <Section title={t('settings.size')}>
-        <p className={styles.hint}>{t('settings.sizeHint')}</p>
-        <Checkbox
-          label={t('settings.forceWidth')}
-          checked={s.forceWidth}
-          onChange={(forceWidth) => update({ forceWidth })}
-        />
-        {s.forceWidth ? (
-          <FieldRow>
-            <NumberField
+        <div className={styles.select}>
+          <label htmlFor={sizeId}>{t('settings.sizeChoice')}</label>
+          <select id={sizeId} value={sizeChoice} onChange={(e) => chooseSize(e.target.value)}>
+            <option value="image">{t('settings.sizeImage')}</option>
+            {CARD_PRESETS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {t('settings.sizePreset', {
+                  name: t(`settings.presets.${p.id}`),
+                  w: p.widthMm,
+                  h: p.heightMm,
+                })}
+              </option>
+            ))}
+            <option value="custom">{t('settings.sizeCustom')}</option>
+          </select>
+        </div>
+        {sizeChoice === 'image' ? <p className={styles.hint}>{t('settings.sizeHint')}</p> : null}
+        {sizeChoice === 'custom' ? (
+          <>
+            <Checkbox
               label={t('settings.forceWidth')}
+              checked={s.forceWidth}
+              onChange={(forceWidth) => update({ forceWidth })}
+            />
+            {s.forceWidth ? (
+              <FieldRow>
+                <NumberField
+                  label={t('settings.cardWidth')}
+                  value={s.cardWidthMm}
+                  min={1}
+                  unit={mm}
+                  onChange={(cardWidthMm) => update({ cardWidthMm })}
+                />
+              </FieldRow>
+            ) : null}
+            <Checkbox
+              label={t('settings.forceHeight')}
+              checked={s.forceHeight}
+              onChange={(forceHeight) => update({ forceHeight })}
+            />
+            {s.forceHeight ? (
+              <FieldRow>
+                <NumberField
+                  label={t('settings.cardHeight')}
+                  value={s.cardHeightMm}
+                  min={1}
+                  unit={mm}
+                  onChange={(cardHeightMm) => update({ cardHeightMm })}
+                />
+              </FieldRow>
+            ) : null}
+          </>
+        ) : null}
+        {sizeChoice !== 'image' && sizeChoice !== 'custom' ? (
+          <>
+            <NumberField
+              label={t('settings.cardWidth')}
               value={s.cardWidthMm}
               min={1}
               unit={mm}
               onChange={(cardWidthMm) => update({ cardWidthMm })}
             />
-          </FieldRow>
-        ) : null}
-        <Checkbox
-          label={t('settings.forceHeight')}
-          checked={s.forceHeight}
-          onChange={(forceHeight) => update({ forceHeight })}
-        />
-        {s.forceHeight ? (
-          <FieldRow>
             <NumberField
-              label={t('settings.forceHeight')}
+              label={t('settings.cardHeight')}
               value={s.cardHeightMm}
               min={1}
               unit={mm}
               onChange={(cardHeightMm) => update({ cardHeightMm })}
             />
-          </FieldRow>
+            <p className={styles.hint}>{t('settings.presetHint')}</p>
+          </>
         ) : null}
       </Section>
 
