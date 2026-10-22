@@ -17,9 +17,8 @@ const TOOLS = [
   { to: '/templates', key: 'templates' },
 ] as const;
 
-/** El enlace de donación de PDFCartas (menú Ayuda > Donar). */
-const DONATE_URL =
-  'https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=onjmze%40gmail%2ecom&lc=ES&item_name=Programa%20crear%20PDF%20de%20cartas&item_number=PDFCartas&no_note=0&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest';
+/** Donaciones por PayPal.Me (el botón antiguo de PDFCartas ya no acepta donaciones). */
+const DONATE_URL = 'https://paypal.me/Onzebol';
 
 export function Layout() {
   const { t, i18n } = useTranslation();
