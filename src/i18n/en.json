@@ -2,7 +2,8 @@
   "app": {
     "name": "PnP Cards",
     "tagline": "Print and play cards, ready to print",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "version": "Version {{version}}"
   },
   "nav": {
     "cards": "Cards",
@@ -11,7 +12,10 @@
     "pdfToImages": "PDF to images",
     "extractImages": "Extract images",
     "templates": "Templates",
-    "menu": "Tools"
+    "menu": "Tools",
+    "donate": "Donate",
+    "donateHint": "Support the project with a PayPal donation",
+    "newTab": "opens in a new tab"
   },
   "theme": {
     "label": "Theme",

@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../i18n';
 import { useUiStore, type ThemePreference } from '../store/uiStore';
@@ -16,11 +17,24 @@ const TOOLS = [
   { to: '/templates', key: 'templates' },
 ] as const;
 
+/** El enlace de donación de PDFCartas (menú Ayuda > Donar). */
+const DONATE_URL =
+  'https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=onjmze%40gmail%2ecom&lc=ES&item_name=Programa%20crear%20PDF%20de%20cartas&item_number=PDFCartas&no_note=0&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest';
+
 export function Layout() {
   const { t, i18n } = useTranslation();
   const theme = useUiStore((s) => s.theme);
   const setTheme = useUiStore((s) => s.setTheme);
   useApplyTheme();
+  const { pathname } = useLocation();
+  const navRef = useRef<HTMLElement>(null);
+
+  // En pantallas estrechas la barra se desplaza: que la sección actual quede a la vista.
+  useEffect(() => {
+    navRef.current
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }, [pathname]);
 
   return (
     <div className={styles.shell}>
@@ -44,7 +58,7 @@ export function Layout() {
             {t('app.name')}
           </span>
         </div>
-        <nav className={styles.nav} aria-label={t('nav.menu')}>
+        <nav ref={navRef} className={styles.nav} aria-label={t('nav.menu')}>
           {TOOLS.map((tool) => (
             <NavLink
               key={tool.to}
@@ -59,6 +73,26 @@ export function Layout() {
           ))}
         </nav>
         <div className={styles.prefs}>
+          <a
+            className={styles.donate}
+            href={DONATE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={t('nav.donateHint')}
+            aria-label={`${t('nav.donate')} (${t('nav.newTab')})`}
+          >
+            <svg className={styles.paypal} viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                className={styles.paypalBack}
+                d="M8.5 22.5 11.5 4.5H18c3.5 0 5 2 4.5 5.5-.6 3.5-3 5-6.5 5h-2.3l-1.2 7.5ZM14.1 12.5h2c2 0 3.2-1 3.5-2.6.3-1.7-.5-2.8-2.3-2.8h-2.4Z"
+              />
+              <path
+                className={styles.paypalFront}
+                d="M6 20 9 2h6.5c3.5 0 5 2 4.5 5.5-.6 3.5-3 5-6.5 5h-2.3L10 20ZM11.6 10h2c2 0 3.2-1 3.5-2.6.3-1.7-.5-2.8-2.3-2.8h-2.4Z"
+              />
+            </svg>
+            {t('nav.donate')}
+          </a>
           <InstallButton />
           <label>
             <span className="visually-hidden">{t('theme.label')}</span>
@@ -86,6 +120,11 @@ export function Layout() {
       <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
+      <footer className={styles.footer}>
+        <span>{t('app.version', { version: __APP_VERSION__ })}</span>
+        <span aria-hidden="true">·</span>
+        <Link to="/privacy">{t('privacy.link')}</Link>
+      </footer>
       <ConfirmHost />
       <UpdateNotice />
     </div>

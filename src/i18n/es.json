@@ -2,7 +2,8 @@
   "app": {
     "name": "PnP Cards",
     "tagline": "Cartas print and play listas para imprimir",
-    "skip": "Saltar al contenido"
+    "skip": "Saltar al contenido",
+    "version": "Versión {{version}}"
   },
   "nav": {
     "cards": "Cartas",
@@ -11,7 +12,10 @@
     "pdfToImages": "PDF a imágenes",
     "extractImages": "Extraer imágenes",
     "templates": "Plantillas",
-    "menu": "Herramientas"
+    "menu": "Herramientas",
+    "donate": "Donar",
+    "donateHint": "Apoya el proyecto con una donación en PayPal",
+    "newTab": "se abre en otra pestaña"
   },
   "theme": {
     "label": "Tema",
