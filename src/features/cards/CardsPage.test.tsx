@@ -171,6 +171,49 @@ describe('SettingsPanel', () => {
     await user.type(margin, '5,5');
     expect(useSettingsStore.getState().settings.marginMm).toBe(5.5);
   });
+
+  it('elegir un tamaño predefinido fuerza ancho y alto', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    const size = screen.getByLabelText('Tamaño');
+    expect(size).toHaveValue('image');
+    await user.selectOptions(size, 'tarot');
+    expect(useSettingsStore.getState().settings).toMatchObject({
+      forceWidth: true,
+      forceHeight: true,
+      cardWidthMm: 70,
+      cardHeightMm: 120,
+    });
+    expect(screen.getByRole('option', { name: 'Tarot (70 × 120 mm)' })).toBeInTheDocument();
+  });
+
+  it('al cambiar las medidas de un tamaño pasa a personalizado', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    await user.selectOptions(screen.getByLabelText('Tamaño'), 'poker');
+    const width = screen.getByLabelText('Ancho');
+    await user.clear(width);
+    await user.type(width, '64');
+    expect(screen.getByLabelText('Tamaño')).toHaveValue('custom');
+    expect(screen.getByLabelText('Forzar ancho')).toBeChecked();
+  });
+
+  it('personalizado sin medidas parte de póker y vuelve a la resolución', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    const size = screen.getByLabelText('Tamaño');
+    await user.selectOptions(size, 'custom');
+    expect(size).toHaveValue('custom');
+    expect(screen.getByLabelText('Ancho')).toHaveValue('63');
+    await user.selectOptions(size, 'image');
+    expect(useSettingsStore.getState().settings).toMatchObject({
+      forceWidth: false,
+      forceHeight: false,
+    });
+  });
 });
 
 describe('CardsPage', () => {
@@ -181,7 +224,7 @@ describe('CardsPage', () => {
     expect(screen.getByText(/no indican su resolución/)).toBeInTheDocument();
 
     await user.click(screen.getByText('Tamaño de la carta'));
-    await user.click(screen.getByLabelText('Forzar ancho'));
+    await user.selectOptions(screen.getByLabelText('Tamaño'), 'poker');
     expect(screen.queryByText(/no indican su resolución/)).not.toBeInTheDocument();
   });
 
