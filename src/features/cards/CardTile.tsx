@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore, type CardImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
+import { IMAGE_ACCEPT } from '../../lib/imageFormat';
 import { CardInfo } from './CardInfo';
 import { loadImage } from './loadImages';
 import styles from './CardTile.module.css';
@@ -129,7 +130,7 @@ export const CardTile = memo(function CardTile({
             {t('cards.find')}
             <input
               type="file"
-              accept="image/*,.tif,.tiff"
+              accept={IMAGE_ACCEPT}
               className="visually-hidden"
               aria-label={t('cards.findNamed', { name })}
               onChange={(e) => {

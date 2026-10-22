@@ -20,7 +20,9 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
 ## Arquitectura
 
 - `src/lib/` — lógica pura sin React ni DOM: unidades, maquetación, líneas de corte, sangrado,
-  ppp, recorte, división, nombres de archivo, formato de proyecto. Todo con tests.
+  ppp, recorte, división, nombres de archivo, formato de proyecto, formatos de imagen
+  (`imageFormat.ts`: detección por bytes, extensiones admitidas e `IMAGE_ACCEPT` de los selectores).
+  Todo con tests.
   Coordenadas en puntos PDF (1/72"), origen abajo a la izquierda, como iText y pdf-lib.
   `plan.ts` (`planDocument`) reúne todo: qué carta va en cada hueco, margen y líneas de corte por
   página. Lo usan el PDF y la vista previa, así que nunca difieren. Con reversos, intercala tras

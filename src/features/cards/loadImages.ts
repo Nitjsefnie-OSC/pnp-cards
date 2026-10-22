@@ -1,14 +1,14 @@
 import { readDpi } from '../../lib/dpi';
+import { detectImageFormat, isImageFileName } from '../../lib/imageFormat';
 import type { FolderFile } from '../../lib/imageMatch';
 import type { ImageFormat, NewImage } from '../../store/cardsStore';
 
-const ACCEPTED = /\.(jpe?g|png|webp|gif|bmp|tiff?)$/i;
 const THUMB_HEIGHT = 300;
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 export const isAcceptedImage = (file: File) =>
-  file.type.startsWith('image/') || ACCEPTED.test(file.name);
+  file.type.startsWith('image/') || isImageFileName(file.name);
 
 /** Ordena por ruta (o nombre), como hacía PDFCartas al soltar archivos. */
 export const sortByPath = (entries: FolderFile[]) =>
@@ -17,14 +17,6 @@ export const sortByPath = (entries: FolderFile[]) =>
 /** Archivos sueltos: su ruta es su nombre. */
 export const looseFiles = (files: File[]): FolderFile[] =>
   files.map((file) => ({ file, path: file.name }));
-
-function detectFormat(bytes: Uint8Array): ImageFormat | 'tiff' | 'other' {
-  if (bytes[0] === 0xff && bytes[1] === 0xd8) return 'jpeg';
-  if (bytes[0] === 0x89 && bytes[1] === 0x50) return 'png';
-  const order = String.fromCharCode(bytes[0], bytes[1]);
-  if (order === 'II' || order === 'MM') return 'tiff';
-  return 'other';
-}
 
 function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number) {
   return new Promise<Blob>((resolve, reject) =>
@@ -61,12 +53,12 @@ async function thumbnail(bitmap: ImageBitmap): Promise<string> {
 
 /**
  * Lee un archivo de imagen: ppp, tamaño en píxeles y miniatura. JPG y PNG se guardan tal cual
- * (se incrustarán sin recodificar); TIFF, WebP y demás se convierten a PNG.
+ * (se incrustarán sin recodificar); TIFF, WebP, AVIF y demás se convierten a PNG.
  */
 export async function loadImage(file: File, path = file.name): Promise<NewImage> {
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
-  const detected = detectFormat(bytes);
+  const detected = detectImageFormat(bytes);
   const dpi = readDpi(bytes);
 
   let blob: Blob;

@@ -20,6 +20,7 @@ import { pickFolder as defaultPickFolder, type PickedFolder } from '../../projec
 import { track } from '../../analytics/track';
 import { isProjectFile } from '../../project/useProjectActions';
 import { totalCards, useCardsStore } from '../../store/cardsStore';
+import { IMAGE_ACCEPT } from '../../lib/imageFormat';
 import { CardTile } from './CardTile';
 import { loadImages as defaultLoadImages, looseFiles, type LoadResult } from './loadImages';
 import styles from './CardTray.module.css';
@@ -121,7 +122,7 @@ export function CardTray({
         <input
           ref={inputRef}
           type="file"
-          accept="image/*,.tif,.tiff"
+          accept={IMAGE_ACCEPT}
           multiple
           hidden
           data-testid="file-input"

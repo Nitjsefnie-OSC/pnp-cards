@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import styles from '../components/Dialog.module.css';
 import { useModalDialog } from '../components/useModalDialog';
 import { looseFiles } from '../features/cards/loadImages';
+import { IMAGE_ACCEPT } from '../lib/imageFormat';
 import type { useProjectActions } from './useProjectActions';
 
 type Actions = ReturnType<typeof useProjectActions>;
@@ -81,7 +82,7 @@ export function FolderDialog({ actions }: { actions: Actions }) {
         <input
           ref={filesRef}
           type="file"
-          accept="image/*,.tif,.tiff"
+          accept={IMAGE_ACCEPT}
           multiple
           hidden
           data-testid="project-images"

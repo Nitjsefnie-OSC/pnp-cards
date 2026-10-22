@@ -18,6 +18,7 @@ import {
   type LoadResult,
 } from '../cards/loadImages';
 import type { FolderFile } from '../../lib/imageMatch';
+import { IMAGE_ACCEPT } from '../../lib/imageFormat';
 import { RegionEditor } from './RegionEditor';
 import { useSplitStore, type SplitItem } from './splitStore';
 import styles from './SplitPage.module.css';
@@ -209,7 +210,7 @@ export function SplitPage({
           <input
             ref={inputRef}
             type="file"
-            accept="image/*,.tif,.tiff"
+            accept={IMAGE_ACCEPT}
             multiple
             hidden
             data-testid="split-input"

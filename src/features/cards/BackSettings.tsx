@@ -4,6 +4,7 @@ import { Checkbox, FieldRow, RadioGroup, Section } from '../../components/form/F
 import type { BackFlip } from '../../lib/settings';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
+import { IMAGE_ACCEPT } from '../../lib/imageFormat';
 import { loadImage as defaultLoadImage } from './loadImages';
 import styles from './SettingsPanel.module.css';
 
@@ -85,7 +86,7 @@ export function BackSettings({
             <input
               ref={inputRef}
               type="file"
-              accept="image/*,.tif,.tiff"
+              accept={IMAGE_ACCEPT}
               hidden
               data-testid="back-input"
               onChange={(e) => {
