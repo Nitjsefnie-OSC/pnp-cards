@@ -76,3 +76,5 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   por imagen, imágenes sin ppp → 72 ppp con aviso (igual que el original).
 - Commits al final de cada fase; la rama principal es `main` y despliega a GitHub Pages
   (`base: '/pnp-cards/'` en `vite.config.ts`).
+- CI: `.github/workflows/ci.yml` comprueba cada PR (lint, tests y build; su job `build` es el
+  check exigido para mergear); `deploy.yml` vuelve a compilar `main` al mergear y lo publica.

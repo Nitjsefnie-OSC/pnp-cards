@@ -1,0 +1,30 @@
+name: CI
+
+# Comprueba cada PR contra main: no publica nada, solo asegura que se podrá desplegar.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  # Un push nuevo a la PR cancela la comprobación anterior.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # El check «build» es el exigido para mergear (protección de main): no cambiar el nombre.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      # Tipos (tsc -b) y empaquetado: errores que los tests no detectan.
+      - run: npm run build
