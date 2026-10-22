@@ -31,7 +31,8 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
 - `src/pdf/` — construcción de PDF con pdf-lib (`buildPdf`: cada imagen se incrusta una vez; JPG/PNG
   sin recodificar). Sin APIs de DOM ni de worker, para poder probarlo en entorno node.
 - `src/workers/` — un worker por tarea larga (`pdf.worker.ts` genera cartas, `merge.worker.ts` une
-  PDF). En el worker, `serveTask` atiende la tarea; en la página, `runWorker` la lanza con
+  PDF, `heic.worker.ts` pasa fotos HEIC a JPG con libheif-js cuando el navegador no las abre; libheif
+  queda fuera del precacheo de Workbox y se guarda al usarse). En el worker, `serveTask` atiende la tarea; en la página, `runWorker` la lanza con
   progreso y la cancela con `terminate()` al abortar la señal. Los clientes están en
   `pdfClient.ts`. Los errores llegan como `TaskError` (`code` y `detail`).
 - `src/pdf/pdfjs.ts` — pdf.js se carga bajo demanda (`loadPdfjs`, worker con `?url`); las

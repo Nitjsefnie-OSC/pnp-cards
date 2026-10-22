@@ -96,6 +96,7 @@ export function SplitPage({
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [loading, setLoading] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
+  const [heicOffline, setHeicOffline] = useState(false);
   const [dropping, setDropping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -118,10 +119,12 @@ export function SplitPage({
     if (files.length === 0) return;
     setLoading(files.length);
     setFailed([]);
+    setHeicOffline(false);
     try {
       const result = await loadImages(looseFiles(files));
       actions.add(result.images);
       setFailed(result.failed);
+      setHeicOffline(!!result.heicOffline);
     } finally {
       setLoading(0);
     }
@@ -239,6 +242,7 @@ export function SplitPage({
           {failed.length > 0 ? (
             <span className={styles.error} role="alert">
               {t('split.failed', { names: failed.join(', ') })}
+              {heicOffline ? ` ${t('cards.heicOffline')}` : null}
             </span>
           ) : null}
         </div>

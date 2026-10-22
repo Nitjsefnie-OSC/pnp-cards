@@ -44,6 +44,7 @@ export function CardTray({
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
+  const [heicOffline, setHeicOffline] = useState(false);
   const [dropping, setDropping] = useState(false);
   const [notice, setNotice] = useState('');
 
@@ -56,11 +57,13 @@ export function CardTray({
     if (entries.length === 0) return;
     setLoading(entries.length);
     setFailed([]);
+    setHeicOffline(false);
     setNotice('');
     try {
       const result = await loadImages(entries);
       useCardsStore.getState().addImages(result.images);
       setFailed(result.failed);
+      setHeicOffline(!!result.heicOffline);
     } finally {
       setLoading(0);
     }
@@ -196,6 +199,7 @@ export function CardTray({
       {failed.length > 0 ? (
         <p className={styles.error} role="alert">
           {t('cards.failed', { names: failed.join(', ') })}
+          {heicOffline ? ` ${t('cards.heicOffline')}` : null}
         </p>
       ) : null}
 

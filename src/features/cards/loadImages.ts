@@ -2,6 +2,8 @@ import { readDpi } from '../../lib/dpi';
 import { detectImageFormat, isImageFileName } from '../../lib/imageFormat';
 import type { FolderFile } from '../../lib/imageMatch';
 import type { ImageFormat, NewImage } from '../../store/cardsStore';
+import { HEIC_JPEG_QUALITY } from '../../workers/heicDecode';
+import { convertHeic } from '../../workers/pdfClient';
 
 const THUMB_HEIGHT = 300;
 
@@ -44,6 +46,37 @@ async function tiffToPng(buffer: ArrayBuffer): Promise<Blob> {
   return canvasToBlob(canvas, 'image/png');
 }
 
+/** Una foto HEIC no se ha podido convertir porque libheif no está guardado y no hay conexión. */
+export class HeicOfflineError extends Error {
+  constructor() {
+    super('HEIC sin conexión');
+    this.name = 'HeicOfflineError';
+  }
+}
+
+/**
+ * HEIC/HEIF a JPG. Safari 17+ ya lo abre con `createImageBitmap`; el resto de navegadores, con
+ * libheif en un worker. Las dos vías dejan la foto derecha (aplican su giro).
+ */
+async function heicToJpeg(file: File, buffer: ArrayBuffer): Promise<Blob> {
+  let bitmap: ImageBitmap | undefined;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    try {
+      return await convertHeic(buffer);
+    } catch (err) {
+      throw navigator.onLine ? err : new HeicOfflineError();
+    }
+  }
+  try {
+    const canvas = drawToCanvas(bitmap, bitmap.width, bitmap.height);
+    return await canvasToBlob(canvas, 'image/jpeg', HEIC_JPEG_QUALITY);
+  } finally {
+    bitmap.close();
+  }
+}
+
 async function thumbnail(bitmap: ImageBitmap): Promise<string> {
   const height = Math.min(THUMB_HEIGHT, bitmap.height);
   const width = Math.max(1, Math.round((bitmap.width * height) / bitmap.height));
@@ -53,7 +86,7 @@ async function thumbnail(bitmap: ImageBitmap): Promise<string> {
 
 /**
  * Lee un archivo de imagen: ppp, tamaño en píxeles y miniatura. JPG y PNG se guardan tal cual
- * (se incrustarán sin recodificar); TIFF, WebP, AVIF y demás se convierten a PNG.
+ * (se incrustarán sin recodificar); las fotos HEIC/HEIF, a JPG; TIFF, WebP, AVIF y demás, a PNG.
  */
 export async function loadImage(file: File, path = file.name): Promise<NewImage> {
   const buffer = await file.arrayBuffer();
@@ -66,6 +99,9 @@ export async function loadImage(file: File, path = file.name): Promise<NewImage>
   if (detected === 'jpeg' || detected === 'png') {
     blob = new Blob([buffer], { type: `image/${detected}` });
     format = detected;
+  } else if (detected === 'heic') {
+    blob = await heicToJpeg(file, buffer);
+    format = 'jpeg';
   } else if (detected === 'tiff') {
     blob = await tiffToPng(buffer);
     format = 'png';
@@ -99,6 +135,8 @@ export async function loadImage(file: File, path = file.name): Promise<NewImage>
 export interface LoadResult {
   images: NewImage[];
   failed: string[];
+  /** Alguna foto HEIC ha fallado por no haber conexión para descargar su decodificador. */
+  heicOffline?: boolean;
 }
 
 /**
@@ -108,12 +146,14 @@ export interface LoadResult {
 export async function loadImages(entries: FolderFile[]): Promise<LoadResult> {
   const images: NewImage[] = [];
   const failed: string[] = [];
+  let heicOffline = false;
   for (const { file, path } of sortByPath(entries.filter((e) => isAcceptedImage(e.file)))) {
     try {
       images.push(await loadImage(file, path));
-    } catch {
+    } catch (err) {
       failed.push(path);
+      if (err instanceof HeicOfflineError) heicOffline = true;
     }
   }
-  return { images, failed };
+  return { images, failed, heicOffline };
 }

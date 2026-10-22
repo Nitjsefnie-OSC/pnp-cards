@@ -11,7 +11,9 @@ describe('Privacidad', () => {
   it('explica qué se cuenta y qué no se cuenta nunca', () => {
     render(<PrivacyPage />);
     expect(screen.getByText(/no salen de tu equipo/)).toBeInTheDocument();
-    expect(screen.getByText(/Imágenes, nombres de archivo, nombres de proyecto/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Imágenes, nombres de archivo, nombres de proyecto/),
+    ).toBeInTheDocument();
   });
 
   it('permite desactivar las estadísticas', async () => {
