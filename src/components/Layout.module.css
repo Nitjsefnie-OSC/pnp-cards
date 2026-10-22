@@ -104,18 +104,20 @@
   filter: brightness(0.95);
 }
 
-.paypal {
-  width: 18px;
-  height: 18px;
-  fill-rule: evenodd;
+.cup {
+  width: 20px;
+  height: 20px;
 }
 
-.paypalBack {
-  fill: var(--paypal-light);
+.cupBody {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
 }
 
-.paypalFront {
-  fill: var(--paypal-dark);
+.cupHeart {
+  fill: var(--register);
 }
 
 .prefs {

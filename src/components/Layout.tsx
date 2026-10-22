@@ -17,8 +17,8 @@ const TOOLS = [
   { to: '/templates', key: 'templates' },
 ] as const;
 
-/** Donaciones por PayPal.Me (el botón antiguo de PDFCartas ya no acepta donaciones). */
-const DONATE_URL = 'https://paypal.me/Onzebol';
+/** Donaciones en Ko-fi: tarjeta, Apple/Google Pay o PayPal, sin crearse cuenta. */
+const DONATE_URL = 'https://ko-fi.com/onzebol';
 
 export function Layout() {
   const { t, i18n } = useTranslation();
@@ -80,14 +80,14 @@ export function Layout() {
             title={t('nav.donateHint')}
             aria-label={`${t('nav.donate')} (${t('nav.newTab')})`}
           >
-            <svg className={styles.paypal} viewBox="0 0 24 24" aria-hidden="true">
+            <svg className={styles.cup} viewBox="0 0 24 24" aria-hidden="true">
               <path
-                className={styles.paypalBack}
-                d="M8.5 22.5 11.5 4.5H18c3.5 0 5 2 4.5 5.5-.6 3.5-3 5-6.5 5h-2.3l-1.2 7.5ZM14.1 12.5h2c2 0 3.2-1 3.5-2.6.3-1.7-.5-2.8-2.3-2.8h-2.4Z"
+                className={styles.cupBody}
+                d="M3 8h14v6a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6Zm14 2h1.5a2.5 2.5 0 0 1 0 5H16.5"
               />
               <path
-                className={styles.paypalFront}
-                d="M6 20 9 2h6.5c3.5 0 5 2 4.5 5.5-.6 3.5-3 5-6.5 5h-2.3L10 20ZM11.6 10h2c2 0 3.2-1 3.5-2.6.3-1.7-.5-2.8-2.3-2.8h-2.4Z"
+                className={styles.cupHeart}
+                d="M10 16.5s-3.5-2.1-3.5-4.2A1.8 1.8 0 0 1 10 11.4a1.8 1.8 0 0 1 3.5.9c0 2.1-3.5 4.2-3.5 4.2Z"
               />
             </svg>
             {t('nav.donate')}
