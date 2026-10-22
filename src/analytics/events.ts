@@ -24,7 +24,7 @@ export type AnalyticsEvent =
   | { name: 'unir-pdf' }
   | { name: 'dividir-imagen' }
   | { name: 'pdf-a-imagenes' }
-  | { name: 'extraer-imagenes' };
+  | { name: 'extraer-imagenes'; mode: 'imagenes' | 'paginas' };
 
 export function pagesBucket(n: number) {
   if (n <= 1) return '1';
@@ -77,6 +77,8 @@ export function eventPaths(event: AnalyticsEvent): string[] {
       return [base, `${base}/codigo/${clean(event.code)}`];
     case 'proyecto-abierto':
       return [base, `${base}/tipo/${event.kind}`];
+    case 'extraer-imagenes':
+      return [base, `${base}/modo/${event.mode}`];
     default:
       return [base];
   }

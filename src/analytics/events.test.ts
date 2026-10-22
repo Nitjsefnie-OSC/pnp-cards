@@ -64,4 +64,11 @@ describe('eventPaths', () => {
       'proyecto-abierto/tipo/bsk',
     ]);
   });
+
+  it('extraer imágenes cuenta el modo', () => {
+    expect(eventPaths({ name: 'extraer-imagenes', mode: 'paginas' })).toEqual([
+      'extraer-imagenes',
+      'extraer-imagenes/modo/paginas',
+    ]);
+  });
 });

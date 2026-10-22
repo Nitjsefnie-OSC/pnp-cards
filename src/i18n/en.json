@@ -340,7 +340,7 @@
   },
   "extract": {
     "title": "Extract images",
-    "intro": "Pull out the images inside a PDF, at their original resolution. Repeated ones are saved once, with “ xN” in the name.",
+    "intro": "Pull out the images inside a PDF, at their original resolution, or each whole page as an image. Repeated ones are saved once, with “ xN” in the name.",
     "choose": "Choose PDF",
     "change": "Choose another PDF",
     "empty": "Drop a PDF here or press “Choose PDF”.",
@@ -371,7 +371,23 @@
     "zipName": "{{name}} images.zip",
     "unreadable": "{{name}} can’t be read: it’s damaged.",
     "encrypted": "{{name}} is password-protected and can’t be read.",
-    "errorUnknown": "The images couldn’t be extracted ({{message}})."
+    "errorUnknown": "The images couldn’t be extracted ({{message}}).",
+    "reading": "Reading…",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "mode": "What to extract",
+    "modeImages": "Separate images",
+    "modePages": "Whole pages",
+    "pagesHint": "Each page as one image. Useful when the cards are drawn as vectors, built from several layers or cut into strips.",
+    "extractPages": "Extract pages",
+    "drawing": "Drawing pages: {{done}} of {{total}}",
+    "pagesFound_one": "{{count}} page extracted",
+    "pagesFound_other": "{{count}} pages extracted",
+    "pagesSelected_one": "{{count}} page selected",
+    "pagesSelected_other": "{{count}} pages selected",
+    "toSplit": "Split into cards",
+    "zipNamePages": "{{name}} pages.zip",
+    "cantRead": "Can’t be read: it’s damaged or password-protected."
   },
   "templates": {
     "title": "Templates",

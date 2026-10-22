@@ -39,6 +39,8 @@ function controllableRasterize() {
           Array.from({ length: n }, (_, i) => ({
             name: `reglas_pag_${i + 1}.jpg`,
             blob: new Blob([new Uint8Array(1000)]),
+            width: 2480,
+            height: 3508,
           })),
         ),
       ),

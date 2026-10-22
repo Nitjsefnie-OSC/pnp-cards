@@ -108,15 +108,48 @@
   border-radius: var(--radius-m);
 }
 
-.name {
+.sourceTitle {
   grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
 }
 
+.sourceTitle .muted,
+.sourceTitle .error {
+  flex: none;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* Formato, resolución y páginas en columnas; el tamaño resultante, en toda la fila. */
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4) var(--space-5);
+}
+
+.hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--text-muted);
+}
+
 .sourceActions {
+  align-self: end;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);

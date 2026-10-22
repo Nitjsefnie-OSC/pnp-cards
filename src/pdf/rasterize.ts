@@ -17,6 +17,8 @@ export interface RasterOptions {
 export interface PageImage {
   name: string;
   blob: Blob;
+  width: number;
+  height: number;
 }
 
 const JPEG_QUALITY = 0.95;
@@ -67,6 +69,8 @@ export async function rasterizePdf(
       images.push({
         name: `${baseName}_pag_${number}.${ext}`,
         blob: new Blob([withDpi as Uint8Array<ArrayBuffer>], { type: `image/${format}` }),
+        width,
+        height,
       });
       onProgress?.(i + 1, pages.length);
     }

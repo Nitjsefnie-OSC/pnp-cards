@@ -1,24 +1,18 @@
-import { useEffect, useId, useRef, useState, type DragEvent } from 'react';
+import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { track } from '../../analytics/track';
 import { useNavigate } from 'react-router-dom';
 import { downloadUrl } from '../../components/download';
-import { RadioGroup } from '../../components/form/Fields';
-import { NumberField } from '../../components/form/NumberField';
 import { formatSize } from '../../components/formatSize';
 import { zipFiles } from '../../components/zipFiles';
-import { pagePixels, parsePageRange } from '../../lib/pageRange';
 import { inspectPdf, type PdfInfo } from '../../pdf/pdfjs';
-import {
-  rasterizePdf,
-  type PageImage,
-  type RasterFormat,
-  type RasterOptions,
-} from '../../pdf/rasterize';
+import { rasterizePdf, type PageImage, type RasterOptions } from '../../pdf/rasterize';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { loadImage } from '../cards/loadImages';
 import { useSplitStore } from '../split/splitStore';
 import styles from './PdfToImagesPage.module.css';
+import { RasterFields } from './RasterFields';
+import { useRasterSettings } from './useRasterSettings';
 
 type Source =
   | { kind: 'none' }
@@ -33,10 +27,6 @@ type Status =
   | { kind: 'preparing' }
   | { kind: 'cancelled' }
   | { kind: 'error'; message: string };
-
-const PRESETS = [150, 300, 600];
-/** Por encima de esto (píxeles por página) el navegador puede quedarse sin memoria. */
-const BIG_PAGE = 40e6;
 
 const isPdf = (file: File) => file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
 const baseName = (name: string) => name.replace(/\.[^.]+$/, '');
@@ -63,13 +53,8 @@ export function PdfToImagesPage({
 }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const rangeId = useId();
   const [source, setSource] = useState<Source>({ kind: 'none' });
   const [notPdf, setNotPdf] = useState('');
-  const [format, setFormat] = useState<RasterFormat>('jpeg');
-  const [preset, setPreset] = useState<string>('300');
-  const [customDpi, setCustomDpi] = useState(400);
-  const [range, setRange] = useState('');
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [dropping, setDropping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -82,10 +67,9 @@ export function PdfToImagesPage({
     };
   }, [readyUrl]);
 
-  const dpi = preset === 'custom' ? customDpi : Number(preset);
   const info = source.kind === 'ready' ? source.info : null;
-  const pages = info ? parsePageRange(range, info.pages) : null;
-  const size = info?.firstPage ? pagePixels(info.firstPage, dpi) : null;
+  const raster = useRasterSettings(info);
+  const { pages } = raster;
   const running = status.kind === 'running' || status.kind === 'preparing';
 
   async function open(file: File | undefined) {
@@ -95,7 +79,7 @@ export function PdfToImagesPage({
       return;
     }
     setNotPdf('');
-    setRange('');
+    raster.setRange('');
     setStatus({ kind: 'idle' });
     if (source.kind === 'ready' && source.info.thumbUrl) URL.revokeObjectURL(source.info.thumbUrl);
     setSource({ kind: 'reading', file });
@@ -114,8 +98,8 @@ export function PdfToImagesPage({
     try {
       const name = baseName(source.file.name);
       const images = await rasterize(source.file, name, {
-        dpi,
-        format,
+        dpi: raster.dpi,
+        format: raster.format,
         pages,
         signal: controller.signal,
         onProgress: (done, total) => setStatus({ kind: 'running', done, total }),
@@ -236,84 +220,7 @@ export function PdfToImagesPage({
 
         {info ? (
           <div className={styles.options}>
-            <RadioGroup<RasterFormat>
-              legend={t('pdfToImages.format')}
-              value={format}
-              onChange={(f) => {
-                setFormat(f);
-                resetResult();
-              }}
-              options={[
-                { value: 'jpeg', label: t('pdfToImages.jpeg') },
-                { value: 'png', label: t('pdfToImages.png') },
-              ]}
-            />
-
-            <fieldset className={styles.dpi}>
-              <legend>{t('pdfToImages.resolution')}</legend>
-              <div className={styles.segmented}>
-                {[...PRESETS.map(String), 'custom'].map((value) => (
-                  <label key={value} data-checked={preset === value || undefined}>
-                    <input
-                      type="radio"
-                      name="dpi"
-                      value={value}
-                      checked={preset === value}
-                      onChange={() => {
-                        setPreset(value);
-                        resetResult();
-                      }}
-                    />
-                    {value === 'custom' ? t('pdfToImages.custom') : value}
-                  </label>
-                ))}
-                <span className={styles.unit}>{t('pdfToImages.dpi')}</span>
-              </div>
-              {preset === 'custom' ? (
-                <NumberField
-                  label={t('pdfToImages.resolution')}
-                  value={customDpi}
-                  min={36}
-                  max={1200}
-                  integer
-                  unit={t('pdfToImages.dpi')}
-                  onChange={(v) => {
-                    setCustomDpi(v);
-                    resetResult();
-                  }}
-                />
-              ) : null}
-            </fieldset>
-
-            <div className={styles.range}>
-              <label htmlFor={rangeId}>{t('pdfToImages.range')}</label>
-              <input
-                id={rangeId}
-                value={range}
-                placeholder={t('pdfToImages.rangeHint')}
-                autoComplete="off"
-                spellCheck={false}
-                aria-invalid={pages === null || undefined}
-                onChange={(e) => {
-                  setRange(e.target.value);
-                  resetResult();
-                }}
-              />
-              {pages === null ? (
-                <p className={styles.error}>
-                  {t('pdfToImages.rangeInvalid', { count: info.pages })}
-                </p>
-              ) : null}
-            </div>
-
-            {size ? (
-              <p className={styles.info}>
-                {t('pdfToImages.size', { w: size.width, h: size.height })}
-                {size.width * size.height > BIG_PAGE ? (
-                  <span className={styles.warning}> {t('pdfToImages.big')}</span>
-                ) : null}
-              </p>
-            ) : null}
+            <RasterFields settings={raster} pageCount={info.pages} onChange={resetResult} />
           </div>
         ) : null}
 

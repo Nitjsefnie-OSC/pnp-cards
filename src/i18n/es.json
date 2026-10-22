@@ -340,7 +340,7 @@
   },
   "extract": {
     "title": "Extraer imágenes",
-    "intro": "Saca las imágenes que lleva dentro un PDF, a su resolución original. Las repetidas se guardan una vez, con « xN» en el nombre.",
+    "intro": "Saca las imágenes que lleva dentro un PDF, a su resolución original, o cada página entera como una imagen. Las repetidas se guardan una vez, con « xN» en el nombre.",
     "choose": "Elegir PDF",
     "change": "Elegir otro PDF",
     "empty": "Arrastra aquí un PDF o pulsa «Elegir PDF».",
@@ -371,7 +371,23 @@
     "zipName": "{{name}} imágenes.zip",
     "unreadable": "{{name}} no se puede leer: está dañado.",
     "encrypted": "{{name}} está protegido con contraseña y no se puede leer.",
-    "errorUnknown": "No se han podido extraer las imágenes ({{message}})."
+    "errorUnknown": "No se han podido extraer las imágenes ({{message}}).",
+    "reading": "Leyendo…",
+    "pages_one": "{{count}} página",
+    "pages_other": "{{count}} páginas",
+    "mode": "Qué extraer",
+    "modeImages": "Imágenes sueltas",
+    "modePages": "Páginas completas",
+    "pagesHint": "Cada página como una imagen. Útil cuando las cartas están dibujadas con vectores, montadas en varias capas o troceadas.",
+    "extractPages": "Extraer páginas",
+    "drawing": "Dibujando páginas: {{done}} de {{total}}",
+    "pagesFound_one": "{{count}} página extraída",
+    "pagesFound_other": "{{count}} páginas extraídas",
+    "pagesSelected_one": "{{count}} página elegida",
+    "pagesSelected_other": "{{count}} páginas elegidas",
+    "toSplit": "Dividir en cartas",
+    "zipNamePages": "{{name}} páginas.zip",
+    "cantRead": "No se puede leer: está dañado o protegido con contraseña."
   },
   "templates": {
     "title": "Plantillas",

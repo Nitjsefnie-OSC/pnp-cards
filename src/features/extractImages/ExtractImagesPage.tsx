@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { track } from '../../analytics/track';
 import { useNavigate } from 'react-router-dom';
 import { downloadBlob } from '../../components/download';
-import { Checkbox } from '../../components/form/Fields';
+import { Checkbox, RadioGroup } from '../../components/form/Fields';
 import { zipFiles } from '../../components/zipFiles';
+import { inspectPdf, type PdfInfo } from '../../pdf/pdfjs';
+import { rasterizePdf, type PageImage, type RasterOptions } from '../../pdf/rasterize';
 import { renderExtracted, type ExtractedImage } from '../../pdf/renderExtracted';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import {
@@ -15,13 +17,20 @@ import {
 } from '../../workers/pdfClient';
 import type { Analysis } from '../../pdf/extractImages';
 import { loadImage } from '../cards/loadImages';
+import { RasterFields } from '../pdfToImages/RasterFields';
+import { useRasterSettings } from '../pdfToImages/useRasterSettings';
+import { useSplitStore } from '../split/splitStore';
+import { useExtractStore, type ExtractMode } from './extractStore';
 import styles from './ExtractImagesPage.module.css';
+
+type Info = { kind: 'reading' } | { kind: 'ready'; info: PdfInfo } | { kind: 'unreadable' };
 
 type Status =
   | { kind: 'idle' }
   | { kind: 'analyzing'; done: number; total: number }
   | { kind: 'rendering'; done: number; total: number }
-  | { kind: 'ready'; images: ExtractedImage[]; skipped: number }
+  | { kind: 'drawing'; done: number; total: number }
+  | { kind: 'ready'; mode: ExtractMode; images: ExtractedImage[]; skipped: number }
   | { kind: 'preparing' }
   | { kind: 'cancelled' }
   | { kind: 'error'; message: string };
@@ -38,6 +47,10 @@ async function extractedToImages(images: ExtractedImage[]) {
   return loaded;
 }
 
+/** Las páginas dibujadas, como imágenes extraídas que aparecen una vez. */
+const pagesToExtracted = (pages: PageImage[]): ExtractedImage[] =>
+  pages.map((p) => ({ ...p, count: 1 }));
+
 /** Miniatura de una imagen extraída (URL temporal mientras se ve). */
 function Thumb({ blob }: { blob: Blob }) {
   const url = useMemo(() => URL.createObjectURL(blob), [blob]);
@@ -50,6 +63,8 @@ export function ExtractImagesPage({
   renderImages = renderExtracted,
   zip = zipFiles,
   toImages = extractedToImages,
+  inspect = inspectPdf,
+  rasterize = rasterizePdf,
 }: {
   analyze?: AnalyzePdfImages;
   renderImages?: (
@@ -59,10 +74,15 @@ export function ExtractImagesPage({
   ) => Promise<ExtractedImage[]>;
   zip?: (files: ExtractedImage[]) => Promise<Blob>;
   toImages?: (images: ExtractedImage[]) => Promise<NewImage[]>;
+  inspect?: (file: Blob) => Promise<PdfInfo>;
+  rasterize?: (file: Blob, baseName: string, options: RasterOptions) => Promise<PageImage[]>;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
+  const [info, setInfo] = useState<Info>({ kind: 'reading' });
+  const { mode, setMode } = useExtractStore();
+  const raster = useRasterSettings(info.kind === 'ready' ? info.info : null);
   const [notPdf, setNotPdf] = useState('');
   const [ignoreSmall, setIgnoreSmall] = useState(true);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
@@ -71,12 +91,15 @@ export function ExtractImagesPage({
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const running =
-    status.kind === 'analyzing' || status.kind === 'rendering' || status.kind === 'preparing';
+  const working =
+    status.kind === 'analyzing' || status.kind === 'rendering' || status.kind === 'drawing';
+  const running = working || status.kind === 'preparing';
+  const pagesMode = mode === 'pages';
+  const canExtract = !pagesMode || (info.kind === 'ready' && raster.pages !== null);
   const images = status.kind === 'ready' ? status.images : [];
   const chosen = images.filter((i) => !excluded.has(i.name));
 
-  function open(f: File | undefined) {
+  async function open(f: File | undefined) {
     if (!f) return;
     if (!isPdf(f)) {
       setNotPdf(t('extract.notPdf', { name: f.name }));
@@ -85,12 +108,62 @@ export function ExtractImagesPage({
     setNotPdf('');
     setFile(f);
     setStatus({ kind: 'idle' });
+    raster.setRange('');
+    setInfo({ kind: 'reading' });
+    try {
+      const read = await inspect(f);
+      // Aquí no se enseña la miniatura.
+      if (read.thumbUrl) URL.revokeObjectURL(read.thumbUrl);
+      setInfo({ kind: 'ready', info: read });
+    } catch {
+      setInfo({ kind: 'unreadable' });
+    }
+  }
+
+  function changeMode(next: ExtractMode) {
+    setMode(next);
+    setExcluded(new Set());
+    setStatus((s) => (s.kind === 'ready' || s.kind === 'cancelled' ? { kind: 'idle' } : s));
+  }
+
+  async function extractPages(f: File, signal: AbortSignal) {
+    const pages = raster.pages;
+    if (!pages) return;
+    setStatus({ kind: 'drawing', done: 0, total: pages.length });
+    const result = await rasterize(f, baseName(f.name), {
+      dpi: raster.dpi,
+      format: raster.format,
+      pages,
+      signal,
+      onProgress: (done, total) => setStatus({ kind: 'drawing', done, total }),
+    });
+    setExcluded(new Set());
+    track({ name: 'extraer-imagenes', mode: 'paginas' });
+    setStatus({ kind: 'ready', mode: 'pages', images: pagesToExtracted(result), skipped: 0 });
   }
 
   async function extract() {
     if (!file) return;
     const controller = new AbortController();
     abortRef.current = controller;
+    if (pagesMode) {
+      try {
+        await extractPages(file, controller.signal);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError')
+          setStatus({ kind: 'cancelled' });
+        else
+          setStatus({
+            kind: 'error',
+            message: t('extract.errorUnknown', {
+              message: err instanceof Error ? err.message : String(err),
+            }),
+          });
+      } finally {
+        abortRef.current = null;
+      }
+      return;
+    }
     const options: TaskOptions = {
       signal: controller.signal,
       onProgress: (done, total) => setStatus({ kind: 'analyzing', done, total }),
@@ -107,8 +180,8 @@ export function ExtractImagesPage({
         setStatus({ kind: 'rendering', done, total });
       });
       setExcluded(new Set());
-      track({ name: 'extraer-imagenes' });
-      setStatus({ kind: 'ready', images: result, skipped: analysis.skipped });
+      track({ name: 'extraer-imagenes', mode: 'imagenes' });
+      setStatus({ kind: 'ready', mode: 'images', images: result, skipped: analysis.skipped });
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError')
         setStatus({ kind: 'cancelled' });
@@ -135,16 +208,28 @@ export function ExtractImagesPage({
     });
   }
 
+  const resultMode = status.kind === 'ready' ? status.mode : mode;
+
   async function download() {
     if (!file) return;
-    downloadBlob(await zip(chosen), t('extract.zipName', { name: baseName(file.name) }));
+    const name = baseName(file.name);
+    downloadBlob(
+      await zip(chosen),
+      t(resultMode === 'pages' ? 'extract.zipNamePages' : 'extract.zipName', { name }),
+    );
   }
 
-  async function addToCards() {
+  async function sendTo(target: 'cards' | 'split') {
     const selection = chosen;
     setStatus({ kind: 'preparing' });
-    useCardsStore.getState().addImages(await toImages(selection));
-    navigate('/');
+    const loaded = await toImages(selection);
+    if (target === 'cards') {
+      useCardsStore.getState().addImages(loaded);
+      navigate('/');
+    } else {
+      useSplitStore.getState().add(loaded);
+      navigate('/split');
+    }
   }
 
   return (
@@ -162,7 +247,7 @@ export function ExtractImagesPage({
         if (!hasFiles(e)) return;
         e.preventDefault();
         setDropping(false);
-        open(e.dataTransfer.files[0]);
+        void open(e.dataTransfer.files[0]);
       }}
     >
       <div className={styles.column}>
@@ -178,7 +263,7 @@ export function ExtractImagesPage({
           hidden
           data-testid="pdf-input"
           onChange={(e) => {
-            open(e.target.files?.[0]);
+            void open(e.target.files?.[0]);
             e.target.value = '';
           }}
         />
@@ -201,13 +286,40 @@ export function ExtractImagesPage({
           </div>
         ) : (
           <div className={styles.source}>
-            <span className={styles.name}>{file.name}</span>
-            <Checkbox
-              label={t('extract.ignoreSmall')}
-              hint={t('extract.ignoreSmallHint')}
-              checked={ignoreSmall}
-              onChange={setIgnoreSmall}
-            />
+            <span className={styles.sourceTitle}>
+              <span className={styles.name}>{file.name}</span>
+              <span className={info.kind === 'unreadable' ? styles.error : styles.muted}>
+                {info.kind === 'reading'
+                  ? t('extract.reading')
+                  : info.kind === 'unreadable'
+                    ? t('extract.cantRead')
+                    : t('extract.pages', { count: info.info.pages })}
+              </span>
+            </span>
+            <div className={styles.settings}>
+              <RadioGroup<ExtractMode>
+                legend={t('extract.mode')}
+                value={mode}
+                onChange={changeMode}
+                options={[
+                  { value: 'images', label: t('extract.modeImages') },
+                  { value: 'pages', label: t('extract.modePages') },
+                ]}
+              />
+              {!pagesMode ? (
+                <Checkbox
+                  label={t('extract.ignoreSmall')}
+                  hint={t('extract.ignoreSmallHint')}
+                  checked={ignoreSmall}
+                  onChange={setIgnoreSmall}
+                />
+              ) : info.kind === 'ready' ? (
+                <div className={styles.options}>
+                  <p className={styles.hint}>{t('extract.pagesHint')}</p>
+                  <RasterFields settings={raster} pageCount={info.info.pages} />
+                </div>
+              ) : null}
+            </div>
             <div className={styles.sourceActions}>
               <button
                 type="button"
@@ -217,7 +329,7 @@ export function ExtractImagesPage({
               >
                 {t('extract.change')}
               </button>
-              {status.kind === 'analyzing' || status.kind === 'rendering' ? (
+              {working ? (
                 <button
                   type="button"
                   className={styles.secondary}
@@ -229,10 +341,10 @@ export function ExtractImagesPage({
                 <button
                   type="button"
                   className={styles.primary}
-                  disabled={running}
+                  disabled={running || !canExtract}
                   onClick={() => void extract()}
                 >
-                  {t('extract.extract')}
+                  {t(pagesMode ? 'extract.extractPages' : 'extract.extract')}
                 </button>
               )}
             </div>
@@ -240,11 +352,11 @@ export function ExtractImagesPage({
         )}
 
         <div aria-live="polite" className={styles.status}>
-          {status.kind === 'analyzing' || status.kind === 'rendering' ? (
+          {working ? (
             <>
               <progress max={status.total || 1} value={status.done} className={styles.progress} />
               <span>
-                {t(status.kind === 'analyzing' ? 'extract.analyzing' : 'extract.rendering', {
+                {t(`extract.${status.kind}`, {
                   done: status.done,
                   total: status.total,
                 })}
@@ -261,9 +373,11 @@ export function ExtractImagesPage({
           ) : status.kind === 'ready' ? (
             <>
               <span>
-                {images.length === 0
-                  ? t('extract.none')
-                  : t('extract.found', { count: images.length })}
+                {status.mode === 'pages'
+                  ? t('extract.pagesFound', { count: images.length })
+                  : images.length === 0
+                    ? t('extract.none')
+                    : t('extract.found', { count: images.length })}
               </span>
               {status.skipped > 0 ? (
                 <span className={styles.muted}>
@@ -319,7 +433,11 @@ export function ExtractImagesPage({
               })}
             </ul>
             <div className={styles.footer}>
-              <span>{t('extract.selected', { count: chosen.length })}</span>
+              <span>
+                {t(resultMode === 'pages' ? 'extract.pagesSelected' : 'extract.selected', {
+                  count: chosen.length,
+                })}
+              </span>
               <div className={styles.actions}>
                 <button
                   type="button"
@@ -331,9 +449,17 @@ export function ExtractImagesPage({
                 </button>
                 <button
                   type="button"
+                  className={styles.secondary}
+                  disabled={chosen.length === 0 || running}
+                  onClick={() => void sendTo('split')}
+                >
+                  {t('extract.toSplit')}
+                </button>
+                <button
+                  type="button"
                   className={styles.primary}
                   disabled={chosen.length === 0 || running}
-                  onClick={() => void addToCards()}
+                  onClick={() => void sendTo('cards')}
                 >
                   {t('extract.addToCards')}
                 </button>
