@@ -1,10 +1,8 @@
 name: Deploy to GitHub Pages
 
+# Publica main en GitHub Pages al mergear (las PR se comprueban en ci.yml).
 on:
   push:
-    branches: [main]
-  # En las PR solo se comprueba (job build, exigido para mergear); no se despliega.
-  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -14,11 +12,11 @@ permissions:
   id-token: write
 
 concurrency:
-  # Cada PR en su grupo, para que no cancele un despliegue de main.
-  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.ref) || 'pages' }}
+  group: pages
   cancel-in-progress: true
 
 jobs:
+  # Se vuelve a comprobar y compilar: es el main ya mergeado lo que se publica.
   build:
     runs-on: ubuntu-latest
     steps:
@@ -34,13 +32,11 @@ jobs:
         env:
           # Código de GoatCounter (Settings → Variables). Sin él, no se envían estadísticas.
           VITE_GOATCOUNTER_CODE: ${{ vars.GOATCOUNTER_CODE }}
-      - if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
-    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:
