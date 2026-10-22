@@ -43,9 +43,16 @@ describe('detectImageFormat', () => {
     expect(detectImageFormat(ftyp('avis', 'avif', 'msf1'))).toBe('avif');
   });
 
-  it('no confunde otros ftyp (vídeo MP4, HEIC) con AVIF', () => {
+  it.each(['heic', 'heix', 'hevc', 'heim', 'heis', 'mif1', 'msf1'])(
+    'reconoce HEIC/HEIF por la marca %s',
+    (brand) => {
+      expect(detectImageFormat(ftyp(brand, 'mif1', 'heic'))).toBe('heic');
+    },
+  );
+
+  it('no confunde otros ftyp (vídeo MP4) con AVIF ni HEIC', () => {
     expect(detectImageFormat(ftyp('isom', 'mp41'))).toBe('other');
-    expect(detectImageFormat(ftyp('heic', 'mif1'))).toBe('other');
+    expect(detectImageFormat(ftyp('mp42', 'isom'))).toBe('other');
   });
 
   it('devuelve other con WebP, GIF o archivos cortos', () => {
@@ -71,11 +78,14 @@ describe('isImageFileName', () => {
     'carta.bmp',
     'carta.tif',
     'carta.tiff',
+    'carta.heic',
+    'IMG_0001.HEIC',
+    'carta.heif',
   ])('acepta %s', (name) => {
     expect(isImageFileName(name)).toBe(true);
   });
 
-  it.each(['carta.pdf', 'carta.txt', 'jfif', 'carta.jfif.zip', 'carta.heic'])(
+  it.each(['carta.pdf', 'carta.txt', 'jfif', 'carta.jfif.zip', 'carta.heic.mov'])(
     'rechaza %s',
     (name) => {
       expect(isImageFileName(name)).toBe(false);
@@ -96,6 +106,8 @@ describe('IMAGE_ACCEPT', () => {
         '.pjpeg',
         '.pjp',
         '.avif',
+        '.heic',
+        '.heif',
       ]),
     );
   });

@@ -23,11 +23,19 @@ export default defineConfig({
       workbox: {
         // Todo el build, workers de PDF y pdf.js incluidos, para usarla sin conexión.
         globPatterns: ['**/*.{js,mjs,css,html,svg,png,woff2,webmanifest}'],
+        // Salvo libheif (~2 MB, solo para fotos HEIC): se guarda la primera vez que se usa.
+        globIgnores: ['**/libheif-bundle-*.js'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
-        // Sin caché en tiempo de ejecución: las peticiones a otros dominios no pasan por aquí.
-        runtimeCaching: [],
+        // Solo libheif; las peticiones a otros dominios no pasan por aquí.
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/libheif-bundle-[\w-]+\.js$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'libheif', expiration: { maxEntries: 1 } },
+          },
+        ],
       },
       devOptions: { enabled: false },
     }),

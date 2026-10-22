@@ -39,6 +39,7 @@
     "dropHere": "Drop the images to add them",
     "loading": "Loading {{count}} images…",
     "failed": "Could not read: {{names}}",
+    "heicOffline": "HEIC photos need a connection the first time, to download their converter. Connect to the internet and add them again.",
     "blankName": "Blank",
     "copies": "Number of copies",
     "copiesOf": "Copies of {{name}}",

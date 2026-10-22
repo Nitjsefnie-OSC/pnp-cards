@@ -12,6 +12,7 @@ export type GeneratePdf = (input: BuildInput, options?: TaskOptions) => Promise<
 export type MergePdfs = (input: MergeInput, options?: TaskOptions) => Promise<Uint8Array>;
 export type SplitImages = (input: SplitInput, options?: TaskOptions) => Promise<Uint8Array>;
 export type AnalyzePdfImages = (input: ExtractInput, options?: TaskOptions) => Promise<Analysis>;
+export type ConvertHeic = (data: ArrayBuffer, options?: TaskOptions) => Promise<Blob>;
 
 /** Genera el PDF de cartas en un Web Worker (con progreso y cancelación). */
 export const generatePdf: GeneratePdf = (input, options) =>
@@ -42,5 +43,16 @@ export const analyzePdfImages: AnalyzePdfImages = (input, options) =>
   runWorker<Analysis>(
     () => new Worker(new URL('./extract.worker.ts', import.meta.url), { type: 'module' }),
     input,
+    options,
+  );
+
+/**
+ * Convierte una foto HEIC/HEIF a JPG en un Web Worker. libheif pesa: el worker no se precarga
+ * (ver `globIgnores` en vite.config.ts), así que la primera vez necesita conexión.
+ */
+export const convertHeic: ConvertHeic = (data, options) =>
+  runWorker<Blob>(
+    () => new Worker(new URL('./heic.worker.ts', import.meta.url), { type: 'module' }),
+    data,
     options,
   );

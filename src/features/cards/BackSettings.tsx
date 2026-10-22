@@ -5,7 +5,7 @@ import type { BackFlip } from '../../lib/settings';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { IMAGE_ACCEPT } from '../../lib/imageFormat';
-import { loadImage as defaultLoadImage } from './loadImages';
+import { HeicOfflineError, loadImage as defaultLoadImage } from './loadImages';
 import styles from './SettingsPanel.module.css';
 
 /** Reversos: activarlos, elegir la imagen del reverso común y cómo se da la vuelta al papel. */
@@ -25,8 +25,9 @@ export function BackSettings({
     try {
       useCardsStore.getState().setBack(await loadImage(file));
       setError(null);
-    } catch {
-      setError(t('settings.backFailed', { name: file.name }));
+    } catch (err) {
+      const offline = err instanceof HeicOfflineError ? ` ${t('cards.heicOffline')}` : '';
+      setError(t('settings.backFailed', { name: file.name }) + offline);
     }
   }
 

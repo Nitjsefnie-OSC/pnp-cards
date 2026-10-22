@@ -23,6 +23,7 @@ const FORMAT_NAMES: Record<string, string> = {
   gif: 'GIF',
   bmp: 'BMP',
   avif: 'AVIF',
+  heic: 'HEIC',
 };
 
 function Row({ label, children }: { label: string; children: ReactNode }) {

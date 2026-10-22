@@ -39,6 +39,7 @@
     "dropHere": "Suelta las imágenes para añadirlas",
     "loading": "Cargando {{count}} imágenes…",
     "failed": "No se han podido leer: {{names}}",
+    "heicOffline": "Las fotos HEIC necesitan conexión la primera vez, para descargar su conversor. Conéctate a internet y vuelve a añadirlas.",
     "blankName": "En blanco",
     "copies": "Número de copias",
     "copiesOf": "Copias de {{name}}",
