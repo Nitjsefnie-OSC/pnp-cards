@@ -27,7 +27,7 @@ describe('Layout', () => {
 
   it('enlaza a PayPal.Me en otra pestaña', () => {
     const donate = screen.getByRole('link', { name: 'Donar (se abre en otra pestaña)' });
-    expect(donate).toHaveAttribute('href', 'https://paypal.me/Onzebol');
+    expect(donate).toHaveAttribute('href', 'https://paypal.me/Onzebol/5EUR');
     expect(donate).toHaveAttribute('target', '_blank');
     expect(donate).toHaveAttribute('rel', 'noopener noreferrer');
   });

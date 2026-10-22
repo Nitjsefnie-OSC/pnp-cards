@@ -18,7 +18,7 @@ const TOOLS = [
 ] as const;
 
 /** Donaciones por PayPal.Me (el botón antiguo de PDFCartas ya no acepta donaciones). */
-const DONATE_URL = 'https://paypal.me/Onzebol';
+const DONATE_URL = 'https://paypal.me/Onzebol/5EUR';
 
 export function Layout() {
   const { t, i18n } = useTranslation();
