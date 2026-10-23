@@ -249,4 +249,101 @@ describe('buildPdf', () => {
       for (const m of matrices) expect(Math.abs(Number(m[1]))).toBeLessThan(1e-9);
     });
   });
+
+  describe('ahorro de tinta', () => {
+    /** Estados gráficos de los recursos de una página. */
+    const extGStates = (doc: PDFDocument, index: number) => {
+      const states = doc.getPage(index).node.Resources()?.lookup(PDFName.of('ExtGState'), PDFDict);
+      if (!states) return [];
+      return states.entries().map(([key]) => {
+        const d = states.lookup(key, PDFDict);
+        return { BM: String(d.get(PDFName.of('BM'))), ca: String(d.get(PDFName.of('ca'))) };
+      });
+    };
+
+    it('sin la opción no usa estados gráficos ni transparencias', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({ settings: DEFAULT_SETTINGS, cards: [card(jpg, 'jpeg', 1)] }),
+      );
+      expect(extGStates(doc, 0)).toEqual([]);
+      expect(pageContent(doc, 0)).not.toMatch(/ gs$/m);
+    });
+
+    it('sobre cada carta pinta un gris con fusión «Saturation» y un blanco al 50 %, sin recodificar', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({
+          settings: { ...DEFAULT_SETTINGS, inkSaver: true },
+          cards: [card(jpg, 'jpeg', 2)],
+        }),
+      );
+      // Un estado por capa y por página: el PDF no engorda con las copias.
+      expect(extGStates(doc, 0).sort((a, b) => a.BM.localeCompare(b.BM))).toEqual([
+        { BM: '/Normal', ca: '0.5' },
+        { BM: '/Saturation', ca: '1' },
+      ]);
+      const content = pageContent(doc, 0);
+      // Dos cartas: dos rectángulos en cada capa, del tamaño de cada carta (30 × 42 px a 300 ppp).
+      const w = (30 / 300) * 72;
+      const h = (42 / 300) * 72;
+      const rects = [...content.matchAll(/^(\S+) (\S+) (\S+) (\S+) re$/gm)].map((m) =>
+        m.slice(1, 5).map(Number),
+      );
+      // Las máscaras de recorte no están activadas: solo quedan los rectángulos del ahorro.
+      expect(rects).toHaveLength(4);
+      for (const r of rects) {
+        expect(r[2]).toBeCloseTo(w, 6);
+        expect(r[3]).toBeCloseTo(h, 6);
+      }
+      expect(rects[0]).toEqual(rects[2]);
+      expect(rects[1]).toEqual(rects[3]);
+      // Gris al 50 % en la primera capa y blanco en la segunda, cada una dentro de su estado.
+      expect(content).toMatch(/\/\S+ gs\n0\.5 0\.5 0\.5 rg\n/);
+      expect(content).toMatch(/\/\S+ gs\n1 1 1 rg\n/);
+      // Las imágenes siguen sin tocarse.
+      const streams = imageStreams(doc);
+      expect(streams).toHaveLength(1);
+      expect(streams[0].contents).toEqual(jpg);
+    });
+
+    it('las capas van después de las cartas y antes de las líneas de corte, que conservan su color', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({
+          settings: {
+            ...DEFAULT_SETTINGS,
+            inkSaver: true,
+            cutLines: { ...DEFAULT_SETTINGS.cutLines, enabled: true, color: '#ff0000' },
+          },
+          cards: [card(jpg, 'jpeg', 1)],
+        }),
+      );
+      const content = pageContent(doc, 0);
+      const image = content.search(/ Do$/m);
+      const layers = content.search(/ gs$/m);
+      const lines = content.search(/^1 0 0 RG$/m);
+      expect(image).toBeGreaterThan(-1);
+      expect(layers).toBeGreaterThan(image);
+      expect(lines).toBeGreaterThan(layers);
+      // El estado gráfico se restaura antes de las líneas: tantos Q como q.
+      expect(content.match(/^q$/gm)).toHaveLength(content.match(/^Q$/gm)!.length);
+      expect(content.slice(lines)).not.toMatch(/ gs$/m);
+    });
+
+    it('también aclara los reversos, pero no las cartas en blanco', async () => {
+      const build = (inkSaver: boolean) =>
+        buildPdf({
+          settings: { ...DEFAULT_SETTINGS, inkSaver, backs: { enabled: true, flip: 'long' } },
+          cards: [card(jpg, 'jpeg', 1), { ...card(jpg, 'jpeg', 1), data: null }],
+          back: { data: new Blob([png]), format: 'png', widthPx: 30, heightPx: 42 },
+        });
+      const plain = await PDFDocument.load(await build(false));
+      const saver = await PDFDocument.load(await build(true));
+      const rects = (doc: PDFDocument, index: number) =>
+        pageContent(doc, index).match(/ re$/gm)?.length ?? 0;
+      // Carta y reverso: un rectángulo más por capa en cada página (el reverso ya lleva el de su
+      // recorte), y nada sobre la carta en blanco.
+      expect(rects(saver, 0) - rects(plain, 0)).toBe(2);
+      expect(rects(saver, 1) - rects(plain, 1)).toBe(2);
+      expect(extGStates(saver, 1).map((s) => s.BM)).toEqual(['/Saturation', '/Normal']);
+    });
+  });
 });

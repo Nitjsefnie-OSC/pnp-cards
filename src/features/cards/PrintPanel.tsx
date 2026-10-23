@@ -103,6 +103,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
         cutLines: settings.cutLines.enabled,
         bleed: settings.bleed.enabled,
         backs: settings.backs.enabled,
+        inkSaver: settings.inkSaver,
       });
       setStatus({
         kind: 'ready',

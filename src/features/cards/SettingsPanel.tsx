@@ -352,6 +352,15 @@ export function SettingsPanel() {
         ) : null}
       </Section>
 
+      <Section title={t('settings.print')} help="print-real-size">
+        <Checkbox
+          label={t('settings.inkSaver')}
+          hint={t('settings.inkSaverHint')}
+          checked={s.inkSaver}
+          onChange={(inkSaver) => update({ inkSaver })}
+        />
+      </Section>
+
       <div className={styles.footer}>
         <Checkbox label={t('settings.openAfter')} checked={openAfter} onChange={setOpenAfter} />
         <button type="button" className={styles.reset} onClick={reset}>

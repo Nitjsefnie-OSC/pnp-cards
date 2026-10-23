@@ -47,6 +47,15 @@
           "type": "p",
           "text": "Set the printer to the same paper size as the PDF page (A4 unless you changed it under Layout). Card stock of 200 to 300 gsm gives stiffer cards; if your printer can’t take it, print on plain paper and glue it onto card or sleeve it."
         },
+        { "type": "h", "text": "Ink saver" },
+        {
+          "type": "p",
+          "text": "To playtest a game before printing it for real you don’t need colour. With “Ink saver”, under Settings › Printing, cards and backs come out in lighter greyscale: white stays white and black becomes a mid grey, so text stays readable while backgrounds use far less ink. Cut lines and bleed keep their colour."
+        },
+        {
+          "type": "note",
+          "text": "It is done with PDF transparency, without touching the images. If your printer or viewer ignores it and the cards come out in colour, open the PDF in another viewer (Chrome and Acrobat print it correctly)."
+        },
         { "type": "h", "text": "Double-sided" },
         {
           "type": "p",

@@ -15,6 +15,7 @@ export type AnalyticsEvent =
       cutLines: boolean;
       bleed: boolean;
       backs: boolean;
+      inkSaver: boolean;
     }
   | { name: 'pdf-error'; code: string }
   | { name: 'pdf-cancelado' }
@@ -72,6 +73,7 @@ export function eventPaths(event: AnalyticsEvent): string[] {
         ...(event.cutLines ? [`${base}/opcion/lineas-de-corte`] : []),
         ...(event.bleed ? [`${base}/opcion/margen-de-corte`] : []),
         ...(event.backs ? [`${base}/opcion/reversos`] : []),
+        ...(event.inkSaver ? [`${base}/opcion/ahorro-de-tinta`] : []),
       ];
     case 'pdf-error':
       return [base, `${base}/codigo/${clean(event.code)}`];

@@ -5,10 +5,13 @@ import {
   concatTransformationMatrix,
   degrees,
   endPath,
+  fill,
   popGraphicsState,
   pushGraphicsState,
   rectangle,
   rgb,
+  setFillingRgbColor,
+  setGraphicsState,
   type PDFFont,
   type PDFImage,
   type PDFPage,
@@ -18,7 +21,7 @@ import type { Dpi } from '../lib/dpi';
 import type { HeaderPlacement } from '../lib/header';
 import { planDocument } from '../lib/plan';
 import { slotLocalSize, slotMatrix } from '../lib/template';
-import type { LayoutSettings } from '../lib/settings';
+import { INK_SAVER_LIGHTEN, type LayoutSettings } from '../lib/settings';
 
 export interface PdfCard {
   /** null en una imagen en blanco. */
@@ -98,6 +101,38 @@ function drawHeader(
   });
 }
 
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Ahorro de tinta sobre los huecos con carta: un gris con fusión «Saturation» (que la deja en
+ * escala de grises con la misma luminosidad) y encima un blanco semitransparente que la aclara.
+ * Las imágenes no se tocan. Son transparencias de PDF 1.4; pdf-lib no conoce ese modo de fusión,
+ * así que el estado gráfico se crea a mano.
+ */
+function drawInkSaver(page: PDFPage, rects: Rect[]) {
+  if (rects.length === 0) return;
+  const layers = [
+    { state: { BM: 'Saturation', ca: 1 }, gray: 0.5 },
+    { state: { BM: 'Normal', ca: INK_SAVER_LIGHTEN }, gray: 1 },
+  ];
+  for (const { state, gray } of layers) {
+    const key = page.node.newExtGState('GS', page.doc.context.obj({ Type: 'ExtGState', ...state }));
+    page.pushOperators(
+      pushGraphicsState(),
+      setGraphicsState(key),
+      setFillingRgbColor(gray, gray, gray),
+      ...rects.map((r) => rectangle(r.x, r.y, r.width, r.height)),
+      fill(),
+      popGraphicsState(),
+    );
+  }
+}
+
 function hexToRgb(hex: string) {
   let h = hex.replace('#', '');
   if (h.length === 3) h = [...h].map((d) => d + d).join('');
@@ -157,9 +192,11 @@ export async function buildPdf(
 
     // En una página de reversos, cada hueco lleva la imagen del reverso con su propio recorte.
     const isBack = planned.side === 'back';
+    const drawn: Rect[] = [];
     for (const { card, placement, crop, rotation } of planned.items) {
       const source = isBack ? back! : cards[card];
       const img = await image(source);
+      if (img) drawn.push(placement);
       if (img && rotation !== undefined) {
         // Plantilla: se recorta al hueco y se gira el sistema de coordenadas; dentro, la carta
         // se dibuja sin girar (y con su recorte, si lo hay) de 0,0 a su tamaño.
@@ -188,6 +225,7 @@ export async function buildPdf(
       done += 1;
       onProgress?.(done, plan.total);
     }
+    if (settings.inkSaver) drawInkSaver(page, drawn);
 
     if (planned.header && header) {
       const label = header.texts.pageLabel
