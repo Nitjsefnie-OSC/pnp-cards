@@ -105,6 +105,29 @@
   color: var(--danger);
 }
 
+.dpi[data-ok] {
+  color: var(--ok);
+}
+
+/* Saldrá con menos de 300 ppp: etiqueta ámbar en su propia línea y borde de aviso en la carta. */
+.tile[data-low] .meta {
+  flex-wrap: wrap;
+}
+
+.dpi[data-low] {
+  margin-left: auto;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-s);
+  background: var(--note);
+  color: var(--note-text);
+  font-weight: 600;
+}
+
+.tile[data-low] {
+  padding: calc(var(--space-2) - 1px);
+  border: 2px dashed var(--accent);
+}
+
 .copies {
   display: flex;
   flex-direction: column;

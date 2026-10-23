@@ -213,7 +213,11 @@
         },
         {
           "type": "p",
-          "text": "El botón de información de cada carta muestra sus píxeles, su resolución y el tamaño que tendrá en el PDF."
+          "text": "La etiqueta de cada carta muestra los ppp con los que saldrá impresa de verdad: los píxeles de la imagen (o del recorte) entre su tamaño final, contando el tamaño forzado o el hueco de la plantilla. Si bajan de 300, la etiqueta pasa a aviso y, encima de la lista, otro aviso cuenta cuántas cartas saldrán con poca resolución. Busca imágenes más grandes o imprímelas más pequeñas."
+        },
+        {
+          "type": "p",
+          "text": "El botón de información de cada carta muestra sus píxeles, su resolución, los ppp con los que saldrá impresa y el tamaño que tendrá en el PDF."
         }
       ]
     },

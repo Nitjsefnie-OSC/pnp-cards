@@ -1,7 +1,8 @@
 import { useState, type CSSProperties } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
+import { fixedSize, lowResolution, MIN_PRINT_DPI } from '../../lib/cardInfo';
 import { ProjectBar } from '../../project/ProjectBar';
 import { useProjectActions } from '../../project/useProjectActions';
 import { CardTray } from './CardTray';
@@ -17,17 +18,30 @@ const TABS: Tab[] = ['cards', 'settings', 'preview'];
 function DpiWarning() {
   const { t } = useTranslation();
   const missing = useCardsStore((s) => s.cards.some((c) => c.blob && !c.dpi));
-  const sized = useSettingsStore(
-    (s) =>
-      s.settings.forceWidth ||
-      s.settings.forceHeight ||
-      s.settings.crop.enabled ||
-      s.settings.mode === 'template',
-  );
+  const sized = useSettingsStore((s) => fixedSize(s.settings));
   if (!missing || sized) return null;
   return (
     <p className={styles.warning} role="status">
       {t('cards.noDpi')}
+    </p>
+  );
+}
+
+/** Cuántas cartas saldrán por debajo de los ppp mínimos a su tamaño de impresión. */
+function LowDpiWarning() {
+  const settings = useSettingsStore((s) => s.settings);
+  const count = useCardsStore(
+    (s) => s.cards.filter((c) => c.blob && lowResolution(c, settings)).length,
+  );
+  if (count === 0) return null;
+  return (
+    <p className={`${styles.warning} ${styles.lowDpi}`} role="status">
+      <Trans
+        i18nKey="cards.lowDpi"
+        count={count}
+        values={{ min: MIN_PRINT_DPI }}
+        components={{ strong: <strong /> }}
+      />
     </p>
   );
 }
@@ -70,6 +84,7 @@ export function CardsPage() {
       <div id="panel-cards" className={styles.cards} data-active={tab === 'cards' || undefined}>
         <ProjectBar actions={actions} />
         <DpiWarning />
+        <LowDpiWarning />
         <CardTray onProjectFile={(file) => void actions.openFile(file)} />
       </div>
       <aside

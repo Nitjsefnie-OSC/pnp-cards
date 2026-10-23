@@ -10,7 +10,7 @@ import {
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { formatSize } from '../../components/formatSize';
-import { cardFit } from '../../lib/cardInfo';
+import { cardFit, fixedSize, lowResolution, printedDpi } from '../../lib/cardInfo';
 import { useCardsStore, type CardImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import styles from './CardTile.module.css';
@@ -59,6 +59,8 @@ function InfoContent({
   if (!card.blob && !card.missing) return <p>{t('cardInfo.blank')}</p>;
 
   const fit = card.blob ? cardFit(card, settings) : null;
+  const printed = card.blob ? printedDpi(card, settings) : null;
+  const low = card.blob ? lowResolution(card, settings) : false;
   const format = card.sourceFormat
     ? (FORMAT_NAMES[card.sourceFormat] ?? card.sourceFormat.toUpperCase())
     : null;
@@ -89,6 +91,17 @@ function InfoContent({
                 <span className={styles.infoWarning}>{t('cardInfo.noDpi')}</span>
               )}
             </Row>
+            {printed !== null && (low || fixedSize(settings)) ? (
+              <Row label={t('cardInfo.printed')}>
+                {low ? (
+                  <span className={styles.infoWarning}>
+                    {t('cardInfo.printedLow', { dpi: printed })}
+                  </span>
+                ) : (
+                  t('cardInfo.dpiValue', { dpi: printed })
+                )}
+              </Row>
+            ) : null}
             <Row label={t('cardInfo.physical')}>{size(fit.physicalMm)}</Row>
             <Row label={t('cardInfo.pdf')}>
               {fit.result.kind === 'same'

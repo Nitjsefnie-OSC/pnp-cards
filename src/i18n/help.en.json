@@ -151,7 +151,11 @@
         },
         {
           "type": "p",
-          "text": "The info button on each card shows its pixels, its resolution and the size it will have in the PDF."
+          "text": "Each card’s label shows the dpi it will really print at: the pixels of the image (or of the crop) over its final size, counting the forced size or the template slot. Below 300, the label turns into a warning and another notice above the list counts how many cards will print at low resolution. Look for bigger images or print them smaller."
+        },
+        {
+          "type": "p",
+          "text": "The info button on each card shows its pixels, its resolution, the dpi it will print at and the size it will have in the PDF."
         }
       ]
     },
