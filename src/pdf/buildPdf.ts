@@ -15,11 +15,13 @@ import {
   type PDFFont,
   type PDFImage,
   type PDFPage,
+  type RGB,
 } from 'pdf-lib';
 import { imageDrawRect } from '../lib/crop';
 import type { Dpi } from '../lib/dpi';
 import type { HeaderPlacement } from '../lib/header';
 import { planDocument } from '../lib/plan';
+import { RULER_LABEL, rulerCells, type RulerPlacement } from '../lib/ruler';
 import { slotLocalSize, slotMatrix } from '../lib/template';
 import { INK_SAVER_LIGHTEN, type LayoutSettings } from '../lib/settings';
 
@@ -108,6 +110,20 @@ interface Rect {
   height: number;
 }
 
+/** Grosor del contorno de la regla de comprobación (pt). */
+const RULER_BORDER = 0.4;
+
+/**
+ * Regla de comprobación: el contorno de la barra, sus casillas rellenas (una de cada dos) y el
+ * rótulo a la derecha, todo en el color de las líneas de corte.
+ */
+function drawRuler(page: PDFPage, font: PDFFont, ruler: RulerPlacement, color: RGB) {
+  const { x, y, width, height, label } = ruler;
+  page.drawRectangle({ x, y, width, height, borderColor: color, borderWidth: RULER_BORDER });
+  for (const cell of rulerCells(ruler)) page.drawRectangle({ ...cell, color });
+  page.drawText(RULER_LABEL, { x: label.x, y: label.y, size: label.size, font, color });
+}
+
 /**
  * Ahorro de tinta sobre los huecos con carta: un gris con fusión «Saturation» (que la deja en
  * escala de grises con la misma luminosidad) y encima un blanco semitransparente que la aclara.
@@ -174,11 +190,10 @@ export async function buildPdf(
 
   const bleedColor = hexToRgb(settings.bleed.color);
   const lineColor = hexToRgb(settings.cutLines.color);
-  // La fuente solo se incrusta si alguna página lleva cabecera.
-  const header =
-    input.header && plan.pages.some((p) => p.header !== null)
-      ? { font: await doc.embedFont(StandardFonts.Helvetica), texts: input.header }
-      : null;
+  // La fuente solo se incrusta si alguna página lleva cabecera o regla.
+  const needsFont = plan.pages.some((p) => (input.header && p.header !== null) || p.ruler !== null);
+  const font = needsFont ? await doc.embedFont(StandardFonts.Helvetica) : null;
+  const header = font && input.header ? { font, texts: input.header } : null;
   const headerName = header ? encodable(header.texts.name, header.font) : '';
   let done = 0;
 
@@ -233,6 +248,7 @@ export async function buildPdf(
         .replace('{{total}}', String(plan.sheets));
       drawHeader(page, header.font, planned.header, headerName, encodable(label, header.font));
     }
+    if (planned.ruler && font) drawRuler(page, font, planned.ruler, lineColor);
 
     if (planned.cutLines) {
       const thickness = planned.cutLines.lineWidth;

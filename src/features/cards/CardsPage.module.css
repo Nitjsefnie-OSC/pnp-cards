@@ -155,6 +155,16 @@
   cursor: default;
 }
 
+/* Aviso fijo: imprimir a tamaño real, no «Ajustar a la página». */
+.printNote {
+  margin: 0 var(--space-4) var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-s);
+  background: var(--note);
+  color: var(--note-text);
+  font-size: 0.875rem;
+}
+
 /* Divisor arrastrable en el borde izquierdo de la vista previa. */
 .divider {
   position: absolute;

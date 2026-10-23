@@ -232,6 +232,7 @@ describe('planDocument', () => {
       sheet: 1,
       side: 'back',
       header: null,
+      ruler: null,
       size: { width: 595, height: 842 },
       items: [{ card: 0, placement: { x: 10, y: 20, width: 30, height: 40 }, crop: null }],
       bleed: [{ x: 5, y: 15, width: 5, height: 50 }],
@@ -447,6 +448,82 @@ describe('planDocument', () => {
         y: page.header!.start.y - 5,
       });
       expect(moved.header?.end).toEqual({ x: page.header!.end.x + 10, y: page.header!.end.y - 5 });
+    });
+  });
+
+  describe('regla de comprobación', () => {
+    it('sin la opción, ninguna página lleva regla', () => {
+      const { pages } = planDocument(settings(), [{ ...big, copies: 10 }]);
+      expect(pages.every((p) => p.ruler === null)).toBe(true);
+    });
+
+    it('con la opción, solo la primera página la lleva, abajo y alineada con la primera columna', () => {
+      const { pages } = planDocument(settings({ ruler: { enabled: true, allPages: false } }), [
+        { ...big, copies: 10 },
+      ]);
+      expect(pages).toHaveLength(2);
+      expect(pages[0].ruler?.where).toBe('bottom');
+      // Margen de 8 mm: la barra empieza donde las cartas y queda centrada en el margen.
+      expect(pages[0].ruler?.x).toBeCloseTo(mmToPt(8), 6);
+      expect(pages[0].ruler?.y).toBeCloseTo(mmToPt(3), 6);
+      expect(pages[1].ruler).toBeNull();
+    });
+
+    it('con «en todas las páginas», todas la llevan en el mismo sitio', () => {
+      const { pages } = planDocument(settings({ ruler: { enabled: true, allPages: true } }), [
+        { ...big, copies: 10 },
+      ]);
+      expect(pages.map((p) => p.ruler !== null)).toEqual([true, true]);
+      expect(pages[1].ruler).toEqual(pages[0].ruler);
+    });
+
+    it('con reversos, las páginas de reversos nunca la llevan', () => {
+      const { pages } = planDocument(
+        settings({
+          ruler: { enabled: true, allPages: true },
+          backs: { enabled: true, flip: 'long' },
+        }),
+        [{ ...big, copies: 10 }],
+        square,
+      );
+      expect(pages.map((p) => p.ruler !== null)).toEqual([true, false, true, false]);
+    });
+
+    it('con la cabecera arriba, la regla se queda abajo', () => {
+      const { pages } = planDocument(
+        settings({ header: true, ruler: { enabled: true, allPages: false } }),
+        [big],
+      );
+      expect(pages[0].header?.where).toBe('top');
+      expect(pages[0].ruler?.where).toBe('bottom');
+    });
+
+    it('con plantilla también va en la primera página', () => {
+      const template = {
+        id: 't',
+        name: 'Una',
+        pageMm: { width: 210, height: 297 },
+        slots: [{ id: 'a', xMm: 10, yMm: 10, widthMm: 63, heightMm: 88, rotation: 0 as const }],
+      };
+      const { pages } = planDocument(
+        settings({ mode: 'template', template, ruler: { enabled: true, allPages: false } }),
+        [{ ...big, copies: 2 }],
+      );
+      expect(pages[0].ruler?.where).toBe('bottom');
+      expect(pages[0].ruler?.x).toBeCloseTo(mmToPt(10), 6);
+      expect(pages[1].ruler).toBeNull();
+    });
+
+    it('el ajuste de la impresora desplaza también la regla', () => {
+      const page = planDocument(settings({ ruler: { enabled: true, allPages: false } }), [big])
+        .pages[0];
+      const moved = translatePage(page, 10, -5);
+      expect(moved.ruler).toEqual({
+        ...page.ruler,
+        x: page.ruler!.x + 10,
+        y: page.ruler!.y - 5,
+        label: { ...page.ruler!.label, x: page.ruler!.label.x + 10, y: page.ruler!.label.y - 5 },
+      });
     });
   });
 });

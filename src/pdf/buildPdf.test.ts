@@ -250,6 +250,100 @@ describe('buildPdf', () => {
     });
   });
 
+  describe('regla de comprobación', () => {
+    const texts = (doc: PDFDocument, index: number) =>
+      [...pageContent(doc, index).matchAll(/<([0-9A-Fa-f]+)> Tj/g)].map((m) =>
+        String.fromCharCode(...(m[1].match(/../g) ?? []).map((h) => parseInt(h, 16))),
+      );
+    /**
+     * Rectángulos de `drawRectangle` en una página: [x, y, ancho, alto] en puntos. pdf-lib los
+     * dibuja como un trazado tras desplazar el origen a su esquina.
+     */
+    const rectangles = (doc: PDFDocument, index: number) =>
+      [
+        ...pageContent(doc, index).matchAll(
+          /^1 0 0 1 (\S+) (\S+) cm\n1 0 0 1 0 0 cm\n1 0 0 1 0 0 cm\n0 0 m\n0 (\S+) l\n(\S+) \S+ l$/gm,
+        ),
+      ].map((m) => [m[1], m[2], m[4], m[3]].map(Number));
+    const ruler = { enabled: true, allPages: false };
+
+    it('sin la opción no dibuja nada', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({ settings: DEFAULT_SETTINGS, cards: [card(jpg, 'jpeg', 1)] }),
+      );
+      expect(texts(doc, 0)).toEqual([]);
+      expect(rectangles(doc, 0)).toEqual([]);
+    });
+
+    it('dibuja la barra a cuadros y «50 mm» a 6 pt solo en la primera página', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({
+          settings: { ...DEFAULT_SETTINGS, ruler },
+          cards: [card(jpg, 'jpeg', 10)],
+        }),
+      );
+      expect(texts(doc, 0)).toEqual(['50 mm']);
+      expect(pageContent(doc, 0)).toMatch(/\/[\w-]+ 6 Tf/);
+      // El contorno de 50 × 2 mm y cinco casillas de 5 mm, todo en el margen de 8 mm.
+      const rects = rectangles(doc, 0);
+      expect(rects).toHaveLength(6);
+      const mm = 72 / 25.4;
+      expect(rects[0][2]).toBeCloseTo(50 * mm, 2);
+      expect(rects[0][3]).toBeCloseTo(2 * mm, 2);
+      for (const r of rects.slice(1)) {
+        expect(r[2]).toBeCloseTo(5 * mm, 2);
+        expect(r[1]).toBeCloseTo(3 * mm, 2);
+      }
+      expect(rects[0][0]).toBeCloseTo(8 * mm, 2);
+      expect(rects[0][1]).toBeCloseTo(3 * mm, 2);
+      expect(rects.slice(1).map((r) => r[0] - rects[0][0])).toEqual(
+        [0, 10, 20, 30, 40].map((x) => expect.closeTo(x * mm, 2)),
+      );
+      expect(texts(doc, 1)).toEqual([]);
+      expect(rectangles(doc, 1)).toEqual([]);
+    });
+
+    it('con «en todas las páginas» va en todas, y nunca en las de reversos', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({
+          settings: {
+            ...DEFAULT_SETTINGS,
+            ruler: { enabled: true, allPages: true },
+            backs: { enabled: true, flip: 'long' },
+          },
+          cards: [card(jpg, 'jpeg', 10)],
+          back: { data: new Blob([png]), format: 'png', widthPx: 30, heightPx: 42 },
+        }),
+      );
+      expect([0, 1, 2, 3].map((i) => texts(doc, i))).toEqual([['50 mm'], [], ['50 mm'], []]);
+    });
+
+    it('usa el color de las líneas de corte y comparte la Helvetica con la cabecera', async () => {
+      const doc = await PDFDocument.load(
+        await buildPdf({
+          settings: {
+            ...DEFAULT_SETTINGS,
+            ruler,
+            header: true,
+            cutLines: { ...DEFAULT_SETTINGS.cutLines, color: '#ff0000' },
+          },
+          cards: [card(jpg, 'jpeg', 1)],
+          header: { name: 'Dragones', pageLabel: '{{n}}/{{total}}' },
+        }),
+      );
+      expect(texts(doc, 0)).toEqual(['Dragones', '1/1', '50 mm']);
+      expect(pageContent(doc, 0)).toMatch(/1 0 0 rg/);
+      const fonts = doc.context
+        .enumerateIndirectObjects()
+        .map(([, obj]) => obj)
+        .filter(
+          (obj): obj is PDFDict =>
+            obj instanceof PDFDict && obj.get(PDFName.of('Type')) === PDFName.of('Font'),
+        );
+      expect(fonts).toHaveLength(1);
+    });
+  });
+
   describe('ahorro de tinta', () => {
     /** Estados gráficos de los recursos de una página. */
     const extGStates = (doc: PDFDocument, index: number) => {

@@ -60,6 +60,7 @@
     "cancel": "Cancelar",
     "cancelled": "Has cancelado la generación del PDF.",
     "ready": "PDF listo: {{pages}}, {{size}}.",
+    "printNote": "Al imprimir, elige <strong>tamaño real</strong> o <strong>escala 100 %</strong>, no «Ajustar a la página»: si no, las cartas salen más pequeñas.",
     "downloadAgain": "Descargar otra vez",
     "openPdf": "Abrir el PDF",
     "fileName": "cartas.pdf",
@@ -109,6 +110,9 @@
     "rightToLeft": "De derecha a izquierda",
     "header": "Cabecera en cada página",
     "headerHint": "Nombre del proyecto y número de página, en gris y pequeño, en el hueco libre: arriba, abajo o en el lateral. Si no cabe en ninguno, no se dibuja.",
+    "ruler": "Regla de comprobación",
+    "rulerHint": "Añade una barra de 50 mm en el margen inferior de la primera página. Mídela con una regla: si no mide 50 mm, la impresora está escalando la página. Si no quedan 4 mm libres abajo ni arriba, no se dibuja.",
+    "rulerAllPages": "En todas las páginas",
     "size": "Tamaño de la carta",
     "forceWidth": "Forzar ancho",
     "forceHeight": "Forzar alto",
@@ -206,7 +210,8 @@
     "clamped_other": "El recorte no cabe en {{count}} cartas; se ajustará al borde de cada una.",
     "pageBack": "Página {{page}} de {{pages}} · reversos",
     "labelBack": "Vista previa de la página {{page}}, de reversos",
-    "headerMissing": "La cabecera no cabe: no quedan 3 mm libres arriba, abajo ni a la izquierda."
+    "headerMissing": "La cabecera no cabe: no quedan 3 mm libres arriba, abajo ni a la izquierda.",
+    "rulerMissing": "La regla de comprobación no cabe: no quedan 4 mm libres abajo ni arriba."
   },
   "crop": {
     "title": "Recorte",

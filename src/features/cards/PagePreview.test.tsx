@@ -214,4 +214,62 @@ describe('CropDialog', () => {
       expect(screen.getByText(/La cabecera no cabe/)).toBeInTheDocument();
     });
   });
+
+  describe('regla de comprobación', () => {
+    const ruler = () => screen.queryByTestId('ruler');
+
+    it('sin la opción no se dibuja', () => {
+      useCardsStore.getState().addImages([image('a.png')]);
+      render(<PagePreview />);
+      expect(ruler()).not.toBeInTheDocument();
+    });
+
+    it('va solo en la primera página, con cinco casillas y «50 mm» en el color de las líneas', async () => {
+      const user = userEvent.setup();
+      useSettingsStore.getState().update({
+        ruler: { enabled: true, allPages: false },
+        cutLines: { ...DEFAULT_SETTINGS.cutLines, color: '#ff0000' },
+      });
+      useCardsStore.getState().addImages([image('a x10.png')]);
+      render(<PagePreview />);
+
+      const bar = ruler();
+      expect(bar).toBeInTheDocument();
+      expect(bar).toHaveAttribute('fill', '#ff0000');
+      // El contorno y las cinco casillas rellenas.
+      expect(bar!.querySelectorAll('rect')).toHaveLength(6);
+      expect(bar).toHaveTextContent('50 mm');
+      expect(screen.queryByText(/La regla de comprobación no cabe/)).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
+      expect(ruler()).not.toBeInTheDocument();
+    });
+
+    it('con «en todas las páginas» va en todas, pero no en las de reversos', async () => {
+      const user = userEvent.setup();
+      useSettingsStore.getState().update({
+        ruler: { enabled: true, allPages: true },
+        backs: { enabled: true, flip: 'long' },
+      });
+      useCardsStore.getState().setBack(image('dorso.png'));
+      useCardsStore.getState().addImages([image('a x10.png')]);
+      render(<PagePreview />);
+
+      expect(ruler()).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
+      expect(ruler()).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
+      expect(ruler()).toBeInTheDocument();
+    });
+
+    it('avisa cuando no cabe ni abajo ni arriba', () => {
+      useSettingsStore
+        .getState()
+        .update({ ruler: { enabled: true, allPages: false }, mode: 'manual', marginMm: 1 });
+      useCardsStore.getState().addImages([image('a.png')]);
+      render(<PagePreview />);
+      expect(ruler()).not.toBeInTheDocument();
+      expect(screen.getByText(/La regla de comprobación no cabe/)).toBeInTheDocument();
+    });
+  });
 });

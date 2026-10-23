@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { track } from '../../analytics/track';
 import { downloadUrl as download } from '../../components/download';
 import { formatSize } from '../../components/formatSize';
@@ -210,6 +210,9 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
             </button>
           )}
         </div>
+        <p className={styles.printNote}>
+          <Trans i18nKey="cards.printNote" components={{ strong: <strong /> }} />
+        </p>
       </div>
     </div>
   );

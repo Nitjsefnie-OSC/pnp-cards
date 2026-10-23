@@ -23,6 +23,9 @@
   --danger: #b3261e;
   --danger-text: #ffffff;
   --ok: #1e7a4f;
+  /* Avisos que conviene leer, sin ser errores. */
+  --note: #fdf3d7;
+  --note-text: #5f4300;
 
   --font-body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
   --font-label: 'Barlow Condensed', 'Arial Narrow', sans-serif;
@@ -56,5 +59,7 @@
   --danger: #ff8a80;
   --danger-text: #2a0000;
   --ok: #7fd3a6;
+  --note: #3a3012;
+  --note-text: #f3d98a;
   color-scheme: dark;
 }

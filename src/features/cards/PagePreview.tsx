@@ -2,6 +2,7 @@ import { useId, useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { HeaderPlacement } from '../../lib/header';
 import { planDocument, PlanError, type DocumentPlan, type PlannedItem } from '../../lib/plan';
+import { RULER_LABEL, rulerCells, type RulerPlacement } from '../../lib/ruler';
 import { INK_SAVER_LIGHTEN } from '../../lib/settings';
 import { slotLocalSize, slotSvgMatrix } from '../../lib/template';
 import {
@@ -123,11 +124,36 @@ function PreviewHeader({
   );
 }
 
+/** Regla de comprobación: contorno, casillas rellenas y rótulo, como en el PDF. */
+function PreviewRuler({
+  ruler,
+  color,
+  pageHeight,
+}: {
+  ruler: RulerPlacement;
+  color: string;
+  pageHeight: number;
+}) {
+  const { x, y, width, height, label } = ruler;
+  return (
+    <g fill={color} stroke={color} className={styles.ruler} data-testid="ruler">
+      <rect x={x} y={pageHeight - y - height} width={width} height={height} fill="none" />
+      {rulerCells(ruler).map((c, i) => (
+        <rect key={i} x={c.x} y={pageHeight - c.y - c.height} width={c.width} height={c.height} />
+      ))}
+      <text x={label.x} y={pageHeight - label.y} fontSize={label.size} stroke="none">
+        {RULER_LABEL}
+      </text>
+    </g>
+  );
+}
+
 export function PagePreview() {
   const { t } = useTranslation();
   const all = useCardsStore((s) => s.cards);
   const projectName = useCardsStore((s) => s.name);
   const headerEnabled = useSettingsStore((s) => s.settings.header);
+  const rulerEnabled = useSettingsStore((s) => s.settings.ruler.enabled);
   const inkSaver = useSettingsStore((s) => s.settings.inkSaver);
   const filterId = useId();
   const backsEnabled = useSettingsStore((s) => s.settings.backs.enabled);
@@ -204,6 +230,7 @@ export function PagePreview() {
               pageHeight={H}
             />
           ) : null}
+          {page.ruler ? <PreviewRuler ruler={page.ruler} color={lineColor} pageHeight={H} /> : null}
           {page.cutLines ? (
             <g stroke={lineColor} className={styles.lines}>
               {page.cutLines.segments.map((s, i) => (
@@ -245,6 +272,9 @@ export function PagePreview() {
       ) : null}
       {headerEnabled && plan.pages.every((p) => p.header === null) ? (
         <p className={styles.warning}>{t('preview.headerMissing')}</p>
+      ) : null}
+      {rulerEnabled && plan.pages.every((p) => p.ruler === null) ? (
+        <p className={styles.warning}>{t('preview.rulerMissing')}</p>
       ) : null}
     </div>
   );
