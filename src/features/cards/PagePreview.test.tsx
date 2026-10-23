@@ -140,4 +140,57 @@ describe('CropDialog', () => {
     await user.type(width, '100');
     expect(screen.getByText(/no cabe en esta imagen/)).toBeInTheDocument();
   });
+
+  describe('cabecera', () => {
+    const texts = (container: HTMLElement) =>
+      [...container.querySelectorAll('svg text')].map((el) => el.textContent);
+
+    it('sin la opción no dibuja ningún texto en la página', () => {
+      useCardsStore.getState().addImages([image('a.png')]);
+      const { container } = render(<PagePreview />);
+      expect(texts(container)).toEqual([]);
+    });
+
+    it('muestra el nombre del proyecto y el número de página en cada página', async () => {
+      const user = userEvent.setup();
+      useSettingsStore.getState().update({ header: true });
+      useCardsStore.getState().setName('Dragones del valle');
+      useCardsStore.getState().addImages([image('a x10.png')]);
+      const { container } = render(<PagePreview />);
+
+      expect(texts(container)).toEqual(['Dragones del valle', 'Página 1 de 2']);
+      await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
+      expect(texts(container)).toEqual(['Dragones del valle', 'Página 2 de 2']);
+      expect(screen.queryByText(/La cabecera no cabe/)).not.toBeInTheDocument();
+    });
+
+    it('sin nombre de proyecto usa el título genérico', () => {
+      useSettingsStore.getState().update({ header: true });
+      useCardsStore.getState().addImages([image('a.png')]);
+      const { container } = render(<PagePreview />);
+      expect(texts(container)).toEqual(['Cartas', 'Página 1 de 1']);
+    });
+
+    it('con reversos numera hojas y no la pone en las páginas de reversos', async () => {
+      const user = userEvent.setup();
+      useSettingsStore.getState().update({ header: true, backs: { enabled: true, flip: 'long' } });
+      useCardsStore.getState().setBack(image('dorso.png'));
+      useCardsStore.getState().addImages([image('a x10.png')]);
+      const { container } = render(<PagePreview />);
+
+      expect(texts(container)).toEqual(['Cartas', 'Hoja 1 de 2']);
+      await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
+      expect(texts(container)).toEqual([]);
+      await user.click(screen.getByRole('button', { name: 'Página siguiente' }));
+      expect(texts(container)).toEqual(['Cartas', 'Hoja 2 de 2']);
+    });
+
+    it('avisa cuando no cabe en ningún sitio', () => {
+      useSettingsStore.getState().update({ header: true, mode: 'manual', marginMm: 1 });
+      useCardsStore.getState().addImages([image('a.png')]);
+      const { container } = render(<PagePreview />);
+      expect(texts(container)).toEqual([]);
+      expect(screen.getByText(/La cabecera no cabe/)).toBeInTheDocument();
+    });
+  });
 });

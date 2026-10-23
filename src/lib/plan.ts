@@ -3,6 +3,7 @@ import { cardSize, type Size } from './cardSize';
 import { coverCrop, CROP_DPI, cropRect, type PxRect } from './crop';
 import { cutLines, type CutLines } from './cutLines';
 import type { Dpi } from './dpi';
+import { headerPlacement, type HeaderPlacement } from './header';
 import { isMirrored, layoutPage, resolveGrid, type Placement } from './layout';
 import { slotBox, slotCropMarks, slotLocalSize, type Rotation, type Template } from './template';
 import { mmToPt } from './units';
@@ -37,6 +38,8 @@ export interface PlannedItem {
 export interface PlannedPage {
   /** Número de página, desde 1. */
   number: number;
+  /** Hoja a la que pertenece (contando solo las páginas de cartas), desde 1. */
+  sheet: number;
   /**
    * Cartas o reversos. En una página de reversos, cada elemento es el reverso de la carta
    * `card` y su recorte es el de la imagen del reverso.
@@ -46,12 +49,16 @@ export interface PlannedPage {
   items: PlannedItem[];
   bleed: Rect[];
   cutLines: CutLines | null;
+  /** Cabecera con el nombre y el número de hoja; solo en páginas de cartas, si cabe. */
+  header: HeaderPlacement | null;
 }
 
 export interface DocumentPlan {
   pages: PlannedPage[];
   /** Cartas del documento (sin contar los reversos). */
   total: number;
+  /** Páginas de cartas (sin contar las de reversos). */
+  sheets: number;
   /** Índices de las cartas cuyo recorte no cabía en la imagen y se ha ajustado. */
   clampedCards: number[];
 }
@@ -132,6 +139,7 @@ function backPage(
     });
   return {
     number: front.number + 1,
+    sheet: front.sheet,
     side: 'back',
     size: front.size,
     items,
@@ -140,6 +148,7 @@ function backPage(
       settings,
     ),
     cutLines: null,
+    header: null,
   };
 }
 
@@ -156,6 +165,11 @@ export function translatePage(page: PlannedPage, dx: number, dy: number): Planne
       placement: { ...item.placement, x: item.placement.x + dx, y: item.placement.y + dy },
     })),
     bleed: page.bleed.map((r) => ({ ...r, x: r.x + dx, y: r.y + dy })),
+    header: page.header && {
+      ...page.header,
+      start: { x: page.header.start.x + dx, y: page.header.start.y + dy },
+      end: { x: page.header.end.x + dx, y: page.header.end.y + dy },
+    },
     cutLines: page.cutLines && {
       ...page.cutLines,
       segments: page.cutLines.segments.map((s) => ({
@@ -189,6 +203,16 @@ function withBacks(
 }
 
 /**
+ * Cabecera de las páginas de cartas, si está activada y cabe. Se calcula con la página llena
+ * (todos los huecos, con la carta de referencia) para que quede en el mismo sitio en todas las
+ * páginas, también en la última aunque tenga menos cartas.
+ */
+function pageHeader(settings: LayoutSettings, page: Size, frame: Placement[]) {
+  if (!settings.header) return null;
+  return headerPlacement(page, frame, bleedRects(frame, settings));
+}
+
+/**
  * Con plantilla, cada carta va a su hueco (estirada a su tamaño y con su giro), en orden. De
  * derecha a izquierda, los huecos se reflejan en horizontal.
  */
@@ -202,6 +226,11 @@ function planTemplate(
   const perPage = Math.max(1, template.slots.length);
   const lines = settings.cutLines;
   const gap = MARK_GAP + (settings.bleed.enabled ? mmToPt(settings.bleed.mm) : 0);
+  const header = pageHeader(
+    settings,
+    page,
+    template.slots.map((slot) => slotBox(slot, page.height)),
+  );
   const pages: PlannedPage[] = [];
   for (let start = 0; start < sequence.length; start += perPage) {
     const pageCards = sequence.slice(start, start + perPage);
@@ -219,10 +248,12 @@ function planTemplate(
     const boxes = items.map((i) => i.placement);
     pages.push({
       number: pages.length + 1,
+      sheet: pages.length + 1,
       side: 'front',
       size: page,
       items,
       bleed: bleedRects(boxes, settings),
+      header,
       cutLines: lines.enabled
         ? {
             lineWidth: mmToPt(lines.widthHundredthsMm / 100),
@@ -256,9 +287,11 @@ export function planDocument(
   if (settings.mode === 'template') {
     const template = settings.template;
     if (!template || template.slots.length === 0) throw new PlanError('no-template');
+    const fronts = planTemplate(settings, template, sequence, crops);
     return {
-      pages: withBacks(settings, planTemplate(settings, template, sequence, crops), cards, back),
+      pages: withBacks(settings, fronts, cards, back),
       total: sequence.length,
+      sheets: fronts.length,
       clampedCards,
     };
   }
@@ -266,6 +299,11 @@ export function planDocument(
   const sizes = cardSizes(settings, cards, crops);
   const { perPage } = resolveGrid(settings);
   const reference = sizes[sequence[0]];
+  const header = pageHeader(
+    settings,
+    layoutPage(settings, [], reference).page,
+    layoutPage(settings, Array<Size>(perPage).fill(reference), reference).placements,
+  );
 
   const pages: PlannedPage[] = [];
   for (let start = 0; start < sequence.length; start += perPage) {
@@ -275,13 +313,20 @@ export function planDocument(
     const { page, placements } = layoutPage(settings, pageSizes, reference);
     pages.push({
       number,
+      sheet: number,
       side: 'front',
       size: page,
       items: pageCards.map((card, i) => ({ card, placement: placements[i], crop: crops[card] })),
       bleed: bleedRects(placements, settings),
       cutLines: cutLines(settings, pageSizes[0], reference),
+      header,
     });
   }
 
-  return { pages: withBacks(settings, pages, cards, back), total: sequence.length, clampedCards };
+  return {
+    pages: withBacks(settings, pages, cards, back),
+    total: sequence.length,
+    sheets: pages.length,
+    clampedCards,
+  };
 }

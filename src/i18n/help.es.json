@@ -126,6 +126,18 @@
           "text": "«De derecha a izquierda» llena cada fila empezando por la derecha."
         },
         {
+          "type": "h",
+          "text": "Cabecera en cada página"
+        },
+        {
+          "type": "p",
+          "text": "Con «Cabecera en cada página», cada página de cartas lleva el nombre del proyecto a la izquierda y «Página 3 de 12» a la derecha, en gris y en letra pequeña. Sirve para ordenar las hojas impresas y saber cuál reimprimir si una sale mal."
+        },
+        {
+          "type": "p",
+          "text": "Va en el hueco libre: arriba si hay al menos 5 mm; si no, abajo; y si tampoco, en el lateral izquierdo, girada. Con menos de 5 mm en todas partes se usa una letra más pequeña, y con menos de 3 mm no se dibuja (la vista previa avisa). Con reversos, solo las páginas de cartas la llevan y el número cuenta hojas: «Hoja 3 de 12»."
+        },
+        {
           "type": "note",
           "text": "El margen de la página no es el margen de corte: este es una banda de color alrededor de cada carta.",
           "link": {

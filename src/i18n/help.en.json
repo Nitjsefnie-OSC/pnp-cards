@@ -88,6 +88,15 @@
           "type": "p",
           "text": "“Right to left” fills each row starting from the right."
         },
+        { "type": "h", "text": "Header on every page" },
+        {
+          "type": "p",
+          "text": "With “Header on every page”, each page of cards carries the project name on the left and “Page 3 of 12” on the right, small and grey. It helps to keep printed sheets in order and to know which one to reprint if one goes wrong."
+        },
+        {
+          "type": "p",
+          "text": "It goes in the free space: at the top if there are at least 5 mm; otherwise at the bottom; and failing that, down the left side, rotated. With less than 5 mm everywhere a smaller type is used, and with less than 3 mm it isn’t drawn (the preview warns you). With backs, only the pages of cards carry it and the number counts sheets: “Sheet 3 of 12”."
+        },
         {
           "type": "note",
           "text": "The page margin is not the bleed: the bleed is a band of colour around each card.",

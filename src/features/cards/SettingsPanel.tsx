@@ -154,6 +154,12 @@ export function SettingsPanel() {
             />
           </FieldRow>
         ) : null}
+        <Checkbox
+          label={t('settings.header')}
+          hint={t('settings.headerHint')}
+          checked={s.header}
+          onChange={(header) => update({ header })}
+        />
       </Section>
 
       <Section title={t('settings.placement')} defaultOpen help="layout">

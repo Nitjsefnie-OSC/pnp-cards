@@ -1,17 +1,21 @@
 import {
   PDFDocument,
+  StandardFonts,
   clip,
   concatTransformationMatrix,
+  degrees,
   endPath,
   popGraphicsState,
   pushGraphicsState,
   rectangle,
   rgb,
+  type PDFFont,
   type PDFImage,
   type PDFPage,
 } from 'pdf-lib';
 import { imageDrawRect } from '../lib/crop';
 import type { Dpi } from '../lib/dpi';
+import type { HeaderPlacement } from '../lib/header';
 import { planDocument } from '../lib/plan';
 import { slotLocalSize, slotMatrix } from '../lib/template';
 import type { LayoutSettings } from '../lib/settings';
@@ -36,15 +40,63 @@ export interface PdfBack {
   heightPx: number;
 }
 
+/** Textos de la cabecera (ya traducidos): el nombre y el rótulo del número de hoja. */
+export interface HeaderTexts {
+  name: string;
+  /** Con «{{n}}» y «{{total}}», que se sustituyen en cada página. */
+  pageLabel: string;
+}
+
 export interface BuildInput {
   settings: LayoutSettings;
   cards: PdfCard[];
   /** Obligatorio con los reversos activados. */
   back?: PdfBack | null;
   title?: string;
+  /** Obligatorio con la cabecera activada (`settings.header`). */
+  header?: HeaderTexts | null;
 }
 
 export type ProgressHandler = (done: number, total: number) => void;
+
+const HEADER_COLOR = rgb(0.48, 0.48, 0.48);
+
+/** Sustituye por «?» los caracteres que la fuente no puede codificar (Helvetica solo tiene WinAnsi). */
+function encodable(text: string, font: PDFFont) {
+  return [...text.normalize('NFC')]
+    .map((ch) => {
+      try {
+        font.encodeText(ch);
+        return ch;
+      } catch {
+        return '?';
+      }
+    })
+    .join('');
+}
+
+/**
+ * Cabecera de una página: el nombre desde `start` y el número de hoja terminando en `end`,
+ * sobre la misma línea base; en el lateral, girados 90° (y entonces el ancho del texto corre
+ * hacia arriba).
+ */
+function drawHeader(
+  page: PDFPage,
+  font: PDFFont,
+  placement: HeaderPlacement,
+  name: string,
+  label: string,
+) {
+  const { size, rotation, start, end } = placement;
+  const common = { size, font, color: HEADER_COLOR, rotate: degrees(rotation) };
+  page.drawText(name, { ...common, x: start.x, y: start.y });
+  const width = font.widthOfTextAtSize(label, size);
+  page.drawText(label, {
+    ...common,
+    x: rotation === 90 ? end.x : end.x - width,
+    y: rotation === 90 ? end.y - width : end.y,
+  });
+}
 
 function hexToRgb(hex: string) {
   let h = hex.replace('#', '');
@@ -87,6 +139,12 @@ export async function buildPdf(
 
   const bleedColor = hexToRgb(settings.bleed.color);
   const lineColor = hexToRgb(settings.cutLines.color);
+  // La fuente solo se incrusta si alguna página lleva cabecera.
+  const header =
+    input.header && plan.pages.some((p) => p.header !== null)
+      ? { font: await doc.embedFont(StandardFonts.Helvetica), texts: input.header }
+      : null;
+  const headerName = header ? encodable(header.texts.name, header.font) : '';
   let done = 0;
 
   for (const planned of plan.pages) {
@@ -129,6 +187,13 @@ export async function buildPdf(
       if (isBack) continue;
       done += 1;
       onProgress?.(done, plan.total);
+    }
+
+    if (planned.header && header) {
+      const label = header.texts.pageLabel
+        .replace('{{n}}', String(planned.sheet))
+        .replace('{{total}}', String(plan.sheets));
+      drawHeader(page, header.font, planned.header, headerName, encodable(label, header.font));
     }
 
     if (planned.cutLines) {
