@@ -45,6 +45,11 @@ export interface LayoutSettings {
   /** Nombre del proyecto y número de página en el hueco libre de cada página de cartas. */
   header: boolean;
   /**
+   * Regla de comprobación: barra de 50 mm en el margen de la primera página de cartas (o de
+   * todas), para ver con una regla si la impresora escala la página.
+   */
+  ruler: { enabled: boolean; allPages: boolean };
+  /**
    * Ahorro de tinta: cartas y reversos en escala de grises y aclarados, para pruebas de juego.
    * No afecta a las líneas de corte ni al margen de corte.
    */
@@ -83,6 +88,7 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   backs: { enabled: false, flip: 'long' },
   backOffsetMm: { x: 0, y: 0 },
   header: false,
+  ruler: { enabled: false, allPages: false },
   inkSaver: false,
   forceWidth: false,
   forceHeight: false,
@@ -114,6 +120,7 @@ export function mergeSettings(saved: DeepPartial<LayoutSettings> | undefined): L
     ...rest,
     backs: { ...d.backs, ...saved?.backs },
     backOffsetMm: { ...d.backOffsetMm, ...saved?.backOffsetMm },
+    ruler: { ...d.ruler, ...saved?.ruler },
     customPageMm: { ...d.customPageMm, ...saved?.customPageMm },
     crop: { ...d.crop, ...saved?.crop },
     cutLines: { ...d.cutLines, ...saved?.cutLines },

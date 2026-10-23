@@ -40,7 +40,7 @@
         },
         {
           "type": "p",
-          "text": "Print one sheet first and measure a card with a ruler before using up the card stock."
+          "text": "Print one sheet first and measure a card with a ruler before using up the card stock. Easier still: turn on “Check ruler” in Settings › Page and measure the 50 mm bar printed in the margin."
         },
         { "type": "h", "text": "Paper" },
         {
@@ -105,6 +105,15 @@
         {
           "type": "p",
           "text": "It goes in the free space: at the top if there are at least 5 mm; otherwise at the bottom; and failing that, down the left side, rotated. With less than 5 mm everywhere a smaller type is used, and with less than 3 mm it isn’t drawn (the preview warns you). With backs, only the pages of cards carry it and the number counts sheets: “Sheet 3 of 12”."
+        },
+        { "type": "h", "text": "Check ruler" },
+        {
+          "type": "p",
+          "text": "With “Check ruler”, the first page of cards carries a labelled 50 mm chequered bar in the bottom margin, in the colour of the cut lines. Measure it on the printed sheet: if it isn’t 50 mm, the print dialog is scaling the page and the cards come out smaller. With “On every page” it goes on each page of cards; never on the pages of backs."
+        },
+        {
+          "type": "p",
+          "text": "It needs 4 mm free at the bottom (or, failing that, at the top; if the header is at the bottom, the ruler goes to the top). With cards together or a template that fills the sheet it may not fit, and then it isn’t drawn: the preview warns you."
         },
         {
           "type": "note",

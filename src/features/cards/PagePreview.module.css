@@ -81,6 +81,16 @@
   fill: #7a7a7a;
 }
 
+/* El contorno de la regla mide 0,4 pt; se dibuja a 1 px para que se vea. */
+.ruler {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.ruler rect {
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
 .message {
   max-width: 28ch;
   color: #dcebe3;

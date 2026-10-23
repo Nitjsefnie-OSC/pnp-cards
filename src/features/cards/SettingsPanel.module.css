@@ -9,6 +9,11 @@
   font-size: 0.875rem;
 }
 
+/* Subopción de una casilla, sangrada bajo ella. */
+.nested {
+  padding-left: var(--space-5);
+}
+
 .button {
   align-self: flex-start;
   padding: var(--space-2) var(--space-4);

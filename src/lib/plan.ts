@@ -5,6 +5,7 @@ import { cutLines, type CutLines } from './cutLines';
 import type { Dpi } from './dpi';
 import { headerPlacement, type HeaderPlacement } from './header';
 import { isMirrored, layoutPage, resolveGrid, type Placement } from './layout';
+import { rulerPlacement, type RulerPlacement } from './ruler';
 import { slotBox, slotCropMarks, slotLocalSize, type Rotation, type Template } from './template';
 import { mmToPt } from './units';
 import type { LayoutSettings } from './settings';
@@ -51,6 +52,8 @@ export interface PlannedPage {
   cutLines: CutLines | null;
   /** Cabecera con el nombre y el número de hoja; solo en páginas de cartas, si cabe. */
   header: HeaderPlacement | null;
+  /** Regla de comprobación; solo en la primera página de cartas (o en todas), si cabe. */
+  ruler: RulerPlacement | null;
 }
 
 export interface DocumentPlan {
@@ -149,6 +152,7 @@ function backPage(
     ),
     cutLines: null,
     header: null,
+    ruler: null,
   };
 }
 
@@ -169,6 +173,12 @@ export function translatePage(page: PlannedPage, dx: number, dy: number): Planne
       ...page.header,
       start: { x: page.header.start.x + dx, y: page.header.start.y + dy },
       end: { x: page.header.end.x + dx, y: page.header.end.y + dy },
+    },
+    ruler: page.ruler && {
+      ...page.ruler,
+      x: page.ruler.x + dx,
+      y: page.ruler.y + dy,
+      label: { ...page.ruler.label, x: page.ruler.label.x + dx, y: page.ruler.label.y + dy },
     },
     cutLines: page.cutLines && {
       ...page.cutLines,
@@ -213,6 +223,19 @@ function pageHeader(settings: LayoutSettings, page: Size, frame: Placement[]) {
 }
 
 /**
+ * Cabecera y regla de comprobación de las páginas de cartas, calculadas con la página llena. La
+ * regla evita el lado de la cabecera, y `rulerOn` dice qué páginas la llevan.
+ */
+function pageExtras(settings: LayoutSettings, page: Size, frame: Placement[]) {
+  const header = pageHeader(settings, page, frame);
+  const ruler = settings.ruler.enabled
+    ? rulerPlacement(page, frame, bleedRects(frame, settings), header)
+    : null;
+  const rulerOn = (number: number) => (settings.ruler.allPages || number === 1 ? ruler : null);
+  return { header, rulerOn };
+}
+
+/**
  * Con plantilla, cada carta va a su hueco (estirada a su tamaño y con su giro), en orden. De
  * derecha a izquierda, los huecos se reflejan en horizontal.
  */
@@ -226,7 +249,7 @@ function planTemplate(
   const perPage = Math.max(1, template.slots.length);
   const lines = settings.cutLines;
   const gap = MARK_GAP + (settings.bleed.enabled ? mmToPt(settings.bleed.mm) : 0);
-  const header = pageHeader(
+  const { header, rulerOn } = pageExtras(
     settings,
     page,
     template.slots.map((slot) => slotBox(slot, page.height)),
@@ -254,6 +277,7 @@ function planTemplate(
       items,
       bleed: bleedRects(boxes, settings),
       header,
+      ruler: rulerOn(pages.length + 1),
       cutLines: lines.enabled
         ? {
             lineWidth: mmToPt(lines.widthHundredthsMm / 100),
@@ -299,7 +323,7 @@ export function planDocument(
   const sizes = cardSizes(settings, cards, crops);
   const { perPage } = resolveGrid(settings);
   const reference = sizes[sequence[0]];
-  const header = pageHeader(
+  const { header, rulerOn } = pageExtras(
     settings,
     layoutPage(settings, [], reference).page,
     layoutPage(settings, Array<Size>(perPage).fill(reference), reference).placements,
@@ -320,6 +344,7 @@ export function planDocument(
       bleed: bleedRects(placements, settings),
       cutLines: cutLines(settings, pageSizes[0], reference),
       header,
+      ruler: rulerOn(number),
     });
   }
 

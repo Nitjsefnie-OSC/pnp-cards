@@ -60,6 +60,7 @@
     "cancel": "Cancel",
     "cancelled": "You cancelled the PDF.",
     "ready": "PDF ready: {{pages}}, {{size}}.",
+    "printNote": "When printing, choose <strong>actual size</strong> or <strong>100 % scale</strong>, not “Fit to page”: otherwise the cards come out smaller.",
     "downloadAgain": "Download again",
     "openPdf": "Open the PDF",
     "fileName": "cards.pdf",
@@ -109,6 +110,9 @@
     "rightToLeft": "Right to left",
     "header": "Header on every page",
     "headerHint": "Project name and page number, small and grey, in the free space: top, bottom or down the side. If it fits nowhere, it isn’t drawn.",
+    "ruler": "Check ruler",
+    "rulerHint": "Adds a 50 mm bar in the bottom margin of the first page. Measure it with a ruler: if it isn’t 50 mm, the printer is scaling the page. If there aren’t 4 mm free at the bottom or top, it isn’t drawn.",
+    "rulerAllPages": "On every page",
     "size": "Card size",
     "forceWidth": "Force width",
     "forceHeight": "Force height",
@@ -206,7 +210,8 @@
     "clamped_other": "The crop doesn’t fit {{count}} cards; it will be fitted to each card’s edge.",
     "pageBack": "Page {{page}} of {{pages}} · backs",
     "labelBack": "Preview of page {{page}}, backs",
-    "headerMissing": "The header doesn’t fit: there aren’t 3 mm free at the top, bottom or left."
+    "headerMissing": "The header doesn’t fit: there aren’t 3 mm free at the top, bottom or left.",
+    "rulerMissing": "The check ruler doesn’t fit: there aren’t 4 mm free at the bottom or top."
   },
   "crop": {
     "title": "Crop",

@@ -167,4 +167,13 @@ describe('PrintPanel', () => {
       pageLabel: 'Hoja {{n}} de {{total}}',
     });
   });
+
+  it('recuerda siempre que hay que imprimir a tamaño real', () => {
+    render(<PrintPanel generatePdf={vi.fn()} />);
+    const note = screen.getByText(/Al imprimir, elige/);
+    expect(note).toHaveTextContent(
+      'Al imprimir, elige tamaño real o escala 100 %, no «Ajustar a la página»: si no, las cartas salen más pequeñas.',
+    );
+    expect(note.querySelectorAll('strong')).toHaveLength(2);
+  });
 });

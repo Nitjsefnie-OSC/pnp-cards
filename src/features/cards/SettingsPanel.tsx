@@ -160,6 +160,21 @@ export function SettingsPanel() {
           checked={s.header}
           onChange={(header) => update({ header })}
         />
+        <Checkbox
+          label={t('settings.ruler')}
+          hint={t('settings.rulerHint')}
+          checked={s.ruler.enabled}
+          onChange={(enabled) => update({ ruler: { ...s.ruler, enabled } })}
+        />
+        {s.ruler.enabled ? (
+          <div className={styles.nested}>
+            <Checkbox
+              label={t('settings.rulerAllPages')}
+              checked={s.ruler.allPages}
+              onChange={(allPages) => update({ ruler: { ...s.ruler, allPages } })}
+            />
+          </div>
+        ) : null}
       </Section>
 
       <Section title={t('settings.placement')} defaultOpen help="layout">
