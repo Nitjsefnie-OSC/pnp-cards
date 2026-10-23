@@ -1,5 +1,6 @@
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import i18n from '../../i18n';
 import { UnreadablePdfError, type PdfInfo } from '../../pdf/pdfjs';
 import { TaskError, type MergePdfs, type TaskOptions } from '../../workers/pdfClient';
@@ -44,7 +45,7 @@ beforeEach(() => {
 describe('Unir PDF', () => {
   it('lista los PDF añadidos con sus páginas y el total', async () => {
     const user = userEvent.setup();
-    render(<MergePage inspect={inspect} />);
+    render(<MergePage inspect={inspect} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('pdf-input'), [pdf('a.pdf'), pdf('bb.pdf')]);
 
     expect(await screen.findByText('5 páginas, 0 kB')).toBeInTheDocument();
@@ -54,7 +55,7 @@ describe('Unir PDF', () => {
 
   it('no deja unir con menos de dos PDF', async () => {
     const user = userEvent.setup();
-    render(<MergePage inspect={inspect} />);
+    render(<MergePage inspect={inspect} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('pdf-input'), [pdf('a.pdf')]);
     expect(await screen.findByText('Añade al menos dos PDF para unirlos.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Unir PDF' })).toBeDisabled();
@@ -62,7 +63,7 @@ describe('Unir PDF', () => {
 
   it('avisa de los archivos que no son PDF', async () => {
     const user = userEvent.setup({ applyAccept: false });
-    render(<MergePage inspect={inspect} />);
+    render(<MergePage inspect={inspect} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('pdf-input'), [
       new File(['x'], 'foto.png', { type: 'image/png' }),
     ]);
@@ -73,7 +74,7 @@ describe('Unir PDF', () => {
 
   it('marca los PDF que no se pueden leer y no deja unirlos', async () => {
     const user = userEvent.setup();
-    render(<MergePage inspect={inspect} />);
+    render(<MergePage inspect={inspect} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('pdf-input'), [pdf('a.pdf'), pdf('roto.pdf')]);
     expect(await screen.findByText(/está dañado o protegido con contraseña/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Unir PDF' })).toBeDisabled();
@@ -86,7 +87,7 @@ describe('Unir PDF', () => {
     const user = userEvent.setup();
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     const m = controllableMerge();
-    render(<MergePage inspect={inspect} merge={m.merge} />);
+    render(<MergePage inspect={inspect} merge={m.merge} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('pdf-input'), [pdf('b.pdf'), pdf('a.pdf')]);
     await screen.findByText('En total, 10 páginas');
 
@@ -112,7 +113,7 @@ describe('Unir PDF', () => {
   it('se puede cancelar', async () => {
     const user = userEvent.setup();
     const m = controllableMerge();
-    render(<MergePage inspect={inspect} merge={m.merge} />);
+    render(<MergePage inspect={inspect} merge={m.merge} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('pdf-input'), [pdf('a.pdf'), pdf('b.pdf')]);
     await screen.findByText('En total, 10 páginas');
     await user.click(screen.getByRole('button', { name: 'Unir PDF' }));
@@ -123,7 +124,7 @@ describe('Unir PDF', () => {
   it('si un PDF falla al unir, dice cuál', async () => {
     const user = userEvent.setup();
     const m = controllableMerge();
-    render(<MergePage inspect={inspect} merge={m.merge} />);
+    render(<MergePage inspect={inspect} merge={m.merge} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('pdf-input'), [pdf('a.pdf'), pdf('b.pdf')]);
     await screen.findByText('En total, 10 páginas');
     await user.click(screen.getByRole('button', { name: 'Unir PDF' }));
@@ -138,6 +139,7 @@ describe('Unir PDF', () => {
         <MergePage inspect={inspect} />
         <ConfirmHost />
       </>,
+      { wrapper: MemoryRouter },
     );
     await user.upload(screen.getByTestId('pdf-input'), [pdf('a.pdf'), pdf('b.pdf')]);
     await screen.findByText('En total, 10 páginas');

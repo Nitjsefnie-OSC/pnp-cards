@@ -1,0 +1,186 @@
+.page {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: var(--space-5);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+}
+
+/* El índice: buscador arriba y los temas por secciones, como un sumario. */
+.index {
+  position: sticky;
+  top: var(--space-5);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+}
+
+.search {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface-2);
+}
+
+.search:focus {
+  background: var(--surface);
+}
+
+.results {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.sectionTitle {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: 1.0625rem;
+  color: var(--text-muted);
+}
+
+.topics {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topic {
+  display: block;
+  padding: var(--space-1) var(--space-2);
+  margin-left: calc(-1 * var(--space-2));
+  border-left: 3px solid transparent;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.topic:hover {
+  color: var(--accent);
+}
+
+/* El tema abierto: la raya de registro magenta al margen, como el marcador de la cabecera. */
+.topic[aria-current='page'] {
+  border-left-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.content {
+  min-width: 0;
+  max-width: 72ch;
+  padding: var(--space-5) var(--space-5) var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+}
+
+.content h1 {
+  font-size: 2.25rem;
+}
+
+.content h1:focus {
+  outline: none;
+}
+
+.lead {
+  margin: var(--space-2) 0 0;
+  font-size: 1.125rem;
+  color: var(--text-muted);
+}
+
+.content h2 {
+  margin-top: var(--space-5);
+  font-size: 1.375rem;
+}
+
+.content p {
+  margin: var(--space-3) 0 0;
+}
+
+.content ul {
+  margin: var(--space-3) 0 0;
+  padding-left: 1.25em;
+}
+
+.content li + li {
+  margin-top: var(--space-1);
+}
+
+/* Los pasos van numerados porque son una secuencia. */
+.steps {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.step + .step {
+  margin-top: var(--space-4);
+}
+
+.step h2 {
+  margin: 0;
+  counter-increment: step;
+}
+
+.step h2::before {
+  content: counter(step) '. ';
+}
+
+.note {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+  background: var(--surface-2);
+}
+
+.note p {
+  margin: 0;
+}
+
+.note a,
+.content a {
+  color: var(--accent);
+}
+
+.link {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-weight: 600;
+}
+
+.link::after {
+  content: ' ›';
+}
+
+.error {
+  margin-top: var(--space-4);
+  color: var(--danger);
+}
+
+@media (max-width: 760px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-3) var(--space-6);
+  }
+
+  .index {
+    position: static;
+  }
+
+  .content {
+    padding: var(--space-4);
+  }
+
+  .content h1 {
+    font-size: 1.75rem;
+  }
+}

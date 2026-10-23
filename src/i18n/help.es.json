@@ -1,0 +1,628 @@
+{
+  "topics": {
+    "getting-started": {
+      "lead": "De las imágenes de tus cartas a un PDF listo para imprimir, en tres pasos.",
+      "blocks": [
+        {
+          "type": "step",
+          "title": "Añade las imágenes",
+          "text": "Arrastra las imágenes o una carpeta a la lista, o pulsa «Añadir imágenes». Valen JPG, PNG, WebP, TIFF y fotos HEIC. Si el nombre acaba en « x3», se añaden 3 copias; también puedes cambiar las copias en cada carta."
+        },
+        {
+          "type": "step",
+          "title": "Revisa los ajustes",
+          "text": "Elige la distribución y, si hace falta, el tamaño de la carta. La vista previa muestra cómo quedará cada página."
+        },
+        {
+          "type": "step",
+          "title": "Genera el PDF",
+          "text": "Pulsa «Generar PDF». Todo se hace en tu navegador: las imágenes no salen de tu equipo."
+        },
+        {
+          "type": "note",
+          "text": "Al imprimir, elige tamaño real o escala 100 %. Con «Ajustar a la página» las cartas salen más pequeñas.",
+          "link": {
+            "topic": "print-real-size",
+            "label": "Más sobre imprimir"
+          }
+        },
+        {
+          "type": "p",
+          "text": "Para seguir otro día, guarda el proyecto: recuerda la lista de cartas y los ajustes."
+        },
+        {
+          "type": "link",
+          "topic": "projects",
+          "label": "Guardar y abrir proyectos"
+        }
+      ]
+    },
+    "print-real-size": {
+      "lead": "El PDF ya lleva cada carta a su medida. Lo único que puede cambiarla es el cuadro de imprimir.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Escala"
+        },
+        {
+          "type": "p",
+          "text": "En el cuadro de imprimir, elige «Tamaño real» o «Escala 100 %» y desactiva «Ajustar a la página» o «Encajar en el área imprimible». Con esas opciones el navegador o el visor reduce la página unos milímetros y todas las cartas salen más pequeñas."
+        },
+        {
+          "type": "p",
+          "text": "Imprime primero una hoja y mide una carta con una regla antes de gastar la cartulina."
+        },
+        {
+          "type": "h",
+          "text": "Papel"
+        },
+        {
+          "type": "p",
+          "text": "Usa en la impresora el mismo tamaño de papel que la página del PDF (A4 salvo que lo cambies en Distribución). Una cartulina de 200 a 300 g da cartas más rígidas; si la impresora no la admite, imprime en papel normal y pégalo sobre cartulina o enfúndalo."
+        },
+        {
+          "type": "h",
+          "text": "Doble cara"
+        },
+        {
+          "type": "p",
+          "text": "Si has añadido reversos, activa la impresión a doble cara en la impresora y elige el mismo volteo (por el borde largo o por el borde corto) que tienes en Ajustes › Reverso. Si tu impresora solo imprime a una cara, imprime las páginas impares, vuelve a poner las hojas y luego imprime las pares."
+        },
+        {
+          "type": "link",
+          "topic": "backs",
+          "label": "Doble cara"
+        },
+        {
+          "type": "h",
+          "text": "Cortar"
+        },
+        {
+          "type": "p",
+          "text": "Con una guillotina o un cúter y una regla metálica, siguiendo las líneas de corte. Un margen de corte del color del fondo disimula los pequeños desvíos."
+        },
+        {
+          "type": "link",
+          "topic": "cut-lines",
+          "label": "Líneas y margen de corte"
+        }
+      ]
+    },
+    "layout": {
+      "lead": "La distribución decide el tamaño de la página y cuántas cartas caben en cada una.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Modos"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Vertical 3 × 3 en A4: nueve cartas por hoja, en vertical. Es la distribución para cartas de póker.",
+            "Horizontal 4 × 2 en A4: la hoja apaisada, con ocho cartas.",
+            "Manual: las columnas y filas que quieras, en A4, A3 o una página a medida, vertical u horizontal.",
+            "Plantilla: cada carta va en un hueco que colocas tú, con la posición, el tamaño y el giro que quieras."
+          ]
+        },
+        {
+          "type": "link",
+          "topic": "templates",
+          "label": "Plantillas"
+        },
+        {
+          "type": "h",
+          "text": "Colocación"
+        },
+        {
+          "type": "p",
+          "text": "Con «Separadas», las cartas se reparten por la página dejando un espacio entre ellas y respetando el margen de la página. Con «Pegadas», van juntas y centradas en la hoja: hay menos cortes que dar, pero cualquier desvío del cúter afecta a dos cartas."
+        },
+        {
+          "type": "p",
+          "text": "El margen de la página es la distancia mínima entre las cartas y el borde del papel. Muchas impresoras no imprimen en los últimos 4 o 5 mm, así que no lo bajes de ahí."
+        },
+        {
+          "type": "p",
+          "text": "«De derecha a izquierda» llena cada fila empezando por la derecha."
+        },
+        {
+          "type": "note",
+          "text": "El margen de la página no es el margen de corte: este es una banda de color alrededor de cada carta.",
+          "link": {
+            "topic": "cut-lines",
+            "label": "Líneas y margen de corte"
+          }
+        }
+      ]
+    },
+    "card-size": {
+      "lead": "Cada carta mide lo que dicen sus píxeles y su resolución, salvo que fuerces un tamaño.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Según la resolución de la imagen"
+        },
+        {
+          "type": "p",
+          "text": "El tamaño en milímetros sale de los píxeles divididos por la resolución (ppp, píxeles por pulgada) y multiplicados por 25,4. Una imagen de 750 × 1050 px a 300 ppp mide 63,5 × 88,9 mm, el tamaño de una carta de póker. La misma imagen a 150 ppp mediría el doble: 127 × 177,8 mm."
+        },
+        {
+          "type": "p",
+          "text": "Si la imagen no indica su resolución, se toman 72 ppp, como hacía PDFCartas, y esa misma imagen saldría de 26 × 37 cm. La app avisa cuando pasa: fuerza entonces el tamaño de la carta."
+        },
+        {
+          "type": "h",
+          "text": "Tamaños predefinidos y personalizado"
+        },
+        {
+          "type": "p",
+          "text": "Al elegir póker, bridge, tarot u otro tamaño de la lista, se fuerzan el ancho y el alto y cada imagen se ajusta a esa medida. Con «Personalizado» indicas tú las medidas, o fuerzas solo el ancho o solo el alto para conservar la proporción de la imagen."
+        },
+        {
+          "type": "p",
+          "text": "Si fuerzas ancho y alto y la imagen tiene otra proporción, se deforma. Para evitarlo, recorta antes las imágenes a la proporción de la carta."
+        },
+        {
+          "type": "link",
+          "topic": "crop",
+          "label": "Recorte"
+        },
+        {
+          "type": "h",
+          "text": "Resolución recomendada"
+        },
+        {
+          "type": "p",
+          "text": "Para que la impresión salga nítida, prepara las imágenes a 300 ppp: una carta de póker de 63 × 88 mm necesita 744 × 1039 px. Forzar el tamaño no añade detalle: una imagen pequeña estirada sale borrosa."
+        },
+        {
+          "type": "p",
+          "text": "El botón de información de cada carta muestra sus píxeles, su resolución y el tamaño que tendrá en el PDF."
+        }
+      ]
+    },
+    "crop": {
+      "lead": "El recorte usa solo una parte de cada imagen: para quitar un borde, un sangrado que no quieres o ajustar la proporción antes de forzar el tamaño.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "El tamaño del recorte se indica en milímetros y se convierte a píxeles a 300 ppp, como en PDFCartas: 10 mm son 118 px. Con 0 mm en una dirección se usa la imagen entera en esa dirección."
+        },
+        {
+          "type": "p",
+          "text": "Centrado, se toma la parte central de cada imagen. En una posición, indicas X e Y en píxeles desde la esquina superior izquierda, y se aplica igual a todas las cartas. En «Ajustar recorte…» lo ves sobre una carta de ejemplo: arrastra el rectángulo o muévelo con las flechas (con Mayús, de 10 en 10 px)."
+        },
+        {
+          "type": "p",
+          "text": "Si el recorte no cabe en alguna imagen, se ajusta a su borde y la vista previa lo avisa."
+        },
+        {
+          "type": "p",
+          "text": "El recorte se hace dentro del PDF con una máscara: la imagen se incrusta entera, sin recodificar, y no pierde calidad."
+        },
+        {
+          "type": "note",
+          "text": "El reverso común no usa este recorte: se ajusta al tamaño de cada carta y, si tiene otra proporción, se recorta centrado.",
+          "link": {
+            "topic": "backs",
+            "label": "Doble cara"
+          }
+        }
+      ]
+    },
+    "cut-lines": {
+      "lead": "Las líneas de corte marcan por dónde cortar. El margen de corte rellena alrededor de cada carta por si el corte se desvía.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Líneas de corte"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Normales: marcas en los márgenes de la página, alineadas con los bordes de las cartas, sin cruzar las imágenes.",
+            "Completas: líneas de borde a borde de la página, que también cruzan el espacio entre las cartas.",
+            "En cruz: pequeñas cruces en las esquinas de cada carta."
+          ]
+        },
+        {
+          "type": "p",
+          "text": "El grosor se indica en centésimas de milímetro: 4 es una línea de 0,04 mm, muy fina pero visible. Puedes cambiar el color, por ejemplo a gris para que se note menos en el canto."
+        },
+        {
+          "type": "p",
+          "text": "Con una plantilla, cada hueco lleva sus marcas en las esquinas, sin elegir estilo."
+        },
+        {
+          "type": "h",
+          "text": "Margen de corte"
+        },
+        {
+          "type": "p",
+          "text": "Es una banda del ancho que indiques (2 mm por defecto) alrededor de cada carta, debajo de la imagen. También se le llama sangrado. Si tus cartas tienen un fondo de color, pon el margen de ese color: si el corte se desvía un poco, no quedará un filo blanco."
+        },
+        {
+          "type": "note",
+          "text": "El margen de corte no es el margen de la página, que es la distancia entre las cartas y el borde del papel.",
+          "link": {
+            "topic": "layout",
+            "label": "Distribución y página"
+          }
+        }
+      ]
+    },
+    "backs": {
+      "lead": "Con «Añadir reversos», detrás de cada página de cartas va otra con sus reversos, en espejo, para imprimir a doble cara.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Elige la imagen del reverso común en Ajustes › Reverso. Se ajusta al tamaño de cada carta y, si tiene otra proporción, se recorta centrada."
+        },
+        {
+          "type": "p",
+          "text": "Para que una carta salga sin reverso, márcalo en su información (el botón de la carta): su hueco queda vacío en la página de reversos."
+        },
+        {
+          "type": "p",
+          "text": "«Volteo del papel» indica cómo da la vuelta a la hoja tu impresora: por el borde largo (lo habitual con la página en vertical) o por el borde corto. Elige el mismo en el cuadro de imprimir y cada reverso caerá detrás de su carta."
+        },
+        {
+          "type": "p",
+          "text": "En la vista previa, las páginas de reversos se ven después de cada página de cartas."
+        },
+        {
+          "type": "link",
+          "topic": "print-real-size",
+          "label": "Imprimir a tamaño real"
+        }
+      ]
+    },
+    "projects": {
+      "lead": "Un proyecto guarda la lista de cartas y los ajustes, no las imágenes.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Qué guarda el archivo .pnpcards"
+        },
+        {
+          "type": "p",
+          "text": "El nombre del proyecto, los ajustes (con la plantilla, si la usas) y, por cada carta, su ruta dentro de la carpeta de imágenes, su nombre, sus copias y si va sin reverso. También la imagen del reverso común. Es un archivo de texto pequeño; las imágenes siguen en tu carpeta y no se copian a ningún sitio."
+        },
+        {
+          "type": "h",
+          "text": "Por qué se pide la carpeta"
+        },
+        {
+          "type": "p",
+          "text": "Al abrir un proyecto, la app tiene que volver a leer las imágenes, y un navegador no puede abrir archivos de tu equipo sin que tú los elijas. Indica la carpeta donde están y cada carta se empareja con su imagen por la ruta y, si no, por el nombre. Si alguna no aparece, se marca como «No se encuentra» y puedes buscarla o quitarla."
+        },
+        {
+          "type": "p",
+          "text": "En Chrome y Edge la app recuerda la carpeta y solo te pedirá permiso para leerla. En Firefox y Safari la eliges cada vez."
+        },
+        {
+          "type": "h",
+          "text": "Recientes y sesión"
+        },
+        {
+          "type": "p",
+          "text": "«Recientes…» guarda en el navegador los últimos 10 proyectos que has abierto o guardado, con sus ajustes y su carpeta. Al volver a la app te ofrece seguir donde lo dejaste. Tampoco aquí hay imágenes: si borras los datos del navegador pierdes esa lista, no tus archivos."
+        },
+        {
+          "type": "note",
+          "text": "Guarda el archivo .pnpcards junto a las imágenes: así, al mover o copiar la carpeta, el proyecto se va con ellas."
+        },
+        {
+          "type": "link",
+          "topic": "bsk",
+          "label": "Proyectos de PDFCartas (.bsk)"
+        }
+      ]
+    },
+    "bsk": {
+      "lead": "Los proyectos de PDFCartas se abren igual que los de PnP Cards: con «Abrir…», arrastrándolos a la lista o con doble clic si tienes la app instalada.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Se conservan la distribución, la colocación y el margen, el tamaño forzado, el recorte, las líneas y el margen de corte, y la lista de imágenes con sus copias."
+        },
+        {
+          "type": "p",
+          "text": "PDFCartas guardaba las rutas completas de Windows. Aquí se te pide la carpeta de las imágenes y se busca cada una por su ruta relativa y, si no, por su nombre."
+        },
+        {
+          "type": "p",
+          "text": "La doble cara manual de PDFCartas, con los reversos intercalados en la lista, ya no existe: esas imágenes de reverso quedan como cartas normales. Quítalas y usa «Añadir reversos», que los genera solo."
+        },
+        {
+          "type": "link",
+          "topic": "backs",
+          "label": "Doble cara"
+        },
+        {
+          "type": "p",
+          "text": "Al guardar, el proyecto se convierte en .pnpcards; el archivo .bsk no se modifica."
+        }
+      ]
+    },
+    "merge": {
+      "lead": "Junta varios PDF en uno, en el orden de la lista.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Añade los PDF, arrastra las filas para cambiar el orden y pulsa «Unir PDF». Hacen falta al menos dos. Sirve, por ejemplo, para juntar las cartas con las reglas o varios mazos en un solo archivo."
+        },
+        {
+          "type": "p",
+          "text": "Los PDF dañados o protegidos con contraseña no se pueden leer: quítalos de la lista. Todo se hace en tu navegador, sin subir nada."
+        },
+        {
+          "type": "link",
+          "to": "/merge",
+          "label": "Abrir Unir PDF"
+        }
+      ]
+    },
+    "split": {
+      "lead": "Corta las hojas con varias cartas en una imagen por carta.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Añade las hojas e indica cuántas columnas y filas tiene cada una. La zona a dividir es el rectángulo que se reparte: «Quitar el margen» detecta el borde de la hoja si el fondo es uniforme, o ajústala a mano con X, Y, ancho y alto, arrastrándola o con las flechas."
+        },
+        {
+          "type": "p",
+          "text": "Con «Mismos ajustes para todas las imágenes», la zona y la rejilla se aplican a todas las hojas. Si las hojas son distintas, desmárcalo y ajusta cada una."
+        },
+        {
+          "type": "p",
+          "text": "Las partes se guardan en PNG, sin pérdida de calidad y con la resolución de la hoja, en un ZIP; o pásalas directamente a Cartas con «Añadir a Cartas»."
+        },
+        {
+          "type": "link",
+          "to": "/split",
+          "label": "Abrir Dividir imagen"
+        }
+      ]
+    },
+    "extract-images": {
+      "lead": "Saca las cartas de un PDF: las imágenes que lleva dentro o cada página entera.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Imágenes sueltas"
+        },
+        {
+          "type": "p",
+          "text": "Extrae las imágenes que lleva el PDF a su resolución original. Las repetidas se guardan una vez, con « xN» en el nombre para que Cartas añada las copias. «Ignorar las imágenes de menos de 100 px» deja fuera iconos y adornos."
+        },
+        {
+          "type": "h",
+          "text": "Páginas completas"
+        },
+        {
+          "type": "p",
+          "text": "Dibuja cada página como una imagen, a 150, 300 o 600 ppp u otra resolución, en PNG o JPG. Es la opción cuando las cartas están hechas con vectores, montadas en varias capas o troceadas. Después, «Dividir en cartas» pasa las páginas a Dividir imagen."
+        },
+        {
+          "type": "p",
+          "text": "En los dos modos puedes elegir qué imágenes o páginas quieres, descargarlas en un ZIP o añadirlas a Cartas. Los PDF protegidos con contraseña no se pueden leer."
+        },
+        {
+          "type": "link",
+          "to": "/extract-images",
+          "label": "Abrir Extraer imágenes"
+        }
+      ]
+    },
+    "templates": {
+      "lead": "Una plantilla coloca los huecos donde quieras. Cada carta ocupa un hueco, en el orden de sus números.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Crea una plantilla en blanco o a partir de la distribución que usas en Cartas, y dale un nombre y un tamaño de página. Cada hueco tiene posición (X e Y en milímetros desde la esquina superior izquierda), ancho, alto y giro. Arrastra los huecos para moverlos y sus esquinas para cambiar el tamaño; con un hueco elegido, las flechas lo mueven 1 mm (con Mayús, 10 mm)."
+        },
+        {
+          "type": "p",
+          "text": "«Usar en Cartas» pone la distribución en «Plantilla» con esa plantilla. El proyecto guarda su propia copia, así que sigue funcionando aunque la borres o la cambies después."
+        },
+        {
+          "type": "p",
+          "text": "Con plantilla, las líneas de corte son marcas en las esquinas de cada hueco. Las plantillas se guardan en el navegador; expórtalas para llevarlas a otro equipo o compartirlas."
+        },
+        {
+          "type": "link",
+          "to": "/templates",
+          "label": "Abrir Plantillas"
+        }
+      ]
+    },
+    "offline": {
+      "lead": "PnP Cards es una página web, pero puedes instalarla como una app y usarla sin conexión.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Instalar"
+        },
+        {
+          "type": "p",
+          "text": "En Chrome y Edge aparece «Instalar» en la cabecera. En Safari, usa «Añadir a pantalla de inicio» en iPhone y iPad, o «Añadir al Dock» en Mac. Firefox no instala apps, pero la página funciona igual."
+        },
+        {
+          "type": "p",
+          "text": "Instalada, los archivos .pnpcards se abren con doble clic en la app."
+        },
+        {
+          "type": "h",
+          "text": "Sin conexión"
+        },
+        {
+          "type": "p",
+          "text": "Tras la primera visita, la app queda guardada en el navegador y funciona sin internet. Solo el conversor de fotos HEIC se descarga la primera vez que lo necesitas."
+        },
+        {
+          "type": "h",
+          "text": "Actualizaciones"
+        },
+        {
+          "type": "p",
+          "text": "Cuando hay una versión nueva, aparece un aviso con «Actualizar». La app no se recarga sola para no perder tus cartas. La versión instalada se ve en el pie de la página."
+        }
+      ]
+    },
+    "faq": {
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Las cartas salen más pequeñas al imprimir"
+        },
+        {
+          "type": "p",
+          "text": "El cuadro de imprimir está ajustando la página al papel. Elige «Tamaño real» o «Escala 100 %»."
+        },
+        {
+          "type": "link",
+          "topic": "print-real-size",
+          "label": "Imprimir a tamaño real"
+        },
+        {
+          "type": "h",
+          "text": "Las cartas salen borrosas o pixeladas"
+        },
+        {
+          "type": "p",
+          "text": "La imagen tiene pocos píxeles para su tamaño. A 300 ppp, una carta de póker necesita 744 × 1039 px. Forzar el tamaño no añade detalle: busca imágenes más grandes."
+        },
+        {
+          "type": "h",
+          "text": "Una carta sale enorme o diminuta"
+        },
+        {
+          "type": "p",
+          "text": "La imagen no indica su resolución y se toma a 72 ppp. Elige un tamaño de carta en Ajustes › Tamaño de la carta."
+        },
+        {
+          "type": "link",
+          "topic": "card-size",
+          "label": "Tamaño de la carta y ppp"
+        },
+        {
+          "type": "h",
+          "text": "Las imágenes salen deformadas"
+        },
+        {
+          "type": "p",
+          "text": "Has forzado el ancho y el alto y la imagen tiene otra proporción. Recorta las imágenes a la proporción de la carta o fuerza solo el ancho o solo el alto."
+        },
+        {
+          "type": "h",
+          "text": "Falta una imagen al abrir un proyecto"
+        },
+        {
+          "type": "p",
+          "text": "El proyecto no lleva las imágenes: las busca en la carpeta por su ruta y su nombre. Si has movido o renombrado alguna, pulsa «Buscar…» en la carta para elegirla."
+        },
+        {
+          "type": "link",
+          "topic": "projects",
+          "label": "Guardar y abrir proyectos"
+        },
+        {
+          "type": "h",
+          "text": "¿Puedo mezclar cartas de distintos tamaños?"
+        },
+        {
+          "type": "p",
+          "text": "Cada carta se dibuja a su tamaño, pero la rejilla y las líneas de corte se calculan con la primera carta. Para que todo cuadre, haz un PDF por cada tamaño o fuerza el tamaño de la carta."
+        },
+        {
+          "type": "h",
+          "text": "¿En qué navegadores funciona?"
+        },
+        {
+          "type": "p",
+          "text": "En las versiones actuales de Chrome, Edge, Firefox y Safari. Recordar la carpeta del proyecto e instalar la app solo lo permiten Chrome y Edge."
+        },
+        {
+          "type": "h",
+          "text": "¿Dónde están mis datos?"
+        },
+        {
+          "type": "p",
+          "text": "Todo en tu equipo. Las imágenes y los PDF no se suben a ningún sitio; los ajustes, las plantillas y la lista de recientes se guardan en el navegador."
+        },
+        {
+          "type": "link",
+          "topic": "privacy",
+          "label": "Privacidad"
+        }
+      ]
+    },
+    "shortcuts": {
+      "lead": "Todo se puede hacer con el teclado. Estos atajos ahorran tiempo.",
+      "blocks": [
+        {
+          "type": "h",
+          "text": "Listas de cartas y de PDF"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Tabulador hasta el asa de una carta, espacio para cogerla, flechas para moverla y espacio para soltarla. Escape cancela el movimiento."
+          ]
+        },
+        {
+          "type": "h",
+          "text": "Recorte y zona a dividir"
+        },
+        {
+          "type": "list",
+          "items": ["Flechas: mueven el rectángulo 1 px.", "Mayús y flechas: lo mueven 10 px."]
+        },
+        {
+          "type": "h",
+          "text": "Plantillas"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Con un hueco elegido, flechas: lo mueven 1 mm.",
+            "Mayús y flechas: lo mueven 10 mm."
+          ]
+        },
+        {
+          "type": "h",
+          "text": "Vista previa"
+        },
+        {
+          "type": "list",
+          "items": [
+            "En el divisor entre las cartas y la vista previa, flechas izquierda y derecha cambian su ancho; Inicio y Fin lo llevan al mínimo y al máximo. Doble clic lo deja en el ancho por defecto."
+          ]
+        },
+        {
+          "type": "h",
+          "text": "Ventanas"
+        },
+        {
+          "type": "list",
+          "items": ["Escape cierra cualquier ventana de la app."]
+        }
+      ]
+    },
+    "privacy": {
+      "lead": "Tus imágenes, tus PDF y tus proyectos no salen de tu equipo: todo se hace en el navegador.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Para saber qué herramientas se usan, se cuentan las visitas y algunos usos de forma anónima, sin cookies, sin identificadores y sin nombres de archivo. Puedes desactivarlo cuando quieras."
+        },
+        {
+          "type": "link",
+          "to": "/privacy",
+          "label": "Leer qué se cuenta y desactivar las estadísticas"
+        }
+      ]
+    }
+  }
+}

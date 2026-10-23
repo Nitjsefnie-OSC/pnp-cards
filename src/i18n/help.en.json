@@ -1,0 +1,453 @@
+{
+  "topics": {
+    "getting-started": {
+      "lead": "From your card images to a print-ready PDF, in three steps.",
+      "blocks": [
+        {
+          "type": "step",
+          "title": "Add the images",
+          "text": "Drop the images or a folder onto the list, or press “Add images”. JPG, PNG, WebP, TIFF and HEIC photos all work. A name ending in “ x3” adds 3 copies; you can also change the copies on each card."
+        },
+        {
+          "type": "step",
+          "title": "Check the settings",
+          "text": "Pick the layout and, if needed, the card size. The preview shows how each page will come out."
+        },
+        {
+          "type": "step",
+          "title": "Create the PDF",
+          "text": "Press “Create PDF”. Everything happens in your browser: the images never leave your computer."
+        },
+        {
+          "type": "note",
+          "text": "When printing, choose actual size or 100% scale. With “Fit to page” the cards come out smaller.",
+          "link": { "topic": "print-real-size", "label": "More about printing" }
+        },
+        {
+          "type": "p",
+          "text": "To carry on another day, save the project: it remembers the card list and the settings."
+        },
+        { "type": "link", "topic": "projects", "label": "Saving and opening projects" }
+      ]
+    },
+    "print-real-size": {
+      "lead": "The PDF already has every card at its real size. The only thing that can change it is the print dialog.",
+      "blocks": [
+        { "type": "h", "text": "Scale" },
+        {
+          "type": "p",
+          "text": "In the print dialog, choose “Actual size” or “Scale 100%” and turn off “Fit to page” or “Fit to printable area”. With those options the browser or viewer shrinks the page by a few millimetres and every card comes out smaller."
+        },
+        {
+          "type": "p",
+          "text": "Print one sheet first and measure a card with a ruler before using up the card stock."
+        },
+        { "type": "h", "text": "Paper" },
+        {
+          "type": "p",
+          "text": "Set the printer to the same paper size as the PDF page (A4 unless you changed it under Layout). Card stock of 200 to 300 gsm gives stiffer cards; if your printer can’t take it, print on plain paper and glue it onto card or sleeve it."
+        },
+        { "type": "h", "text": "Double-sided" },
+        {
+          "type": "p",
+          "text": "If you added backs, turn on double-sided printing and pick the same flip (long edge or short edge) you chose under Settings › Backs. If your printer only prints one side, print the odd pages, put the sheets back in, then print the even pages."
+        },
+        { "type": "link", "topic": "backs", "label": "Double-sided" },
+        { "type": "h", "text": "Cutting" },
+        {
+          "type": "p",
+          "text": "Use a guillotine or a craft knife and a metal ruler, following the cut lines. A bleed in the background colour hides small slips."
+        },
+        { "type": "link", "topic": "cut-lines", "label": "Cut lines and bleed" }
+      ]
+    },
+    "layout": {
+      "lead": "The layout sets the page size and how many cards fit on each page.",
+      "blocks": [
+        { "type": "h", "text": "Modes" },
+        {
+          "type": "list",
+          "items": [
+            "Portrait 3 × 3 on A4: nine cards per sheet, portrait. The layout for poker-size cards.",
+            "Landscape 4 × 2 on A4: the sheet sideways, with eight cards.",
+            "Manual: any number of columns and rows, on A4, A3 or a custom page, portrait or landscape.",
+            "Template: each card goes into a slot you place yourself, with the position, size and rotation you want."
+          ]
+        },
+        { "type": "link", "topic": "templates", "label": "Templates" },
+        { "type": "h", "text": "Placement" },
+        {
+          "type": "p",
+          "text": "With “Spaced out”, the cards spread across the page with a gap between them, keeping the page margin. With “Butted together”, they sit side by side, centred on the sheet: fewer cuts to make, but any slip of the knife affects two cards."
+        },
+        {
+          "type": "p",
+          "text": "The page margin is the minimum distance between the cards and the edge of the paper. Many printers can’t print in the last 4 or 5 mm, so don’t go below that."
+        },
+        {
+          "type": "p",
+          "text": "“Right to left” fills each row starting from the right."
+        },
+        {
+          "type": "note",
+          "text": "The page margin is not the bleed: the bleed is a band of colour around each card.",
+          "link": { "topic": "cut-lines", "label": "Cut lines and bleed" }
+        }
+      ]
+    },
+    "card-size": {
+      "lead": "Each card measures what its pixels and resolution say, unless you force a size.",
+      "blocks": [
+        { "type": "h", "text": "From the image resolution" },
+        {
+          "type": "p",
+          "text": "The size in millimetres is the pixels divided by the resolution (dpi, dots per inch) and multiplied by 25.4. A 750 × 1050 px image at 300 dpi measures 63.5 × 88.9 mm, the size of a poker card. The same image at 150 dpi would be twice as big: 127 × 177.8 mm."
+        },
+        {
+          "type": "p",
+          "text": "If the image doesn’t state its resolution, 72 dpi is assumed, as PDFCartas did, and that same image would come out at 26 × 37 cm. The app warns you when this happens: force the card size then."
+        },
+        { "type": "h", "text": "Preset and custom sizes" },
+        {
+          "type": "p",
+          "text": "Choosing poker, bridge, tarot or another size from the list forces the width and height, and each image is fitted to that size. With “Custom” you type the measurements, or force only the width or only the height to keep the image proportions."
+        },
+        {
+          "type": "p",
+          "text": "If you force width and height and the image has different proportions, it gets distorted. To avoid that, crop the images to the card proportions first."
+        },
+        { "type": "link", "topic": "crop", "label": "Cropping" },
+        { "type": "h", "text": "Recommended resolution" },
+        {
+          "type": "p",
+          "text": "For a sharp print, prepare the images at 300 dpi: a 63 × 88 mm poker card needs 744 × 1039 px. Forcing the size adds no detail: a small image stretched out comes out blurry."
+        },
+        {
+          "type": "p",
+          "text": "The info button on each card shows its pixels, its resolution and the size it will have in the PDF."
+        }
+      ]
+    },
+    "crop": {
+      "lead": "Cropping uses only part of each image: to remove a border or an unwanted bleed, or to fix the proportions before forcing the size.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The crop size is given in millimetres and converted to pixels at 300 dpi, as in PDFCartas: 10 mm is 118 px. With 0 mm in one direction, the whole image is used in that direction."
+        },
+        {
+          "type": "p",
+          "text": "Centred, the middle of each image is taken. At a position, you give X and Y in pixels from the top-left corner, and it applies to every card alike. “Adjust crop…” shows it on a sample card: drag the rectangle or move it with the arrow keys (with Shift, 10 px at a time)."
+        },
+        {
+          "type": "p",
+          "text": "If the crop doesn’t fit in some image, it is clamped to its edge and the preview warns you."
+        },
+        {
+          "type": "p",
+          "text": "The crop is done inside the PDF with a mask: the whole image is embedded, without re-encoding, and loses no quality."
+        },
+        {
+          "type": "note",
+          "text": "The shared back doesn’t use this crop: it is fitted to each card’s size and, if its proportions differ, cropped centred.",
+          "link": { "topic": "backs", "label": "Double-sided" }
+        }
+      ]
+    },
+    "cut-lines": {
+      "lead": "Cut lines mark where to cut. The bleed fills in around each card in case the cut strays.",
+      "blocks": [
+        { "type": "h", "text": "Cut lines" },
+        {
+          "type": "list",
+          "items": [
+            "Normal: marks in the page margins, aligned with the card edges, never crossing the images.",
+            "Full: lines from edge to edge of the page, also crossing the gaps between cards.",
+            "Crosses: small crosses at the corners of each card."
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The thickness is in hundredths of a millimetre: 4 is a 0.04 mm line, very thin but visible. You can change the colour, for instance to grey so it shows less on the card edge."
+        },
+        {
+          "type": "p",
+          "text": "With a template, each slot gets marks at its corners, with no style to choose."
+        },
+        { "type": "h", "text": "Bleed" },
+        {
+          "type": "p",
+          "text": "A band of the width you set (2 mm by default) around each card, underneath the image. If your cards have a coloured background, give the bleed that colour: if the cut strays a little, there won’t be a white edge."
+        },
+        {
+          "type": "note",
+          "text": "The bleed is not the page margin, which is the distance between the cards and the edge of the paper.",
+          "link": { "topic": "layout", "label": "Layout and page" }
+        }
+      ]
+    },
+    "backs": {
+      "lead": "With “Add backs”, each page of cards is followed by a page with their backs, mirrored, for double-sided printing.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Choose the shared back image under Settings › Backs. It is fitted to each card’s size and, if its proportions differ, cropped centred."
+        },
+        {
+          "type": "p",
+          "text": "To print a card without a back, mark it in its info (the card’s button): its slot stays empty on the backs page."
+        },
+        {
+          "type": "p",
+          "text": "“Paper flip” says how your printer turns the sheet over: on the long edge (the usual with a portrait page) or on the short edge. Pick the same in the print dialog and each back lands behind its card."
+        },
+        {
+          "type": "p",
+          "text": "In the preview, the backs pages appear after each page of cards."
+        },
+        { "type": "link", "topic": "print-real-size", "label": "Printing at actual size" }
+      ]
+    },
+    "projects": {
+      "lead": "A project saves the card list and the settings, not the images.",
+      "blocks": [
+        { "type": "h", "text": "What the .pnpcards file holds" },
+        {
+          "type": "p",
+          "text": "The project name, the settings (with the template, if you use one) and, for each card, its path inside the image folder, its name, its copies and whether it has no back. Also the shared back image. It’s a small text file; the images stay in your folder and are never copied anywhere."
+        },
+        { "type": "h", "text": "Why you’re asked for the folder" },
+        {
+          "type": "p",
+          "text": "When opening a project, the app has to read the images again, and a browser can’t open files on your computer unless you pick them. Point it at the folder and each card is matched to its image by path or, failing that, by name. Any image not found is marked “Not found”, and you can locate it or remove the card."
+        },
+        {
+          "type": "p",
+          "text": "In Chrome and Edge the app remembers the folder and only asks for permission to read it. In Firefox and Safari you pick it each time."
+        },
+        { "type": "h", "text": "Recent projects and session" },
+        {
+          "type": "p",
+          "text": "“Recent…” keeps in the browser the last 10 projects you opened or saved, with their settings and folder. When you come back, the app offers to pick up where you left off. No images here either: clearing the browser data loses that list, not your files."
+        },
+        {
+          "type": "note",
+          "text": "Save the .pnpcards file next to the images: when you move or copy the folder, the project goes with them."
+        },
+        { "type": "link", "topic": "bsk", "label": "PDFCartas projects (.bsk)" }
+      ]
+    },
+    "bsk": {
+      "lead": "PDFCartas projects open like PnP Cards ones: with “Open…”, by dropping them onto the list or by double-clicking if the app is installed.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The layout, placement and margin, forced size, crop, cut lines and bleed, and the image list with its copies are all kept."
+        },
+        {
+          "type": "p",
+          "text": "PDFCartas stored full Windows paths. Here you’re asked for the image folder, and each image is looked up by its relative path or, failing that, by its name."
+        },
+        {
+          "type": "p",
+          "text": "PDFCartas’ manual double-sided mode, with the backs interleaved in the list, no longer exists: those back images are left as ordinary cards. Remove them and use “Add backs”, which generates them for you."
+        },
+        { "type": "link", "topic": "backs", "label": "Double-sided" },
+        {
+          "type": "p",
+          "text": "When you save, the project becomes a .pnpcards file; the .bsk file is left untouched."
+        }
+      ]
+    },
+    "merge": {
+      "lead": "Joins several PDFs into one, in the order of the list.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Add the PDFs, drag the rows to reorder them and press “Merge PDFs”. You need at least two. Handy for putting the cards and the rules, or several decks, into a single file."
+        },
+        {
+          "type": "p",
+          "text": "Damaged or password-protected PDFs can’t be read: remove them from the list. Everything happens in your browser, nothing is uploaded."
+        },
+        { "type": "link", "to": "/merge", "label": "Open Merge PDFs" }
+      ]
+    },
+    "split": {
+      "lead": "Cuts sheets holding several cards into one image per card.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Add the sheets and say how many columns and rows each has. The split area is the rectangle that gets divided: “Remove the margin” detects the sheet’s border when the background is plain, or adjust it by hand with X, Y, width and height, by dragging or with the arrow keys."
+        },
+        {
+          "type": "p",
+          "text": "With “Same settings for all images”, the area and grid apply to every sheet. If the sheets differ, untick it and adjust each one."
+        },
+        {
+          "type": "p",
+          "text": "The parts are saved as PNG, lossless and at the sheet’s resolution, in a ZIP; or send them straight to Cards with “Add to Cards”."
+        },
+        { "type": "link", "to": "/split", "label": "Open Split image" }
+      ]
+    },
+    "extract-images": {
+      "lead": "Gets the cards out of a PDF: the images inside it, or each whole page.",
+      "blocks": [
+        { "type": "h", "text": "Separate images" },
+        {
+          "type": "p",
+          "text": "Extracts the images the PDF carries at their original resolution. Repeated ones are saved once, with “ xN” in the name so Cards adds the copies. “Ignore images smaller than 100 px” leaves out icons and ornaments."
+        },
+        { "type": "h", "text": "Whole pages" },
+        {
+          "type": "p",
+          "text": "Draws each page as an image at 150, 300 or 600 dpi or another resolution, as PNG or JPG. This is the option when the cards are drawn with vectors, built from several layers or chopped up. Afterwards, “Split into cards” sends the pages to Split image."
+        },
+        {
+          "type": "p",
+          "text": "In both modes you can choose which images or pages you want, download them as a ZIP or add them to Cards. Password-protected PDFs can’t be read."
+        },
+        { "type": "link", "to": "/extract-images", "label": "Open Extract images" }
+      ]
+    },
+    "templates": {
+      "lead": "A template places the slots wherever you want. Each card takes one slot, in the order of their numbers.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Create a blank template or one from the layout you use in Cards, and give it a name and a page size. Each slot has a position (X and Y in millimetres from the top-left corner), width, height and rotation. Drag slots to move them and their corners to resize them; with a slot selected, the arrow keys move it 1 mm (with Shift, 10 mm)."
+        },
+        {
+          "type": "p",
+          "text": "“Use in Cards” switches the layout to “Template” with that template. The project keeps its own copy, so it keeps working even if you delete or change the template later."
+        },
+        {
+          "type": "p",
+          "text": "With a template, cut lines are marks at the corners of each slot. Templates are stored in the browser; export them to take them to another computer or share them."
+        },
+        { "type": "link", "to": "/templates", "label": "Open Templates" }
+      ]
+    },
+    "offline": {
+      "lead": "PnP Cards is a web page, but you can install it as an app and use it offline.",
+      "blocks": [
+        { "type": "h", "text": "Installing" },
+        {
+          "type": "p",
+          "text": "In Chrome and Edge, “Install” appears in the header. In Safari, use “Add to Home Screen” on iPhone and iPad, or “Add to Dock” on Mac. Firefox doesn’t install apps, but the page works the same."
+        },
+        {
+          "type": "p",
+          "text": "Once installed, .pnpcards files open in the app with a double-click."
+        },
+        { "type": "h", "text": "Offline" },
+        {
+          "type": "p",
+          "text": "After the first visit, the app is stored in the browser and works without internet. Only the HEIC photo converter is downloaded the first time you need it."
+        },
+        { "type": "h", "text": "Updates" },
+        {
+          "type": "p",
+          "text": "When a new version is available, a notice with “Update” appears. The app never reloads on its own, so you don’t lose your cards. The installed version is shown in the page footer."
+        }
+      ]
+    },
+    "faq": {
+      "blocks": [
+        { "type": "h", "text": "The cards come out smaller when printed" },
+        {
+          "type": "p",
+          "text": "The print dialog is fitting the page to the paper. Choose “Actual size” or “Scale 100%”."
+        },
+        { "type": "link", "topic": "print-real-size", "label": "Printing at actual size" },
+        { "type": "h", "text": "The cards come out blurry or pixelated" },
+        {
+          "type": "p",
+          "text": "The image has too few pixels for its size. At 300 dpi, a poker card needs 744 × 1039 px. Forcing the size adds no detail: look for larger images."
+        },
+        { "type": "h", "text": "A card comes out huge or tiny" },
+        {
+          "type": "p",
+          "text": "The image doesn’t state its resolution and is taken at 72 dpi. Pick a card size under Settings › Card size."
+        },
+        { "type": "link", "topic": "card-size", "label": "Card size and dpi" },
+        { "type": "h", "text": "The images come out distorted" },
+        {
+          "type": "p",
+          "text": "You forced the width and height and the image has different proportions. Crop the images to the card proportions, or force only the width or only the height."
+        },
+        { "type": "h", "text": "An image is missing when opening a project" },
+        {
+          "type": "p",
+          "text": "The project doesn’t carry the images: it looks them up in the folder by path and name. If you moved or renamed one, press “Find…” on the card to pick it."
+        },
+        { "type": "link", "topic": "projects", "label": "Saving and opening projects" },
+        { "type": "h", "text": "Can I mix cards of different sizes?" },
+        {
+          "type": "p",
+          "text": "Each card is drawn at its own size, but the grid and the cut lines are worked out from the first card. For everything to line up, make one PDF per size or force the card size."
+        },
+        { "type": "h", "text": "Which browsers work?" },
+        {
+          "type": "p",
+          "text": "Current versions of Chrome, Edge, Firefox and Safari. Remembering the project folder and installing the app only work in Chrome and Edge."
+        },
+        { "type": "h", "text": "Where is my data?" },
+        {
+          "type": "p",
+          "text": "All on your computer. Images and PDFs are never uploaded; settings, templates and the recent list are stored in the browser."
+        },
+        { "type": "link", "topic": "privacy", "label": "Privacy" }
+      ]
+    },
+    "shortcuts": {
+      "lead": "Everything can be done from the keyboard. These shortcuts save time.",
+      "blocks": [
+        { "type": "h", "text": "Card and PDF lists" },
+        {
+          "type": "list",
+          "items": [
+            "Tab to a card’s handle, Space to pick it up, arrow keys to move it and Space to drop it. Escape cancels the move."
+          ]
+        },
+        { "type": "h", "text": "Crop and split area" },
+        {
+          "type": "list",
+          "items": ["Arrow keys: move the rectangle 1 px.", "Shift and arrow keys: move it 10 px."]
+        },
+        { "type": "h", "text": "Templates" },
+        {
+          "type": "list",
+          "items": [
+            "With a slot selected, arrow keys: move it 1 mm.",
+            "Shift and arrow keys: move it 10 mm."
+          ]
+        },
+        { "type": "h", "text": "Preview" },
+        {
+          "type": "list",
+          "items": [
+            "On the divider between the cards and the preview, left and right arrows change its width; Home and End take it to the minimum and maximum. Double-click resets it to the default width."
+          ]
+        },
+        { "type": "h", "text": "Dialogs" },
+        { "type": "list", "items": ["Escape closes any dialog in the app."] }
+      ]
+    },
+    "privacy": {
+      "lead": "Your images, your PDFs and your projects never leave your computer: everything happens in the browser.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "To learn which tools get used, visits and some actions are counted anonymously, with no cookies, no identifiers and no file names. You can turn it off whenever you like."
+        },
+        {
+          "type": "link",
+          "to": "/privacy",
+          "label": "Read what is counted and turn off statistics"
+        }
+      ]
+    }
+  }
+}

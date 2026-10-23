@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import i18n from '../../i18n';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
@@ -35,7 +36,7 @@ describe('BackSettings', () => {
   it('activa los reversos, elige la imagen y muestra su nombre y tamaño', async () => {
     const user = userEvent.setup();
     const loadImage = vi.fn(async () => backImage);
-    render(<BackSettings loadImage={loadImage} />);
+    render(<BackSettings loadImage={loadImage} />, { wrapper: MemoryRouter });
     await open(user);
 
     await user.click(screen.getByLabelText(/Añadir reversos/));
@@ -57,7 +58,7 @@ describe('BackSettings', () => {
   it('elige por qué borde se da la vuelta al papel', async () => {
     const user = userEvent.setup();
     useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
-    render(<BackSettings />);
+    render(<BackSettings />, { wrapper: MemoryRouter });
     await open(user);
     await user.click(screen.getByLabelText('Por el borde corto'));
     expect(useSettingsStore.getState().settings.backs.flip).toBe('short');
@@ -66,7 +67,9 @@ describe('BackSettings', () => {
   it('avisa si la imagen no se puede leer', async () => {
     const user = userEvent.setup();
     useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
-    render(<BackSettings loadImage={() => Promise.reject(new Error('roto'))} />);
+    render(<BackSettings loadImage={() => Promise.reject(new Error('roto'))} />, {
+      wrapper: MemoryRouter,
+    });
     await open(user);
     await user.upload(screen.getByTestId('back-input'), png('roto.png'));
     expect(await screen.findByRole('alert')).toHaveTextContent('No se ha podido leer roto.png.');
@@ -76,7 +79,7 @@ describe('BackSettings', () => {
     const user = userEvent.setup();
     useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
     useCardsStore.getState().setBack({ ...backImage, blob: null, thumbUrl: null, missing: true });
-    render(<BackSettings />);
+    render(<BackSettings />, { wrapper: MemoryRouter });
     await open(user);
     expect(screen.getByText('No se encuentra dorso.png. Elígela otra vez.')).toBeInTheDocument();
   });
@@ -86,7 +89,7 @@ describe('carta sin reverso', () => {
   it('se marca desde su información y se indica en la tarjeta', async () => {
     const user = userEvent.setup();
     useCardsStore.getState().addImages([{ ...backImage, name: 'mapa.png', path: 'mapa.png' }]);
-    render(<CardTray />);
+    render(<CardTray />, { wrapper: MemoryRouter });
 
     // Sin reversos activados, no se ofrece.
     await user.click(screen.getByRole('button', { name: 'Información de mapa.png' }));

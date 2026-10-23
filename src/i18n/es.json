@@ -82,7 +82,8 @@
     "clearMessage": "La lista se queda vacía. Puedes volver a añadir las imágenes cuando quieras.",
     "dividerLabel": "Ancho de la vista previa",
     "dividerHint": "Arrastra para cambiar el ancho de la vista previa; doble clic para el ancho por defecto",
-    "errorNoBack": "Elige la imagen del reverso en Ajustes › Reverso, o quita los reversos."
+    "errorNoBack": "Elige la imagen del reverso en Ajustes › Reverso, o quita los reversos.",
+    "emptyHelp": "Si es tu primera vez, empieza por"
   },
   "settings": {
     "page": "Página",
@@ -485,5 +486,43 @@
     ],
     "optIn": "Enviar estadísticas anónimas de uso",
     "doNotTrack": "Tu navegador pide no ser rastreado, así que no se envía nada."
+  },
+  "help": {
+    "link": "Ayuda",
+    "title": "Ayuda",
+    "about": "Ayuda sobre {{topic}}",
+    "search": "Buscar en la ayuda",
+    "searchPlaceholder": "Buscar en la ayuda…",
+    "results_one": "{{count}} tema encontrado",
+    "results_other": "{{count}} temas encontrados",
+    "noResults": "Ningún tema habla de eso. Prueba con otra palabra.",
+    "index": "Temas de ayuda",
+    "loadFailed": "No se ha podido cargar la ayuda. Comprueba la conexión y vuelve a intentarlo.",
+    "sections": {
+      "start": "Empezar",
+      "cards": "Cartas",
+      "projects": "Proyectos",
+      "tools": "Herramientas",
+      "more": "Más"
+    },
+    "topics": {
+      "getting-started": "Primeros pasos",
+      "print-real-size": "Imprimir a tamaño real",
+      "layout": "Distribución y página",
+      "card-size": "Tamaño de la carta y ppp",
+      "crop": "Recorte",
+      "cut-lines": "Líneas y margen de corte",
+      "backs": "Doble cara",
+      "projects": "Guardar y abrir proyectos",
+      "bsk": "Proyectos de PDFCartas (.bsk)",
+      "merge": "Unir PDF",
+      "split": "Dividir imagen",
+      "extract-images": "Extraer imágenes",
+      "templates": "Plantillas",
+      "offline": "Instalar y usar sin conexión",
+      "faq": "Preguntas frecuentes",
+      "shortcuts": "Atajos de teclado",
+      "privacy": "Privacidad"
+    }
   }
 }
