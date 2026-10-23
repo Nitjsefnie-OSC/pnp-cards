@@ -1,4 +1,6 @@
 import { useId, type ReactNode } from 'react';
+import type { HelpTopicId } from '../../features/help/topics';
+import { HelpLink } from '../HelpLink';
 import styles from './form.module.css';
 
 export function Checkbox({
@@ -81,19 +83,24 @@ export function ColorField({
   );
 }
 
-/** Sección plegable de ajustes. */
+/** Sección plegable de ajustes, con un botón «?» que abre su tema de ayuda. */
 export function Section({
   title,
   children,
   defaultOpen,
+  help,
 }: {
   title: string;
   children: ReactNode;
   defaultOpen?: boolean;
+  help?: HelpTopicId;
 }) {
   return (
     <details className={styles.section} open={defaultOpen}>
-      <summary>{title}</summary>
+      <summary>
+        {title}
+        {help ? <HelpLink topic={help} className={styles.help} /> : null}
+      </summary>
       <div className={styles.sectionBody}>{children}</div>
     </details>
   );

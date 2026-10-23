@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { HelpLink } from '../../components/HelpLink';
 import { confirmAction } from '../../components/confirmAction';
 import { useShallow } from 'zustand/react/shallow';
 import { downloadBlob } from '../../components/download';
@@ -104,7 +105,10 @@ export function TemplatesPage() {
   return (
     <div className={styles.screen}>
       <header className={styles.header}>
-        <h1>{t('templates.title')}</h1>
+        <div className={styles.titleRow}>
+          <h1>{t('templates.title')}</h1>
+          <HelpLink topic="templates" />
+        </div>
         <p>{t('templates.intro')}</p>
       </header>
 

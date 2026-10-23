@@ -124,8 +124,46 @@
 
 .prefs {
   display: flex;
+  align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
+}
+
+/* Ayuda: un botón perfilado en papel, que se rellena cuando la ayuda está abierta. */
+.help {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2) 2px var(--space-1);
+  border: 1.5px solid var(--paper);
+  border-radius: var(--radius-s);
+  color: #eef5f1;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.help:hover {
+  background: color-mix(in srgb, var(--paper) 16%, transparent);
+}
+
+.helpActive {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.helpMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  line-height: 1;
 }
 
 .prefs select {
@@ -185,12 +223,14 @@
     gap: var(--space-1);
   }
 
-  /* Donar solo con el icono: el nombre accesible lo da el aria-label. */
-  .donateLabel {
+  /* Donar y Ayuda solo con el icono: el nombre accesible lo da el aria-label. */
+  .donateLabel,
+  .helpLabel {
     display: none;
   }
 
-  .donate {
+  .donate,
+  .help {
     padding: var(--space-1);
   }
 }

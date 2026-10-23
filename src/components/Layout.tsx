@@ -91,6 +91,19 @@ export function Layout() {
             </svg>
             <span className={styles.donateLabel}>{t('nav.donate')}</span>
           </a>
+          <NavLink
+            to="/help"
+            className={({ isActive }) =>
+              isActive ? `${styles.help} ${styles.helpActive}` : styles.help
+            }
+            aria-label={t('help.link')}
+            title={t('help.title')}
+          >
+            <span className={styles.helpMark} aria-hidden="true">
+              ?
+            </span>
+            <span className={styles.helpLabel}>{t('help.link')}</span>
+          </NavLink>
           <InstallButton />
           <label>
             <span className="visually-hidden">{t('theme.label')}</span>

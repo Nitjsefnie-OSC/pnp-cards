@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
+import { HelpLink } from '../../components/HelpLink';
 import { track } from '../../analytics/track';
 import { confirmAction } from '../../components/confirmAction';
 import { downloadUrl } from '../../components/download';
@@ -266,7 +267,10 @@ export function MergePage({
     >
       <div className={styles.column}>
         <header className={styles.header}>
-          <h1>{t('merge.title')}</h1>
+          <div className={styles.titleRow}>
+            <h1>{t('merge.title')}</h1>
+            <HelpLink topic="merge" />
+          </div>
           <p>{t('merge.intro')}</p>
         </header>
 

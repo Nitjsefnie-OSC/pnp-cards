@@ -82,7 +82,8 @@
     "clearMessage": "The list will be empty. You can add the images again whenever you like.",
     "dividerLabel": "Preview width",
     "dividerHint": "Drag to change the preview width; double-click for the default width",
-    "errorNoBack": "Choose the back image under Settings › Backs, or turn backs off."
+    "errorNoBack": "Choose the back image under Settings › Backs, or turn backs off.",
+    "emptyHelp": "First time here? Start with"
   },
   "settings": {
     "page": "Page",
@@ -485,5 +486,43 @@
     ],
     "optIn": "Send anonymous usage statistics",
     "doNotTrack": "Your browser asks not to be tracked, so nothing is sent."
+  },
+  "help": {
+    "link": "Help",
+    "title": "Help",
+    "about": "Help about {{topic}}",
+    "search": "Search the help",
+    "searchPlaceholder": "Search the help…",
+    "results_one": "{{count}} topic found",
+    "results_other": "{{count}} topics found",
+    "noResults": "No topic mentions that. Try another word.",
+    "index": "Help topics",
+    "loadFailed": "The help could not be loaded. Check your connection and try again.",
+    "sections": {
+      "start": "Getting started",
+      "cards": "Cards",
+      "projects": "Projects",
+      "tools": "Tools",
+      "more": "More"
+    },
+    "topics": {
+      "getting-started": "First steps",
+      "print-real-size": "Printing at actual size",
+      "layout": "Layout and page",
+      "card-size": "Card size and dpi",
+      "crop": "Cropping",
+      "cut-lines": "Cut lines and bleed",
+      "backs": "Double-sided",
+      "projects": "Saving and opening projects",
+      "bsk": "PDFCartas projects (.bsk)",
+      "merge": "Merge PDFs",
+      "split": "Split image",
+      "extract-images": "Extract images",
+      "templates": "Templates",
+      "offline": "Installing and using offline",
+      "faq": "Frequently asked questions",
+      "shortcuts": "Keyboard shortcuts",
+      "privacy": "Privacy"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { HelpLink } from '../../components/HelpLink';
 import { track } from '../../analytics/track';
 import { useNavigate } from 'react-router-dom';
 import { downloadBlob } from '../../components/download';
@@ -255,7 +256,10 @@ export function ExtractImagesPage({
     >
       <div className={styles.column}>
         <header className={styles.header}>
-          <h1>{t('extract.title')}</h1>
+          <div className={styles.titleRow}>
+            <h1>{t('extract.title')}</h1>
+            <HelpLink topic="extract-images" />
+          </div>
           <p>{t('extract.intro')}</p>
         </header>
 

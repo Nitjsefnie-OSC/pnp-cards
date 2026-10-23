@@ -24,6 +24,10 @@ describe('Layout', () => {
     expect(screen.getByRole('link', { name: 'Privacidad' })).toHaveAttribute('href', '/privacy');
   });
 
+  it('lleva a la ayuda desde la cabecera', () => {
+    expect(screen.getByRole('link', { name: 'Ayuda' })).toHaveAttribute('href', '/help');
+  });
+
   it('enlaza a PayPal.Me en otra pestaña', () => {
     const donate = screen.getByRole('link', { name: 'Donar (se abre en otra pestaña)' });
     expect(donate).toHaveAttribute('href', 'https://paypal.me/Onzebol/5EUR');

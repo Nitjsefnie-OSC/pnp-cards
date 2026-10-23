@@ -56,7 +56,7 @@ export function SettingsPanel() {
 
   return (
     <div className={styles.panel}>
-      <Section title={t('settings.page')} defaultOpen>
+      <Section title={t('settings.page')} defaultOpen help="layout">
         <RadioGroup<LayoutMode>
           legend={t('settings.mode')}
           value={s.mode}
@@ -156,7 +156,7 @@ export function SettingsPanel() {
         ) : null}
       </Section>
 
-      <Section title={t('settings.placement')} defaultOpen>
+      <Section title={t('settings.placement')} defaultOpen help="layout">
         <RadioGroup<Placement>
           legend={t('settings.placement')}
           hideLegend
@@ -185,7 +185,7 @@ export function SettingsPanel() {
         />
       </Section>
 
-      <Section title={t('settings.size')}>
+      <Section title={t('settings.size')} help="card-size">
         <div className={styles.select}>
           <label htmlFor={sizeId}>{t('settings.sizeChoice')}</label>
           <select id={sizeId} value={sizeChoice} onChange={(e) => chooseSize(e.target.value)}>
@@ -260,7 +260,7 @@ export function SettingsPanel() {
         ) : null}
       </Section>
 
-      <Section title={t('settings.crop')}>
+      <Section title={t('settings.crop')} help="crop">
         <Checkbox
           label={t('settings.cropEnabled')}
           checked={s.crop.enabled}
@@ -283,7 +283,7 @@ export function SettingsPanel() {
 
       <BackSettings />
 
-      <Section title={t('settings.cut')}>
+      <Section title={t('settings.cut')} help="cut-lines">
         <Checkbox
           label={t('settings.cutLines')}
           checked={s.cutLines.enabled}

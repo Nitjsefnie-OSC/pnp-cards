@@ -32,7 +32,7 @@ export function BackSettings({
   }
 
   return (
-    <Section title={t('settings.backs')}>
+    <Section title={t('settings.backs')} help="backs">
       <Checkbox
         label={t('settings.backsEnabled')}
         hint={t('settings.backsHint')}

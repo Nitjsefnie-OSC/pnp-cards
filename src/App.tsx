@@ -22,6 +22,10 @@ const TemplatesPage = lazy(() =>
   import('./features/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
 );
 
+const HelpPage = lazy(() =>
+  import('./features/help/HelpPage').then((m) => ({ default: m.HelpPage })),
+);
+
 const PrivacyPage = lazy(() =>
   import('./features/privacy/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
 );
@@ -76,6 +80,14 @@ export function App() {
             element={
               <Suspense fallback={null}>
                 <TemplatesPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="help/:topic?"
+            element={
+              <Suspense fallback={null}>
+                <HelpPage />
               </Suspense>
             }
           />

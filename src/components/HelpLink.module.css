@@ -1,0 +1,22 @@
+/* Un círculo con la interrogación, discreto hasta que se pasa por encima. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1.5px solid var(--steel);
+  border-radius: 50%;
+  color: var(--steel);
+  font-family: var(--font-label);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

@@ -33,7 +33,7 @@ beforeEach(() => {
 
 describe('CardTray', () => {
   it('invita a añadir imágenes cuando la lista está vacía', () => {
-    render(<CardTray />);
+    render(<CardTray />, { wrapper: MemoryRouter });
     expect(screen.getByText(/Arrastra aquí las imágenes/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Imagen en blanco' })).toBeDisabled();
   });
@@ -44,7 +44,7 @@ describe('CardTray', () => {
       images: entries.map((e) => fakeImage(e.path)),
       failed: [],
     }));
-    render(<CardTray loadImages={loadImages} />);
+    render(<CardTray loadImages={loadImages} />, { wrapper: MemoryRouter });
 
     await user.upload(screen.getByTestId('file-input'), [file('a.png'), file('b x3.png')]);
 
@@ -55,7 +55,7 @@ describe('CardTray', () => {
   it('cambia las copias, añade una imagen en blanco y quita cartas', async () => {
     const user = userEvent.setup();
     useCardsStore.getState().addImages([fakeImage('a.png')]);
-    render(<CardTray />);
+    render(<CardTray />, { wrapper: MemoryRouter });
 
     const copies = screen.getByLabelText('Copias de a.png');
     await user.clear(copies);
@@ -73,7 +73,7 @@ describe('CardTray', () => {
   it('los botones − y + quitan y añaden copias; − no baja de una', async () => {
     const user = userEvent.setup();
     useCardsStore.getState().addImages([fakeImage('a.png')]);
-    render(<CardTray />);
+    render(<CardTray />, { wrapper: MemoryRouter });
 
     expect(screen.getByText('Número de copias')).toBeInTheDocument();
     const minus = screen.getByRole('button', { name: 'Quitar una copia de a.png' });
@@ -97,7 +97,7 @@ describe('CardTray', () => {
       },
       fakeImage('b.png', null),
     ]);
-    render(<CardTray />);
+    render(<CardTray />, { wrapper: MemoryRouter });
 
     const button = screen.getByRole('button', {
       name: 'Información de héroe con un nombre largo.png',
@@ -128,6 +128,7 @@ describe('CardTray', () => {
         <CardTray />
         <ConfirmHost />
       </>,
+      { wrapper: MemoryRouter },
     );
 
     await user.click(screen.getByRole('button', { name: 'Quitar todas' }));
@@ -148,7 +149,7 @@ describe('CardTray', () => {
   it('avisa de las imágenes que no se han podido leer', async () => {
     const user = userEvent.setup();
     const loadImages = async () => ({ images: [], failed: ['roto.png'] });
-    render(<CardTray loadImages={loadImages} />);
+    render(<CardTray loadImages={loadImages} />, { wrapper: MemoryRouter });
     await user.upload(screen.getByTestId('file-input'), [file('roto.png')]);
     expect(await screen.findByRole('alert')).toHaveTextContent('roto.png');
   });

@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent } from 'react';
+import { Link } from 'react-router-dom';
 import {
   DndContext,
   KeyboardSensor,
@@ -207,6 +208,10 @@ export function CardTray({
         <div className={styles.empty}>
           <p>{t('cards.empty')}</p>
           <p className={styles.hint}>{t('cards.emptyHint')}</p>
+          <p className={styles.hint}>
+            {t('cards.emptyHelp')}{' '}
+            <Link to="/help/getting-started">{t('help.topics.getting-started')}</Link>.
+          </p>
         </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>

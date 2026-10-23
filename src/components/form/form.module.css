@@ -129,3 +129,8 @@
   padding-left: var(--space-5);
   border-left: 2px solid var(--border);
 }
+
+/* El «?» de la sección, a la derecha del título. */
+.help {
+  margin-left: auto;
+}

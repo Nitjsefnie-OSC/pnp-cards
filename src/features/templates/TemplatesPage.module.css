@@ -398,3 +398,9 @@
     grid-column: auto;
   }
 }
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}

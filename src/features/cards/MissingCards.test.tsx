@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import i18n from '../../i18n';
 import { useCardsStore, type NewImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
@@ -58,7 +59,7 @@ beforeEach(() => {
 
 describe('cartas que faltan', () => {
   it('se ven en la bandeja con un aviso de que no se imprimirán', () => {
-    render(<CardTray />);
+    render(<CardTray />, { wrapper: MemoryRouter });
     expect(screen.getByText('No se encuentra')).toBeInTheDocument();
     expect(screen.getByText(/1 imagen no se encuentra y no se imprimirá/)).toBeInTheDocument();
   });
@@ -81,7 +82,7 @@ describe('cartas que faltan', () => {
 
   it('al buscar su imagen, la carta vuelve con sus copias', async () => {
     const user = userEvent.setup();
-    render(<CardTray />);
+    render(<CardTray />, { wrapper: MemoryRouter });
     await user.upload(
       screen.getByLabelText('Buscar imagen de elfo.png'),
       new File(['x'], 'elfo.png', { type: 'image/png' }),

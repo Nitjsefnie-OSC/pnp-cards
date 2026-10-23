@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { HelpLink } from '../../components/HelpLink';
 import { track } from '../../analytics/track';
 import { confirmAction } from '../../components/confirmAction';
 import { useNavigate } from 'react-router-dom';
@@ -199,7 +200,10 @@ export function SplitPage({
       }}
     >
       <header className={styles.header}>
-        <h1>{t('split.title')}</h1>
+        <div className={styles.titleRow}>
+          <h1>{t('split.title')}</h1>
+          <HelpLink topic="split" />
+        </div>
         <p>{t('split.intro')}</p>
         <div className={styles.toolbar}>
           <button

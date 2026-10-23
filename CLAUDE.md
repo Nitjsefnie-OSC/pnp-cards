@@ -55,6 +55,12 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
 - `src/features/<herramienta>/` — componentes de cada herramienta (ruta en HashRouter).
 - `src/components/` — componentes compartidos y layout.
 - `src/i18n/` — react-i18next, `es.json` y `en.json` (mismas claves en ambos).
+- Ayuda: `src/features/help/` (ruta `help/:topic?`). Los temas son una lista fija en `topics.ts`; el
+  título de cada uno va en `es.json`/`en.json` (`help.topics.<id>`, lo usan el índice y los botones «?»)
+  y el contenido en el espacio de nombres `help` (`help.es.json` y `help.en.json`, cargado bajo
+  demanda con `loadHelp`): bloques `p`, `h`, `step`, `list`, `note` y `link`, sin HTML ni Markdown.
+  `HelpLink` (`src/components/`) es el botón «?» de las secciones de Ajustes y de cada herramienta.
+  Al cambiar o añadir una opción, se actualiza su tema de ayuda en los dos idiomas.
 - Estadísticas: `src/analytics/` (GoatCounter). `track()` solo acepta el tipo cerrado
   `AnalyticsEvent` (rangos y valores fijos, nunca nombres); solo se activa en producción, en
   onzebol.github.io, con `VITE_GOATCOUNTER_CODE` y sin Do Not Track ni la casilla desactivada.
