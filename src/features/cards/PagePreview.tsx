@@ -1,7 +1,8 @@
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useId, useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { HeaderPlacement } from '../../lib/header';
 import { planDocument, PlanError, type DocumentPlan, type PlannedItem } from '../../lib/plan';
+import { INK_SAVER_LIGHTEN } from '../../lib/settings';
 import { slotLocalSize, slotSvgMatrix } from '../../lib/template';
 import {
   printableBack,
@@ -76,6 +77,27 @@ function PreviewCard({
   return <g transform={`matrix(${matrix.join(' ')})`}>{picture(local.width, local.height)}</g>;
 }
 
+/**
+ * Filtro que imita el ahorro de tinta del PDF: escala de grises y, encima, blanco con la misma
+ * opacidad (cada canal pasa a `lighten + (1 - lighten) × valor`).
+ */
+function InkSaverFilter({ id }: { id: string }) {
+  const slope = 1 - INK_SAVER_LIGHTEN;
+  const channel = { type: 'linear', slope, intercept: INK_SAVER_LIGHTEN } as const;
+  return (
+    <defs>
+      <filter id={id} colorInterpolationFilters="sRGB">
+        <feColorMatrix type="saturate" values="0" />
+        <feComponentTransfer>
+          <feFuncR {...channel} />
+          <feFuncG {...channel} />
+          <feFuncB {...channel} />
+        </feComponentTransfer>
+      </filter>
+    </defs>
+  );
+}
+
 /** Cabecera de la página, con la misma colocación que en el PDF (texto girado en el lateral). */
 function PreviewHeader({
   header,
@@ -106,6 +128,8 @@ export function PagePreview() {
   const all = useCardsStore((s) => s.cards);
   const projectName = useCardsStore((s) => s.name);
   const headerEnabled = useSettingsStore((s) => s.settings.header);
+  const inkSaver = useSettingsStore((s) => s.settings.inkSaver);
+  const filterId = useId();
   const backsEnabled = useSettingsStore((s) => s.settings.backs.enabled);
   const cards = useMemo(() => printableCards(all), [all]);
   const back = printableBack(useCardsStore((s) => s.back));
@@ -158,14 +182,17 @@ export function PagePreview() {
               fill={bleedColor}
             />
           ))}
-          {page.items.map((item, i) => (
-            <PreviewCard
-              key={i}
-              item={item}
-              card={isBack ? back! : cards[item.card]}
-              pageHeight={H}
-            />
-          ))}
+          {inkSaver ? <InkSaverFilter id={filterId} /> : null}
+          <g filter={inkSaver ? `url(#${filterId})` : undefined} data-testid="cards">
+            {page.items.map((item, i) => (
+              <PreviewCard
+                key={i}
+                item={item}
+                card={isBack ? back! : cards[item.card]}
+                pageHeight={H}
+              />
+            ))}
+          </g>
           {page.header ? (
             <PreviewHeader
               header={page.header}

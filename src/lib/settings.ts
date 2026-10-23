@@ -44,6 +44,11 @@ export interface LayoutSettings {
   backOffsetMm: { x: number; y: number };
   /** Nombre del proyecto y número de página en el hueco libre de cada página de cartas. */
   header: boolean;
+  /**
+   * Ahorro de tinta: cartas y reversos en escala de grises y aclarados, para pruebas de juego.
+   * No afecta a las líneas de corte ni al margen de corte.
+   */
+  inkSaver: boolean;
 
   forceWidth: boolean;
   forceHeight: boolean;
@@ -78,6 +83,7 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   backs: { enabled: false, flip: 'long' },
   backOffsetMm: { x: 0, y: 0 },
   header: false,
+  inkSaver: false,
   forceWidth: false,
   forceHeight: false,
   cardWidthMm: 0,
@@ -87,6 +93,13 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   bleed: { enabled: false, mm: 2, color: '#ffffff' },
   template: null,
 };
+
+/**
+ * Cuánto se aclaran las cartas con el ahorro de tinta: una capa blanca con esta opacidad sobre la
+ * carta ya en escala de grises (el blanco se queda blanco y el negro pasa a este gris). Lo usan el
+ * PDF y la vista previa.
+ */
+export const INK_SAVER_LIGHTEN = 0.5;
 
 export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] };
 

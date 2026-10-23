@@ -62,6 +62,18 @@
         },
         {
           "type": "h",
+          "text": "Ahorro de tinta"
+        },
+        {
+          "type": "p",
+          "text": "Para probar un juego antes de imprimirlo en serio no hace falta color. Con «Ahorro de tinta», en Ajustes › Impresión, las cartas y los reversos salen en escala de grises y aclarados: el blanco sigue siendo blanco y el negro pasa a un gris medio, así que el texto se lee bien y los fondos gastan mucha menos tinta. Las líneas de corte y el margen de corte conservan su color."
+        },
+        {
+          "type": "note",
+          "text": "Se hace con transparencias del PDF, sin tocar las imágenes. Si tu impresora o visor las ignora y las cartas salen en color, pasa el PDF por otro visor (Chrome o Acrobat las imprimen bien)."
+        },
+        {
+          "type": "h",
           "text": "Doble cara"
         },
         {

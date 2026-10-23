@@ -38,6 +38,7 @@ describe('eventPaths', () => {
         cutLines: false,
         bleed: true,
         backs: true,
+        inkSaver: true,
       }),
     ).toEqual([
       'pdf-generado',
@@ -47,6 +48,7 @@ describe('eventPaths', () => {
       'pdf-generado/opcion/recorte',
       'pdf-generado/opcion/margen-de-corte',
       'pdf-generado/opcion/reversos',
+      'pdf-generado/opcion/ahorro-de-tinta',
     ]);
   });
 

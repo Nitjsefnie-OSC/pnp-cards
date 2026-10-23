@@ -89,6 +89,27 @@ describe('PagePreview', () => {
     expect(images(container)[0].parentElement).toHaveAttribute('viewBox', '39 42 744 1039');
   });
 
+  it('con el ahorro de tinta, las cartas pasan por un filtro de grises; sin él, no', () => {
+    useCardsStore.getState().addImages([image('a.png')]);
+    const { container, rerender } = render(<PagePreview />);
+    expect(screen.getByTestId('cards')).not.toHaveAttribute('filter');
+    expect(container.querySelector('filter')).toBeNull();
+
+    useSettingsStore.getState().update({ inkSaver: true });
+    rerender(<PagePreview />);
+    const filter = container.querySelector('filter')!;
+    expect(screen.getByTestId('cards')).toHaveAttribute('filter', `url(#${filter.id})`);
+    expect(filter.querySelector('feColorMatrix')).toHaveAttribute('values', '0');
+    expect(filter.querySelector('feFuncR')).toHaveAttribute('intercept', '0.5');
+    // Las líneas de corte quedan fuera del filtro.
+    useSettingsStore
+      .getState()
+      .update({ cutLines: { ...DEFAULT_SETTINGS.cutLines, enabled: true, style: 'full' } });
+    rerender(<PagePreview />);
+    expect(screen.getByTestId('cards').querySelectorAll('line')).toHaveLength(0);
+    expect(container.querySelectorAll('line')).toHaveLength(12);
+  });
+
   it('explica el problema si solo hay imágenes en blanco', () => {
     useCardsStore.getState().addBlank();
     render(<PagePreview />);
