@@ -30,4 +30,10 @@ describe('Layout', () => {
     expect(donate).toHaveAttribute('target', '_blank');
     expect(donate).toHaveAttribute('rel', 'noopener noreferrer');
   });
+
+  it('ofrece el tema con etiquetas cortas', () => {
+    const theme = screen.getByRole('combobox', { name: 'Tema' });
+    const options = Array.from(theme.querySelectorAll('option'), (o) => o.textContent);
+    expect(options).toEqual(['Auto', 'Claro', 'Oscuro']);
+  });
 });

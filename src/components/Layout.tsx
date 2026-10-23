@@ -89,7 +89,7 @@ export function Layout() {
                 d="M6 20 9 2h6.5c3.5 0 5 2 4.5 5.5-.6 3.5-3 5-6.5 5h-2.3L10 20ZM11.6 10h2c2 0 3.2-1 3.5-2.6.3-1.7-.5-2.8-2.3-2.8h-2.4Z"
               />
             </svg>
-            {t('nav.donate')}
+            <span className={styles.donateLabel}>{t('nav.donate')}</span>
           </a>
           <InstallButton />
           <label>

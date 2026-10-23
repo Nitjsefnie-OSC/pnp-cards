@@ -35,6 +35,7 @@
 .brand {
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: var(--space-2);
   padding: var(--space-2) 0;
 }
@@ -48,7 +49,10 @@
 }
 
 .name {
+  min-width: 0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-family: var(--font-label);
   font-size: 1.375rem;
   font-weight: 600;
@@ -121,6 +125,7 @@
 .prefs {
   display: flex;
   gap: var(--space-2);
+  flex-shrink: 0;
 }
 
 .prefs select {
@@ -161,18 +166,31 @@
   color: var(--text);
 }
 
+/* Marca y preferencias en la primera fila, herramientas en la segunda. Rejilla y no flex con
+   salto de línea: así las preferencias nunca bajan y, si falta sitio, es la marca la que se recorta. */
 @media (max-width: 760px) {
   .header {
-    flex-wrap: wrap;
-    gap: 0 var(--space-3);
-  }
-
-  .brand {
-    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-3);
+    padding: 0 var(--space-3);
   }
 
   .nav {
-    order: 3;
-    flex-basis: 100%;
+    grid-area: 2 / 1 / 2 / -1;
+  }
+
+  .prefs {
+    grid-area: 1 / 2;
+    gap: var(--space-1);
+  }
+
+  /* Donar solo con el icono: el nombre accesible lo da el aria-label. */
+  .donateLabel {
+    display: none;
+  }
+
+  .donate {
+    padding: var(--space-1);
   }
 }

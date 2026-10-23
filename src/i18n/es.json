@@ -18,7 +18,7 @@
   },
   "theme": {
     "label": "Tema",
-    "system": "Automático",
+    "system": "Auto",
     "light": "Claro",
     "dark": "Oscuro"
   },
