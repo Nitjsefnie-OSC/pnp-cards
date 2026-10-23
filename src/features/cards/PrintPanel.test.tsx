@@ -67,6 +67,8 @@ describe('PrintPanel', () => {
     expect(input.cards).toHaveLength(1);
     expect(input.cards[0]).toMatchObject({ copies: 10, format: 'png', widthPx: 744 });
     expect(input.settings.mode).toBe('vertical9');
+    // Sin nombre de proyecto, la cabecera lleva el título genérico; el worker numera las páginas.
+    expect(input.header).toEqual({ name: 'Cartas', pageLabel: 'Página {{n}} de {{total}}' });
 
     gen.progress(4, 10);
     expect(screen.getByText('Generando el PDF: 4 de 10 cartas')).toBeInTheDocument();
@@ -146,5 +148,23 @@ describe('PrintPanel', () => {
     expect(open).toHaveBeenCalledTimes(1);
     await gen.finish();
     expect(tab.location.href).toBe('blob:pdf');
+  });
+
+  it('con reversos, la cabecera numera hojas y lleva el nombre del proyecto', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    useCardsStore.getState().addImages([{ ...image, name: 'a x10.png' }]);
+    useCardsStore.getState().setName('Dragones del valle');
+    useCardsStore.getState().setBack(image);
+    useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
+    const gen = controllable();
+    render(<PrintPanel generatePdf={gen.generate} />);
+
+    await user.click(screen.getByRole('button', { name: 'Generar PDF' }));
+    const [input] = gen.generate.mock.calls[0];
+    expect(input.header).toEqual({
+      name: 'Dragones del valle',
+      pageLabel: 'Hoja {{n}} de {{total}}',
+    });
   });
 });

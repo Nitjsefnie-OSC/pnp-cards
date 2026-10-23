@@ -57,6 +57,14 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
         {
           settings,
           title: projectName || t('cards.pdfTitle'),
+          header: {
+            name: projectName || t('cards.pdfTitle'),
+            // «{{n}}» y «{{total}}» se dejan tal cual: el worker los rellena en cada página.
+            pageLabel: t(settings.backs.enabled ? 'cards.headerSheet' : 'cards.headerPage', {
+              n: '{{n}}',
+              total: '{{total}}',
+            }),
+          },
           cards: cards.map((c) => ({
             data: c.blob,
             format: c.format,

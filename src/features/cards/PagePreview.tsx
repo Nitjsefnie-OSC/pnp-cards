@@ -1,5 +1,6 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { HeaderPlacement } from '../../lib/header';
 import { planDocument, PlanError, type DocumentPlan, type PlannedItem } from '../../lib/plan';
 import { slotLocalSize, slotSvgMatrix } from '../../lib/template';
 import {
@@ -75,9 +76,37 @@ function PreviewCard({
   return <g transform={`matrix(${matrix.join(' ')})`}>{picture(local.width, local.height)}</g>;
 }
 
+/** Cabecera de la página, con la misma colocación que en el PDF (texto girado en el lateral). */
+function PreviewHeader({
+  header,
+  name,
+  label,
+  pageHeight,
+}: {
+  header: HeaderPlacement;
+  name: string;
+  label: string;
+  pageHeight: number;
+}) {
+  const { size, rotation, start, end } = header;
+  const at = (p: { x: number; y: number }) =>
+    `translate(${p.x} ${pageHeight - p.y}) rotate(${-rotation})`;
+  return (
+    <g fontSize={size} className={styles.header}>
+      <text transform={at(start)}>{name}</text>
+      <text transform={at(end)} textAnchor="end">
+        {label}
+      </text>
+    </g>
+  );
+}
+
 export function PagePreview() {
   const { t } = useTranslation();
   const all = useCardsStore((s) => s.cards);
+  const projectName = useCardsStore((s) => s.name);
+  const headerEnabled = useSettingsStore((s) => s.settings.header);
+  const backsEnabled = useSettingsStore((s) => s.settings.backs.enabled);
   const cards = useMemo(() => printableCards(all), [all]);
   const back = printableBack(useCardsStore((s) => s.back));
   const result = usePlan(cards, back);
@@ -137,6 +166,17 @@ export function PagePreview() {
               pageHeight={H}
             />
           ))}
+          {page.header ? (
+            <PreviewHeader
+              header={page.header}
+              name={projectName.trim() || t('cards.pdfTitle')}
+              label={t(backsEnabled ? 'cards.headerSheet' : 'cards.headerPage', {
+                n: page.sheet,
+                total: plan.sheets,
+              })}
+              pageHeight={H}
+            />
+          ) : null}
           {page.cutLines ? (
             <g stroke={lineColor} className={styles.lines}>
               {page.cutLines.segments.map((s, i) => (
@@ -175,6 +215,9 @@ export function PagePreview() {
         <p className={styles.warning}>
           {t('preview.clamped', { count: plan.clampedCards.length })}
         </p>
+      ) : null}
+      {headerEnabled && plan.pages.every((p) => p.header === null) ? (
+        <p className={styles.warning}>{t('preview.headerMissing')}</p>
       ) : null}
     </div>
   );

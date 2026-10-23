@@ -42,6 +42,8 @@ export interface LayoutSettings {
    * la impresora, no del proyecto: al abrir un proyecto o restablecer los ajustes se conserva.
    */
   backOffsetMm: { x: number; y: number };
+  /** Nombre del proyecto y número de página en el hueco libre de cada página de cartas. */
+  header: boolean;
 
   forceWidth: boolean;
   forceHeight: boolean;
@@ -75,6 +77,7 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   rightToLeft: false,
   backs: { enabled: false, flip: 'long' },
   backOffsetMm: { x: 0, y: 0 },
+  header: false,
   forceWidth: false,
   forceHeight: false,
   cardWidthMm: 0,

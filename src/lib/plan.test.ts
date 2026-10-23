@@ -1,5 +1,6 @@
 import { planDocument, PlanError, translatePage, type CardSpec, type PlannedPage } from './plan';
 import { DEFAULT_SETTINGS, type LayoutSettings } from './settings';
+import { mmToPt } from './units';
 
 const dpi300 = { x: 300, y: 300 };
 const big: CardSpec = { widthPx: 744, heightPx: 1039, dpi: dpi300, blank: false, copies: 1 };
@@ -228,7 +229,9 @@ describe('planDocument', () => {
   describe('translatePage', () => {
     const page: PlannedPage = {
       number: 2,
+      sheet: 1,
       side: 'back',
+      header: null,
       size: { width: 595, height: 842 },
       items: [{ card: 0, placement: { x: 10, y: 20, width: 30, height: 40 }, crop: null }],
       bleed: [{ x: 5, y: 15, width: 5, height: 50 }],
@@ -391,6 +394,59 @@ describe('planDocument', () => {
       const s = settings({ mode: 'template', template, rightToLeft: true });
       const [first] = planDocument(s, [big]).pages;
       expect(first.items[0].placement.x).toBeCloseTo(113.386, 3);
+    });
+  });
+
+  describe('cabecera', () => {
+    it('sin la opción, ninguna página lleva cabecera', () => {
+      const { pages, sheets } = planDocument(settings(), [{ ...big, copies: 10 }]);
+      expect(pages.every((p) => p.header === null)).toBe(true);
+      expect(sheets).toBe(2);
+      expect(pages.map((p) => p.sheet)).toEqual([1, 2]);
+    });
+
+    it('con la opción, cada página de cartas lleva la cabecera arriba, en el margen de 8 mm', () => {
+      const { pages } = planDocument(settings({ header: true }), [{ ...big, copies: 10 }]);
+      expect(pages).toHaveLength(2);
+      for (const page of pages) {
+        expect(page.header?.where).toBe('top');
+        expect(page.header?.size).toBe(7);
+        // Alineada con el bloque de cartas (8 mm de margen) más 1,5 mm de separación.
+        expect(page.header?.start.x).toBeCloseTo(mmToPt(9.5), 6);
+        expect(page.header?.end.x).toBeCloseTo(595 - mmToPt(9.5), 6);
+      }
+    });
+
+    it('con reversos, solo las páginas de cartas la llevan y las hojas se numeran de una en una', () => {
+      const { pages, sheets } = planDocument(
+        settings({ header: true, backs: { enabled: true, flip: 'long' } }),
+        [{ ...big, copies: 10 }],
+        square,
+      );
+      expect(pages.map((p) => p.side)).toEqual(['front', 'back', 'front', 'back']);
+      expect(pages.map((p) => p.header !== null)).toEqual([true, false, true, false]);
+      expect(pages.map((p) => p.sheet)).toEqual([1, 1, 2, 2]);
+      expect(sheets).toBe(2);
+    });
+
+    it('con cartas pegadas que llenan la hoja, va en el lateral', () => {
+      // 63,5 × 99 mm: tres filas ocupan los 297 mm de alto; a los lados quedan 9,75 mm.
+      const tall: CardSpec = { ...big, widthPx: 750, heightPx: 1169 };
+      const { pages } = planDocument(
+        settings({ header: true, mode: 'manual', placement: 'together' }),
+        [{ ...tall, copies: 1 }],
+      );
+      expect(pages[0].header?.where).toBe('left');
+    });
+
+    it('el ajuste de la impresora desplaza también la cabecera', () => {
+      const page = planDocument(settings({ header: true }), [big]).pages[0];
+      const moved = translatePage(page, 10, -5);
+      expect(moved.header?.start).toEqual({
+        x: page.header!.start.x + 10,
+        y: page.header!.start.y - 5,
+      });
+      expect(moved.header?.end).toEqual({ x: page.header!.end.x + 10, y: page.header!.end.y - 5 });
     });
   });
 });

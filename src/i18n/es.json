@@ -64,6 +64,8 @@
     "openPdf": "Abrir el PDF",
     "fileName": "cartas.pdf",
     "pdfTitle": "Cartas",
+    "headerPage": "Página {{n}} de {{total}}",
+    "headerSheet": "Hoja {{n}} de {{total}}",
     "errorEmpty": "No hay cartas que imprimir: todas tienen cero copias.",
     "errorBlank": "Las imágenes en blanco toman el tamaño de otra carta. Añade una imagen o fuerza el ancho y el alto en Tamaño de la carta.",
     "errorUnknown": "No se ha podido generar el PDF ({{message}}). Prueba con menos imágenes o revisa que no estén dañadas.",
@@ -105,6 +107,8 @@
     "together": "Pegadas (centradas)",
     "margin": "Margen de la página",
     "rightToLeft": "De derecha a izquierda",
+    "header": "Cabecera en cada página",
+    "headerHint": "Nombre del proyecto y número de página, en gris y pequeño, en el hueco libre: arriba, abajo o en el lateral. Si no cabe en ninguno, no se dibuja.",
     "size": "Tamaño de la carta",
     "forceWidth": "Forzar ancho",
     "forceHeight": "Forzar alto",
@@ -198,7 +202,8 @@
     "clamped_one": "El recorte no cabe en {{count}} carta; se ajustará a su borde.",
     "clamped_other": "El recorte no cabe en {{count}} cartas; se ajustará al borde de cada una.",
     "pageBack": "Página {{page}} de {{pages}} · reversos",
-    "labelBack": "Vista previa de la página {{page}}, de reversos"
+    "labelBack": "Vista previa de la página {{page}}, de reversos",
+    "headerMissing": "La cabecera no cabe: no quedan 3 mm libres arriba, abajo ni a la izquierda."
   },
   "crop": {
     "title": "Recorte",

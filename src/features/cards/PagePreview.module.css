@@ -75,6 +75,12 @@
   cursor: default;
 }
 
+/* Como en el PDF: Helvetica gris; el cuerpo lo fija cada página. */
+.header {
+  font-family: Helvetica, Arial, sans-serif;
+  fill: #7a7a7a;
+}
+
 .message {
   max-width: 28ch;
   color: #dcebe3;
