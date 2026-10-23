@@ -42,8 +42,13 @@ export function InstallButton() {
         const { outcome } = await prompt.userChoice;
         if (outcome === 'accepted') setPrompt(null);
       }}
+      aria-label={t('pwa.install')}
+      title={t('pwa.install')}
     >
-      {t('pwa.install')}
+      <svg className={styles.installIcon} viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3v11m0 0-4-4m4 4 4-4M4 17v3h16v-3" />
+      </svg>
+      <span className={styles.installLabel}>{t('pwa.install')}</span>
     </button>
   );
 }

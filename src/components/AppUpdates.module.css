@@ -1,4 +1,7 @@
 .install {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   padding: 2px var(--space-3);
   border: 1px solid var(--paper);
   border-radius: var(--radius-s);
@@ -10,6 +13,27 @@
 
 .install:hover {
   filter: brightness(0.95);
+}
+
+.installIcon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* En móvil, solo el icono: el nombre accesible lo da el aria-label. */
+@media (max-width: 760px) {
+  .installLabel {
+    display: none;
+  }
+
+  .install {
+    padding: var(--space-1);
+  }
 }
 
 /* Aviso abajo a la derecha, sin tapar el botón de generar en móvil. */
