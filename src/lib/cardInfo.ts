@@ -1,6 +1,7 @@
 import { cardSize, type ImageInfo } from './cardSize';
 import { CROP_DPI, cropRect } from './crop';
 import type { LayoutSettings } from './settings';
+import { slotLocalSize } from './template';
 import { ptToMm, pxToMm } from './units';
 
 type Mm = { width: number; height: number };
@@ -57,4 +58,56 @@ export function cardFit(image: ImageInfo, settings: LayoutSettings): CardFit {
         ? { kind: 'scaled', percent: percentX, printedMm }
         : { kind: 'distorted', percentX, percentY, printedMm },
   };
+}
+
+/** Por debajo de estos ppp al imprimir, la carta puede verse borrosa (lo que piden las imprentas). */
+export const MIN_PRINT_DPI = 300;
+
+/** Si el tamaño de la carta no sale de los ppp de la imagen: forzado, recortado o de una plantilla. */
+export function fixedSize(settings: LayoutSettings) {
+  return (
+    settings.forceWidth ||
+    settings.forceHeight ||
+    settings.crop.enabled ||
+    settings.mode === 'template'
+  );
+}
+
+/**
+ * Ppp con los que saldrá impresa la carta: los píxeles visibles (los del recorte, si lo hay) entre
+ * su tamaño final en pulgadas, en el eje que peor queda. Sin forzar ni recortar coinciden con los
+ * de la imagen (72 si no los indica). Con plantilla manda el hueco más grande, que es el peor
+ * caso; null si no hay plantilla.
+ */
+export function printedDpi(image: ImageInfo, settings: LayoutSettings): number | null {
+  const crop = settings.crop.enabled ? cropRect(image, settings.crop) : null;
+  const visible: ImageInfo = crop
+    ? { widthPx: crop.width, heightPx: crop.height, dpi: { x: CROP_DPI, y: CROP_DPI } }
+    : image;
+  const dpiFor = (widthMm: number, heightMm: number) =>
+    Math.round(Math.min(visible.widthPx / (widthMm / 25.4), visible.heightPx / (heightMm / 25.4)));
+
+  if (settings.mode === 'template') {
+    const slots = settings.template?.slots ?? [];
+    if (slots.length === 0) return null;
+    return Math.min(
+      ...slots.map((slot) => {
+        const box = { x: 0, y: 0, width: slot.widthMm, height: slot.heightMm };
+        const local = slotLocalSize(box, slot.rotation);
+        return dpiFor(local.width, local.height);
+      }),
+    );
+  }
+  const printed = cardSize(visible, settings);
+  return dpiFor(ptToMm(printed.width), ptToMm(printed.height));
+}
+
+/**
+ * Si la carta saldrá con menos de MIN_PRINT_DPI. Una imagen sin ppp a su tamaño «natural» (72 ppp)
+ * ya tiene su propio aviso, así que solo cuenta cuando se fija el tamaño.
+ */
+export function lowResolution(image: ImageInfo, settings: LayoutSettings) {
+  if (!image.dpi && !fixedSize(settings)) return false;
+  const dpi = printedDpi(image, settings);
+  return dpi !== null && dpi < MIN_PRINT_DPI;
 }

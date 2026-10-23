@@ -37,6 +37,12 @@
   max-width: 80ch;
 }
 
+.lowDpi {
+  border-left-color: var(--note-text);
+  background: var(--note);
+  color: var(--note-text);
+}
+
 .print {
   display: flex;
   flex-direction: column;

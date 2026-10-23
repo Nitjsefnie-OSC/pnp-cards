@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore, type CardImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
+import { fixedSize, lowResolution, MIN_PRINT_DPI, printedDpi } from '../../lib/cardInfo';
 import { IMAGE_ACCEPT } from '../../lib/imageFormat';
 import { CardInfo } from './CardInfo';
 import { loadImage } from './loadImages';
@@ -87,13 +88,20 @@ export const CardTile = memo(function CardTile({
     isDragging,
   } = useSortable({ id: card.id });
   const name = card.blob || card.missing ? card.name : t('cards.blankName');
-  const withoutBack = useSettingsStore((s) => s.settings.backs.enabled) && card.noBack;
+  const settings = useSettingsStore((s) => s.settings);
+  const withoutBack = settings.backs.enabled && card.noBack;
+  // Ppp con los que saldrá impresa; sin ppp y sin fijar el tamaño, la etiqueta avisa con «?».
+  const dpi = card.blob ? printedDpi(card, settings) : null;
+  const low = card.blob ? lowResolution(card, settings) : false;
+  const unknownDpi = !card.dpi && !fixedSize(settings);
+  const badge = unknownDpi ? '?' : (dpi ?? card.dpi?.x ?? '?');
 
   return (
     <li
       ref={setNodeRef}
       className={styles.tile}
       data-dragging={isDragging || undefined}
+      data-low={low || undefined}
       style={{ transform: CSS.Translate.toString(transform), transition }}
     >
       <button
@@ -145,10 +153,20 @@ export const CardTile = memo(function CardTile({
           </label>
         ) : null}
         {card.blob ? (
-          <span className={styles.dpi} data-missing={!card.dpi || undefined}>
-            {card.dpi
-              ? t('cards.dpiBadge', { dpi: card.dpi.x })
-              : t('cards.dpiBadge', { dpi: '?' })}
+          <span
+            className={styles.dpi}
+            data-missing={unknownDpi || undefined}
+            data-low={low || undefined}
+            data-ok={(!low && dpi !== null && dpi >= MIN_PRINT_DPI) || undefined}
+          >
+            {low ? (
+              <>
+                <span aria-hidden="true">⚠ </span>
+                {t('cards.dpiPrinted', { dpi })}
+              </>
+            ) : (
+              t('cards.dpiBadge', { dpi: badge })
+            )}
           </span>
         ) : null}
       </div>

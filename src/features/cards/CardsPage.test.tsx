@@ -229,6 +229,43 @@ describe('CardsPage', () => {
     expect(screen.queryByText(/no indican su resolución/)).not.toBeInTheDocument();
   });
 
+  it('avisa de las cartas que saldrán con poca resolución al forzar el tamaño', async () => {
+    const user = userEvent.setup();
+    useCardsStore
+      .getState()
+      .addImages([
+        fakeImage('grande.png'),
+        { ...fakeImage('pequeña.png'), widthPx: 400, heightPx: 560 },
+        { ...fakeImage('sin-ppp.png', null), widthPx: 300, heightPx: 420 },
+      ]);
+    render(<CardsPage />, { wrapper: MemoryRouter });
+    // Sin fijar el tamaño, cada una sale a sus ppp: solo avisa la de 300 px a 72 ppp, con «?».
+    expect(screen.queryByText(/poca resolución/)).not.toBeInTheDocument();
+    expect(screen.getByText('? ppp')).toBeInTheDocument();
+    expect(screen.getAllByText('300 ppp')).toHaveLength(2);
+
+    await user.click(screen.getByText('Tamaño de la carta'));
+    await user.selectOptions(screen.getByLabelText('Tamaño'), 'poker');
+    // 400 / (63 / 25,4) = 161; 300 / (63 / 25,4) = 121.
+    expect(screen.getByText('2 cartas saldrán con poca resolución').closest('p')).toHaveTextContent(
+      '(menos de 300 ppp al tamaño de impresión)',
+    );
+    expect(screen.getByText('161 ppp al imprimir')).toBeInTheDocument();
+    expect(screen.getByText('121 ppp al imprimir')).toBeInTheDocument();
+    expect(screen.getByText('300 ppp')).toBeInTheDocument();
+    expect(screen.queryByText('? ppp')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Información de pequeña.png' }));
+    expect(screen.getByRole('dialog')).toHaveTextContent('161 ppp, poca resolución');
+  });
+
+  it('una imagen de pocos ppp avisa también a su tamaño natural', () => {
+    useCardsStore.getState().addImages([fakeImage('web.png', { x: 150, y: 150 })]);
+    render(<CardsPage />, { wrapper: MemoryRouter });
+    expect(screen.getByText('1 carta saldrá con poca resolución')).toBeInTheDocument();
+    expect(screen.getByText('150 ppp al imprimir')).toBeInTheDocument();
+  });
+
   it('no avisa de los ppp si se recorta, porque el recorte ya fija el tamaño', () => {
     useSettingsStore.getState().update({
       crop: { enabled: true, widthMm: 63, heightMm: 88, centered: true, x: 0, y: 0 },

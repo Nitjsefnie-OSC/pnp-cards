@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { track } from '../../analytics/track';
 import { downloadUrl as download } from '../../components/download';
 import { formatSize } from '../../components/formatSize';
+import { lowResolution } from '../../lib/cardInfo';
 import { safeFileName } from '../../lib/filename';
 import { resolveGrid } from '../../lib/layout';
 import { printableBack, printableCards, totalCards, useCardsStore } from '../../store/cardsStore';
@@ -104,6 +105,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
         bleed: settings.bleed.enabled,
         backs: settings.backs.enabled,
         inkSaver: settings.inkSaver,
+        lowDpi: cards.filter((c) => c.blob && lowResolution(c, settings)).length,
       });
       setStatus({
         kind: 'ready',

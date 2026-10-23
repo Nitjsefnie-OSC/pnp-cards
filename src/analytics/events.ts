@@ -16,6 +16,8 @@ export type AnalyticsEvent =
       bleed: boolean;
       backs: boolean;
       inkSaver: boolean;
+      /** Cartas que saldrán con poca resolución (solo el rango, nunca cuáles). */
+      lowDpi: number;
     }
   | { name: 'pdf-error'; code: string }
   | { name: 'pdf-cancelado' }
@@ -74,6 +76,7 @@ export function eventPaths(event: AnalyticsEvent): string[] {
         ...(event.bleed ? [`${base}/opcion/margen-de-corte`] : []),
         ...(event.backs ? [`${base}/opcion/reversos`] : []),
         ...(event.inkSaver ? [`${base}/opcion/ahorro-de-tinta`] : []),
+        ...(event.lowDpi > 0 ? [`${base}/poca-resolucion/${cardsBucket(event.lowDpi)}`] : []),
       ];
     case 'pdf-error':
       return [base, `${base}/codigo/${clean(event.code)}`];

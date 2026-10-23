@@ -29,7 +29,8 @@ de publicación, p. ej. «2026.10.22».
      un tamaño en mm).
    - _Colocación_: separadas (con margen) o pegadas y centradas; de derecha a izquierda.
    - _Tamaño de la carta_: si no lo fuerzas, se usa la resolución (ppp) de cada imagen. Las
-     imágenes sin ppp se tratan como de 72 ppp y la app te avisa.
+     imágenes sin ppp se tratan como de 72 ppp y la app te avisa. La etiqueta de cada carta
+     muestra los ppp con los que saldrá impresa de verdad y avisa si bajan de 300.
    - _Recorte_: un rectángulo en mm a 300 ppp, centrado en cada imagen o en una posición fija.
      Ajústalo con «Ajustar recorte…» arrastrando el rectángulo.
    - _Reverso_: elige una imagen de reverso común y, detrás de cada página de cartas, va otra con

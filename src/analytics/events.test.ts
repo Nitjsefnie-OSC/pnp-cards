@@ -39,6 +39,7 @@ describe('eventPaths', () => {
         bleed: true,
         backs: true,
         inkSaver: true,
+        lowDpi: 0,
       }),
     ).toEqual([
       'pdf-generado',
@@ -50,6 +51,22 @@ describe('eventPaths', () => {
       'pdf-generado/opcion/reversos',
       'pdf-generado/opcion/ahorro-de-tinta',
     ]);
+  });
+
+  it('las cartas con poca resolución se cuentan por rangos, solo si las hay', () => {
+    const event = {
+      name: 'pdf-generado' as const,
+      pages: 1,
+      cards: 3,
+      layout: 'vertical9' as const,
+      crop: false,
+      cutLines: false,
+      bleed: false,
+      backs: false,
+      inkSaver: false,
+    };
+    expect(eventPaths({ ...event, lowDpi: 2 })).toContain('pdf-generado/poca-resolucion/1-9');
+    expect(eventPaths({ ...event, lowDpi: 0 }).join()).not.toContain('poca-resolucion');
   });
 
   it('los errores solo mandan su código, limpio', () => {
