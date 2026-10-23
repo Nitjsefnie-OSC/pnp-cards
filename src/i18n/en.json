@@ -164,7 +164,30 @@
     "backPerCard": "To leave a card without a back, mark it in its info panel.",
     "flip": "Paper flip",
     "flipLong": "On the long edge",
-    "flipShort": "On the short edge"
+    "flipShort": "On the short edge",
+    "printer": "Printer adjustment",
+    "printerHint": "If the backs come out shifted, print the test sheet double-sided, hold it up to the light to see how far apart the crosses are, and enter it here.",
+    "testSheet": "Download test sheet",
+    "testSheetFile": "test-sheet.pdf",
+    "testSheetFailed": "Couldn't generate the test sheet.",
+    "offsetX": "Move backs right",
+    "offsetY": "Move backs up",
+    "offsetHint": "Negative values: left or down. “Right” and “up” are those of the backs page as it comes out of the printer. It's a setting of your printer: it's kept in this browser and doesn't change when you open another project."
+  },
+  "sheet": {
+    "title": "Alignment test sheet",
+    "front": "Page 1 · front",
+    "back": "Page 2 · back",
+    "flipLong": "Paper flip: on the long edge",
+    "flipShort": "Paper flip: on the short edge",
+    "step1": "1. Print this PDF double-sided, at actual size (100 %, no “fit to page”), with the paper flip shown above.",
+    "step2": "2. Check with a ruler that the square is 50 mm on each side. If not, check the scale in the print dialog.",
+    "step3": "3. Hold the sheet up to the light with the back (page 2) facing you and its text upright: you'll see the front cross through the paper.",
+    "step4": "4. On each ruler on the back, read the mark the front cross line passes through and enter that value, with its sign, under Settings › Backs › Printer adjustment. If the crosses coincide, leave 0.",
+    "backStep": "Hold the sheet up to the light from this side. The vertical line of the front cross crosses the bottom ruler at the value for “Move backs right”; the horizontal line crosses the right ruler at the value for “Move backs up”.",
+    "square": "50 mm",
+    "right": "Move backs right (mm)",
+    "up": "Move backs up (mm)"
   },
   "preview": {
     "page": "Page {{page}} of {{pages}}",

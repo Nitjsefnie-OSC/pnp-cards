@@ -164,7 +164,30 @@
     "backPerCard": "Para dejar una carta sin reverso, márcalo en su información.",
     "flip": "Volteo del papel",
     "flipLong": "Por el borde largo",
-    "flipShort": "Por el borde corto"
+    "flipShort": "Por el borde corto",
+    "printer": "Ajuste de la impresora",
+    "printerHint": "Si los reversos salen movidos, imprime la hoja de prueba a doble cara, mira a contraluz cuánto se separan las cruces y escríbelo aquí.",
+    "testSheet": "Descargar hoja de prueba",
+    "testSheetFile": "hoja-de-prueba.pdf",
+    "testSheetFailed": "No se ha podido generar la hoja de prueba.",
+    "offsetX": "Mover reverso a la derecha",
+    "offsetY": "Mover reverso hacia arriba",
+    "offsetHint": "Valores negativos: a la izquierda o hacia abajo. «Derecha» y «arriba» son los de la página de reversos tal como sale de la impresora. Es un ajuste de tu impresora: se guarda en este navegador y no cambia al abrir otro proyecto."
+  },
+  "sheet": {
+    "title": "Hoja de prueba de alineación",
+    "front": "Página 1 · anverso",
+    "back": "Página 2 · reverso",
+    "flipLong": "Volteo del papel: por el borde largo",
+    "flipShort": "Volteo del papel: por el borde corto",
+    "step1": "1. Imprime este PDF a doble cara, a tamaño real (al 100 %, sin «ajustar a la página»), con el volteo indicado arriba.",
+    "step2": "2. Comprueba con una regla que el cuadrado mide 50 mm de lado. Si no, revisa la escala en el cuadro de imprimir.",
+    "step3": "3. Mira la hoja a contraluz por el lado del reverso (página 2), con su texto derecho: verás la cruz del anverso a través del papel.",
+    "step4": "4. En cada regla del reverso, lee la marca por la que pasa la línea de la cruz del anverso y escribe ese valor, con su signo, en Ajustes › Reverso › Ajuste de la impresora. Si las cruces coinciden, deja 0.",
+    "backStep": "Mira a contraluz por este lado. La línea vertical de la cruz del anverso cruza la regla de abajo por el valor de «Mover reverso a la derecha»; la horizontal cruza la regla de la derecha por el de «Mover reverso hacia arriba».",
+    "square": "50 mm",
+    "right": "Mover reverso a la derecha (mm)",
+    "up": "Mover reverso hacia arriba (mm)"
   },
   "preview": {
     "page": "Página {{page}} de {{pages}}",

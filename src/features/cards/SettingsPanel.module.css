@@ -64,10 +64,18 @@
   font-size: 0.875rem;
 }
 
-.back {
+.back,
+.printer {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+/* El ajuste de la impresora, separado de la imagen y el volteo. */
+.printer {
+  margin-top: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
 }
 
 .label {

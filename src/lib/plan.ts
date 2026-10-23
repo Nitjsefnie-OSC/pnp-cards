@@ -143,7 +143,35 @@ function backPage(
   };
 }
 
-/** Intercala detrás de cada página de cartas su página de reversos, si están activados. */
+/**
+ * Desplaza todo lo dibujado en una página (cartas, margen de corte y líneas de corte) `dx` y
+ * `dy` puntos. Sirve para el ajuste de la impresora en las páginas de reversos.
+ */
+export function translatePage(page: PlannedPage, dx: number, dy: number): PlannedPage {
+  if (dx === 0 && dy === 0) return page;
+  return {
+    ...page,
+    items: page.items.map((item) => ({
+      ...item,
+      placement: { ...item.placement, x: item.placement.x + dx, y: item.placement.y + dy },
+    })),
+    bleed: page.bleed.map((r) => ({ ...r, x: r.x + dx, y: r.y + dy })),
+    cutLines: page.cutLines && {
+      ...page.cutLines,
+      segments: page.cutLines.segments.map((s) => ({
+        x1: s.x1 + dx,
+        y1: s.y1 + dy,
+        x2: s.x2 + dx,
+        y2: s.y2 + dy,
+      })),
+    },
+  };
+}
+
+/**
+ * Intercala detrás de cada página de cartas su página de reversos, si están activados, con el
+ * desplazamiento de la impresora (el mismo en todas las páginas de reversos).
+ */
 function withBacks(
   settings: LayoutSettings,
   fronts: PlannedPage[],
@@ -152,9 +180,11 @@ function withBacks(
 ): PlannedPage[] {
   if (!settings.backs.enabled) return fronts;
   if (!back) throw new PlanError('no-back');
+  const dx = mmToPt(settings.backOffsetMm.x);
+  const dy = mmToPt(settings.backOffsetMm.y);
   return fronts.flatMap((page, i) => {
     const front = { ...page, number: 2 * i + 1 };
-    return [front, backPage(settings, front, cards, back)];
+    return [front, translatePage(backPage(settings, front, cards, back), dx, dy)];
   });
 }
 

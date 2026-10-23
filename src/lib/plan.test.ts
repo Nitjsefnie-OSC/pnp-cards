@@ -1,4 +1,4 @@
-import { planDocument, PlanError, type CardSpec } from './plan';
+import { planDocument, PlanError, translatePage, type CardSpec, type PlannedPage } from './plan';
 import { DEFAULT_SETTINGS, type LayoutSettings } from './settings';
 
 const dpi300 = { x: 300, y: 300 };
@@ -177,6 +177,75 @@ describe('planDocument', () => {
       const plan = planDocument(settings(), [{ ...big, copies: 10 }], square);
       expect(plan.pages.map((p) => p.side)).toEqual(['front', 'front']);
     });
+
+    describe('con el ajuste de la impresora', () => {
+      // 1,5 mm a la derecha = 4,252 pt; 0,5 mm hacia abajo = −1,417 pt.
+      const offset = { x: 1.5, y: -0.5 };
+      const moved = settings({ backs: { enabled: true, flip: 'long' }, backOffsetMm: offset });
+
+      it('desplaza los reversos en mm, a la derecha y hacia arriba, y no las cartas', () => {
+        const [front, back] = planDocument(moved, [big], square).pages;
+        expect(front.items[0].placement.x).toBeCloseTo(22.677, 3);
+        expect(front.items[0].placement.y).toBeCloseTo(569.963, 3);
+        // 393,763 + 4,252 y 569,963 − 1,417.
+        expect(back.items[0].placement.x).toBeCloseTo(398.015, 2);
+        expect(back.items[0].placement.y).toBeCloseTo(568.546, 2);
+        expect(back.items[0].placement.width).toBeCloseTo(178.56, 3);
+      });
+
+      it('es el mismo en todas las páginas de reversos: no se acumula', () => {
+        const plan = planDocument(moved, [{ ...big, copies: 10 }], square);
+        expect(plan.pages[3].items[0].placement.x).toBeCloseTo(398.015, 2);
+        expect(plan.pages[3].items[0].placement.y).toBeCloseTo(568.546, 2);
+        expect(plan.pages[2].items[0].placement.x).toBeCloseTo(22.677, 3);
+      });
+
+      it('mueve el margen de corte exactamente lo mismo que los reversos', () => {
+        const s = { ...moved, bleed: { enabled: true, mm: 2, color: '#fff' } };
+        const back = planDocument(s, [big], square).pages[1];
+        const { x, y } = back.items[0].placement;
+        // La banda izquierda empieza 2 mm (5,669 pt) a la izquierda del reverso desplazado.
+        expect(back.bleed[0].x).toBeCloseTo(x - 5.669, 3);
+        expect(back.bleed[0].y).toBeCloseTo(y - 5.669, 3);
+      });
+
+      it('se aplica igual por el borde corto y conserva el giro', () => {
+        const s = { ...moved, backs: { enabled: true, flip: 'short' as const } };
+        const back = planDocument(s, [big], square).pages[1];
+        // 22,677 + 4,252 y 22,677 − 1,417.
+        expect(back.items[0].placement.x).toBeCloseTo(26.929, 2);
+        expect(back.items[0].placement.y).toBeCloseTo(21.26, 2);
+        expect(back.items[0].rotation).toBe(180);
+      });
+
+      it('no cambia el recorte del reverso', () => {
+        const back = planDocument(moved, [big], square).pages[1];
+        expect(back.items[0].crop).toEqual({ x: 142, y: 0, width: 716, height: 1000 });
+      });
+    });
+  });
+
+  describe('translatePage', () => {
+    const page: PlannedPage = {
+      number: 2,
+      side: 'back',
+      size: { width: 595, height: 842 },
+      items: [{ card: 0, placement: { x: 10, y: 20, width: 30, height: 40 }, crop: null }],
+      bleed: [{ x: 5, y: 15, width: 5, height: 50 }],
+      cutLines: { lineWidth: 0.1, segments: [{ x1: 0, y1: 20, x2: 10, y2: 20 }] },
+    };
+
+    it('mueve cartas, margen y líneas de corte lo mismo', () => {
+      const moved = translatePage(page, 4, -1);
+      expect(moved.items[0].placement).toEqual({ x: 14, y: 19, width: 30, height: 40 });
+      expect(moved.bleed[0]).toEqual({ x: 9, y: 14, width: 5, height: 50 });
+      expect(moved.cutLines!.segments[0]).toEqual({ x1: 4, y1: 19, x2: 14, y2: 19 });
+      expect(moved.cutLines!.lineWidth).toBe(0.1);
+    });
+
+    it('sin desplazamiento, devuelve la misma página', () => {
+      expect(translatePage(page, 0, 0)).toBe(page);
+    });
   });
 
   describe('con recorte', () => {
@@ -301,6 +370,21 @@ describe('planDocument', () => {
       expect(back.items[0].crop).toEqual({ x: 143, y: 0, width: 714, height: 1000 });
       // Hueco 2: 70 × 50 mm girado 90° → la carta sin girar también mide 50 × 70.
       expect(back.items[1].crop).toEqual({ x: 143, y: 0, width: 714, height: 1000 });
+    });
+
+    it('el ajuste de la impresora desplaza los huecos de los reversos sin cambiar su giro', () => {
+      const s = settings({
+        mode: 'template',
+        template,
+        backs: { enabled: true, flip: 'long' },
+        backOffsetMm: { x: 1.5, y: -0.5 },
+      });
+      const [front, back] = planDocument(s, [{ ...big, copies: 2 }], square).pages;
+      expect(front.items[0].placement.x).toBeCloseTo(28.346, 3);
+      // 113,386 + 4,252; 198,425 − 1,417.
+      expect(back.items[0].placement.x).toBeCloseTo(117.638, 2);
+      expect(back.items[0].placement.y).toBeCloseTo(197.008, 2);
+      expect(back.items[1].rotation).toBe(270);
     });
 
     it('de derecha a izquierda refleja los huecos en todas las páginas', () => {

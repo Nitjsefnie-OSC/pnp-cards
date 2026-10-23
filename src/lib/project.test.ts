@@ -14,7 +14,11 @@ const project: ProjectFile = {
 
 const withBack: ProjectFile = {
   ...project,
-  settings: { ...DEFAULT_SETTINGS, backs: { enabled: true, flip: 'short' } },
+  settings: {
+    ...DEFAULT_SETTINGS,
+    backs: { enabled: true, flip: 'short' },
+    backOffsetMm: { x: 1.5, y: -0.5 },
+  },
   cards: [
     { path: 'elfo.png', name: 'elfo.png', copies: 1 },
     { path: 'mapa.png', name: 'mapa.png', copies: 1, noBack: true },
@@ -44,6 +48,7 @@ describe('archivo .pnpcards', () => {
   it('guarda la ruta del reverso común y qué cartas no llevan reverso', () => {
     const json = JSON.parse(serializeProject(withBack));
     expect(json.back).toEqual({ path: 'reversos/dorso.png', name: 'dorso.png' });
+    expect(json.settings.backOffsetMm).toEqual({ x: 1.5, y: -0.5 });
     expect(json.cards).toEqual([
       { path: 'elfo.png', name: 'elfo.png', copies: 1 },
       { path: 'mapa.png', name: 'mapa.png', copies: 1, noBack: true },
@@ -63,6 +68,18 @@ describe('archivo .pnpcards', () => {
     expect(p.back).toBeNull();
     expect(p.cards).toEqual([{ path: 'a.png', name: 'a.png', copies: 2 }]);
     expect(p.settings).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it('un proyecto sin ajuste de la impresora abre con los reversos sin desplazar', () => {
+    const p = parseProject(
+      JSON.stringify({
+        format: 'pnp-cards',
+        version: 2,
+        settings: { backs: { enabled: true, flip: 'long' } },
+        cards: [],
+      }),
+    );
+    expect(p.settings.backOffsetMm).toEqual({ x: 0, y: 0 });
   });
 
   it('completa con los valores por defecto la configuración que falte', () => {

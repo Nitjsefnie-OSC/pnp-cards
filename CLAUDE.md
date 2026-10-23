@@ -30,6 +30,10 @@ Código de referencia (solo lectura, no modificar): `C:\Users\lmaim\source\repos
   vive en `cardsStore.back`, no en la configuración.
 - `src/pdf/` — construcción de PDF con pdf-lib (`buildPdf`: cada imagen se incrusta una vez; JPG/PNG
   sin recodificar). Sin APIs de DOM ni de worker, para poder probarlo en entorno node.
+  `alignmentSheet.ts` genera la hoja de prueba de alineación de los reversos (textos ya traducidos
+  por parámetro; solo caracteres WinAnsi, que es lo que admite Helvetica). El ajuste de la impresora
+  (`settings.backOffsetMm`, en mm) desplaza todo lo de las páginas de reversos en `plan.ts`
+  (`translatePage`); es de este navegador: `replace()` y `reset()` del store lo conservan.
 - `src/workers/` — un worker por tarea larga (`pdf.worker.ts` genera cartas, `merge.worker.ts` une
   PDF, `heic.worker.ts` pasa fotos HEIC a JPG con libheif-js cuando el navegador no las abre; libheif
   queda fuera del precacheo de Workbox y se guarda al usarse). En el worker, `serveTask` atiende la tarea; en la página, `runWorker` la lanza con
