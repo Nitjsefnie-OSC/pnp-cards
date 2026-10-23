@@ -18,10 +18,25 @@ describe('settingsStore', () => {
     expect(s.mode).toBe('vertical9');
   });
 
+  it('el ajuste de la impresora no cambia al abrir un proyecto ni al restablecer', () => {
+    const store = useSettingsStore.getState();
+    store.update({ backOffsetMm: { x: 1.5, y: -0.5 } });
+    store.replace({ ...DEFAULT_SETTINGS, marginMm: 5, backOffsetMm: { x: 3, y: 3 } });
+    expect(useSettingsStore.getState().settings.marginMm).toBe(5);
+    expect(useSettingsStore.getState().settings.backOffsetMm).toEqual({ x: 1.5, y: -0.5 });
+    store.reset();
+    expect(useSettingsStore.getState().settings.marginMm).toBe(8);
+    expect(useSettingsStore.getState().settings.backOffsetMm).toEqual({ x: 1.5, y: -0.5 });
+    store.update({ backOffsetMm: { x: 0, y: 0 } });
+  });
+
   it('al cargar una configuración guardada incompleta, completa lo que falta', () => {
     const merged = mergeSettings({ marginMm: 3, crop: { enabled: true } });
     expect(merged.marginMm).toBe(3);
     expect(merged.crop).toEqual({ ...DEFAULT_SETTINGS.crop, enabled: true });
     expect(merged.cutLines).toEqual(DEFAULT_SETTINGS.cutLines);
+    expect(
+      mergeSettings({ backOffsetMm: { x: 2 } as { x: number; y: number } }).backOffsetMm,
+    ).toEqual({ x: 2, y: 0 });
   });
 });

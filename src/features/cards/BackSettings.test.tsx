@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import i18n from '../../i18n';
@@ -62,6 +62,50 @@ describe('BackSettings', () => {
     await open(user);
     await user.click(screen.getByLabelText('Por el borde corto'));
     expect(useSettingsStore.getState().settings.backs.flip).toBe('short');
+  });
+
+  it('descarga la hoja de prueba con el volteo elegido y guarda el ajuste de la impresora', async () => {
+    const user = userEvent.setup();
+    useSettingsStore.getState().update({ backs: { enabled: true, flip: 'short' } });
+    const buildSheet = vi.fn(async () => new Uint8Array([1, 2, 3]));
+    URL.createObjectURL = vi.fn(() => 'blob:sheet');
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    render(<BackSettings buildSheet={buildSheet} />, { wrapper: MemoryRouter });
+    await open(user);
+
+    await user.click(screen.getByRole('button', { name: 'Descargar hoja de prueba' }));
+    expect(buildSheet).toHaveBeenCalledWith(
+      expect.objectContaining({ backs: { enabled: true, flip: 'short' } }),
+      expect.objectContaining({
+        title: 'Hoja de prueba de alineación',
+        flip: 'Volteo del papel: por el borde corto',
+        right: 'Mover reverso a la derecha (mm)',
+      }),
+    );
+    await waitFor(() => expect(click).toHaveBeenCalledTimes(1));
+
+    const right = screen.getByLabelText('Mover reverso a la derecha');
+    await user.clear(right);
+    await user.type(right, '1,5');
+    const up = screen.getByLabelText('Mover reverso hacia arriba');
+    await user.clear(up);
+    await user.type(up, '-0.5');
+    expect(useSettingsStore.getState().settings.backOffsetMm).toEqual({ x: 1.5, y: -0.5 });
+    // El ajuste de la impresora sobrevive a reset(): se limpia a mano para los demás tests.
+    useSettingsStore.getState().update({ backOffsetMm: { x: 0, y: 0 } });
+  });
+
+  it('avisa si la hoja de prueba no se puede generar', async () => {
+    const user = userEvent.setup();
+    useSettingsStore.getState().update({ backs: { enabled: true, flip: 'long' } });
+    render(<BackSettings buildSheet={() => Promise.reject(new Error('roto'))} />, {
+      wrapper: MemoryRouter,
+    });
+    await open(user);
+    await user.click(screen.getByRole('button', { name: 'Descargar hoja de prueba' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'No se ha podido generar la hoja de prueba.',
+    );
   });
 
   it('avisa si la imagen no se puede leer', async () => {

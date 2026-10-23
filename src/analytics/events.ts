@@ -19,6 +19,7 @@ export type AnalyticsEvent =
   | { name: 'pdf-error'; code: string }
   | { name: 'pdf-cancelado' }
   | { name: 'proyecto-abierto'; kind: 'pnpcards' | 'bsk' }
+  | { name: 'hoja-de-prueba' }
   | { name: 'proyecto-guardado' }
   | { name: 'carpeta-añadida' }
   | { name: 'unir-pdf' }

@@ -36,6 +36,12 @@ export interface LayoutSettings {
    * las cartas, no aquí.
    */
   backs: { enabled: boolean; flip: BackFlip };
+  /**
+   * Ajuste de la impresora: cuánto se desplaza todo lo dibujado en las páginas de reversos, en
+   * mm, a la derecha (x) y hacia arriba (y) de la página tal como sale de la impresora. Es de
+   * la impresora, no del proyecto: al abrir un proyecto o restablecer los ajustes se conserva.
+   */
+  backOffsetMm: { x: number; y: number };
 
   forceWidth: boolean;
   forceHeight: boolean;
@@ -68,6 +74,7 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   marginMm: 8,
   rightToLeft: false,
   backs: { enabled: false, flip: 'long' },
+  backOffsetMm: { x: 0, y: 0 },
   forceWidth: false,
   forceHeight: false,
   cardWidthMm: 0,
@@ -90,6 +97,7 @@ export function mergeSettings(saved: DeepPartial<LayoutSettings> | undefined): L
     ...d,
     ...rest,
     backs: { ...d.backs, ...saved?.backs },
+    backOffsetMm: { ...d.backOffsetMm, ...saved?.backOffsetMm },
     customPageMm: { ...d.customPageMm, ...saved?.customPageMm },
     crop: { ...d.crop, ...saved?.crop },
     cutLines: { ...d.cutLines, ...saved?.cutLines },

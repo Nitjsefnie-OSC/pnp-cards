@@ -205,6 +205,35 @@
           "type": "p",
           "text": "In the preview, the backs pages appear after each page of cards."
         },
+        { "type": "h", "text": "Printer adjustment" },
+        {
+          "type": "p",
+          "text": "Many printers shift the back side by a millimetre or two, and more if you turn the paper over by hand. If the backs come out off-centre, fix it with “Move backs right” and “Move backs up”, in mm, with decimals and negatives (left or down). “Right” and “up” are those of the backs page as it comes out of the printer."
+        },
+        {
+          "type": "step",
+          "title": "Download the test sheet",
+          "text": "Under Settings › Backs › Printer adjustment. Two pages of the chosen page size: a cross in the centre, marks in the corners and a 50 mm square."
+        },
+        {
+          "type": "step",
+          "title": "Print it double-sided",
+          "text": "At actual size (100 %) and with the same paper flip you have chosen. Check that the square measures 50 mm: if not, the PDF is being scaled."
+        },
+        {
+          "type": "step",
+          "title": "Read it against the light",
+          "text": "From the back side, with its text upright. The front cross shows through the paper; on each ruler, the mark its line passes through is the value to enter, with the sign already worked out."
+        },
+        {
+          "type": "step",
+          "title": "Enter the values",
+          "text": "In “Move backs right” and “Move backs up”. Everything on the backs pages (backs and bleed) moves by the same amount, in the preview too."
+        },
+        {
+          "type": "note",
+          "text": "It's a setting of your printer, not of the project: it's kept in this browser and doesn't change when you open another project or reset the settings. The test sheet is generated without the current shift, so the value you read is the one to enter, not an amount to add."
+        },
         { "type": "link", "topic": "print-real-size", "label": "Printing at actual size" }
       ]
     },

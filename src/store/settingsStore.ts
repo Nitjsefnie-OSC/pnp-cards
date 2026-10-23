@@ -15,6 +15,7 @@ interface SettingsState {
   /**
    * Sustituye toda la configuración (al abrir un proyecto). Se completa con los valores por
    * defecto: las sesiones y los recientes guardados por versiones anteriores no la tienen entera.
+   * El ajuste de la impresora (`backOffsetMm`) es de este navegador y se conserva.
    */
   replace: (settings: LayoutSettings) => void;
   reset: () => void;
@@ -31,8 +32,15 @@ export const useSettingsStore = create<SettingsState>()(
       update: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
       setOpenAfter: (openAfter) => set({ openAfter }),
       setPreviewWidth: (previewWidth) => set({ previewWidth }),
-      replace: (settings) => set({ settings: mergeSettings(settings) }),
-      reset: () => set({ settings: DEFAULT_SETTINGS, openAfter: true }),
+      replace: (settings) =>
+        set((s) => ({
+          settings: { ...mergeSettings(settings), backOffsetMm: s.settings.backOffsetMm },
+        })),
+      reset: () =>
+        set((s) => ({
+          settings: { ...DEFAULT_SETTINGS, backOffsetMm: s.settings.backOffsetMm },
+          openAfter: true,
+        })),
     }),
     {
       name: 'pnp-cards-settings',

@@ -1,7 +1,8 @@
 // @vitest-environment node
 import { readFileSync } from 'node:fs';
-import { decodePDFRawStream, PDFArray, PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
 import { DEFAULT_SETTINGS } from '../lib/settings';
+import { pageContent } from '../test/pdfContent';
 import { buildPdf, type PdfCard } from './buildPdf';
 
 const fixture = (name: string) =>
@@ -30,18 +31,6 @@ function imageStreams(doc: PDFDocument) {
       (obj): obj is PDFRawStream =>
         obj instanceof PDFRawStream && obj.dict.get(PDFName.of('Subtype')) === PDFName.of('Image'),
     );
-}
-
-/** Operadores de dibujo de una página, como texto. */
-function pageContent(doc: PDFDocument, index: number) {
-  const contents = doc.getPage(index).node.Contents();
-  const streams =
-    contents instanceof PDFArray
-      ? contents.asArray().map((r) => doc.context.lookup(r))
-      : [contents];
-  return streams
-    .map((s) => new TextDecoder().decode(decodePDFRawStream(s as PDFRawStream).decode()))
-    .join('\n');
 }
 
 describe('buildPdf', () => {

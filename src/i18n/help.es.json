@@ -271,6 +271,38 @@
           "text": "En la vista previa, las páginas de reversos se ven después de cada página de cartas."
         },
         {
+          "type": "h",
+          "text": "Ajuste de la impresora"
+        },
+        {
+          "type": "p",
+          "text": "Muchas impresoras desplazan la cara de atrás uno o dos milímetros, y más si das la vuelta al papel a mano. Si los reversos salen descentrados, se corrige con «Mover reverso a la derecha» y «Mover reverso hacia arriba», en mm, con decimales y negativos (a la izquierda o hacia abajo). «Derecha» y «arriba» son los de la página de reversos tal como sale de la impresora."
+        },
+        {
+          "type": "step",
+          "title": "Descarga la hoja de prueba",
+          "text": "En Ajustes › Reverso › Ajuste de la impresora. Son dos páginas del tamaño de página elegido: una cruz en el centro, marcas en las esquinas y un cuadrado de 50 mm."
+        },
+        {
+          "type": "step",
+          "title": "Imprímela a doble cara",
+          "text": "A tamaño real (100 %) y con el mismo volteo que tienes elegido. Comprueba que el cuadrado mide 50 mm: si no, el PDF se está escalando."
+        },
+        {
+          "type": "step",
+          "title": "Léela a contraluz",
+          "text": "Por el lado del reverso, con su texto derecho. La cruz del anverso se ve a través del papel; en cada regla, la marca por la que pasa su línea es el valor que hay que escribir, con el signo ya resuelto."
+        },
+        {
+          "type": "step",
+          "title": "Escribe los valores",
+          "text": "En «Mover reverso a la derecha» y «Mover reverso hacia arriba». Todo lo que va en las páginas de reversos (reversos y margen de corte) se desplaza igual, también en la vista previa."
+        },
+        {
+          "type": "note",
+          "text": "Es un ajuste de tu impresora, no del proyecto: se guarda en este navegador y no cambia al abrir otro proyecto ni al restablecer los ajustes. La hoja de prueba se genera sin el desplazamiento actual, así que el valor que leas es el que hay que escribir, no una cantidad que sumar."
+        },
+        {
           "type": "link",
           "topic": "print-real-size",
           "label": "Imprimir a tamaño real"
