@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, ColorField, FieldRow, RadioGroup, Section } from '../../components/form/Fields';
@@ -10,7 +10,9 @@ import {
   type CardPresetId,
   type CardSizeChoice,
 } from '../../lib/cardPresets';
+import { cardSizeSummary } from '../../lib/cardInfo';
 import type { CutLineStyle, LayoutMode, PaperSize, Placement } from '../../lib/settings';
+import { printableCards, useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useTemplatesStore } from '../templates/templatesStore';
 import { BackSettings } from './BackSettings';
@@ -18,8 +20,9 @@ import { CropDialog } from './CropDialog';
 import styles from './SettingsPanel.module.css';
 
 export function SettingsPanel() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const s = useSettingsStore((st) => st.settings);
+  const cards = useCardsStore((st) => st.cards);
   const update = useSettingsStore((st) => st.update);
   const openAfter = useSettingsStore((st) => st.openAfter);
   const setOpenAfter = useSettingsStore((st) => st.setOpenAfter);
@@ -36,6 +39,23 @@ export function SettingsPanel() {
   const derivedSize = cardSizeChoice(s);
   const sizeChoice: CardSizeChoice =
     customChosen && derivedSize !== 'image' ? 'custom' : derivedSize;
+  // Tamaño con el que saldrán las cartas cuando lo decide la imagen (o el recorte).
+  const sizeSummary = useMemo(
+    () =>
+      cardSizeSummary(
+        printableCards(cards).filter((c) => c.blob),
+        s,
+      ),
+    [cards, s],
+  );
+  const mmFormat = useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.resolvedLanguage, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    [i18n.resolvedLanguage],
+  );
 
   function chooseSize(value: string) {
     setCustomChosen(value === 'custom');
@@ -223,7 +243,25 @@ export function SettingsPanel() {
             <option value="custom">{t('settings.sizeCustom')}</option>
           </select>
         </div>
-        {sizeChoice === 'image' ? <p className={styles.hint}>{t('settings.sizeHint')}</p> : null}
+        {sizeChoice === 'image' ? (
+          sizeSummary ? (
+            <>
+              <p className={styles.hint}>
+                {t(s.crop.enabled ? 'settings.sizeFromCrop' : 'settings.sizeFromImage', {
+                  w: mmFormat.format(sizeSummary.firstMm.width),
+                  h: mmFormat.format(sizeSummary.firstMm.height),
+                })}
+              </p>
+              {sizeSummary.differentCount > 0 ? (
+                <p className={`${styles.hint} ${styles.hintWarning}`}>
+                  {t('settings.sizeOthers', { count: sizeSummary.differentCount })}
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <p className={styles.hint}>{t('settings.sizeHint')}</p>
+          )
+        ) : null}
         {sizeChoice === 'custom' ? (
           <>
             <Checkbox

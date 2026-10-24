@@ -187,6 +187,10 @@
           "text": "Si la imagen no indica su resolución, se toman 72 ppp, como hacía PDFCartas, y esa misma imagen saldría de 26 × 37 cm. La app avisa cuando pasa: fuerza entonces el tamaño de la carta."
         },
         {
+          "type": "p",
+          "text": "Bajo el desplegable se muestra el tamaño con el que saldrá la primera carta y, si alguna de las demás tiene otra resolución y saldrá con otro tamaño, cuántas son. Con el recorte activado, el tamaño es el del recorte. Para ver el tamaño exacto de cada carta, pulsa su botón de información."
+        },
+        {
           "type": "h",
           "text": "Tamaños predefinidos y personalizado"
         },
