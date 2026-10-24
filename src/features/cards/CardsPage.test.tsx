@@ -120,6 +120,58 @@ describe('CardTray', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('No la indica: se usan 72 ppp');
   });
 
+  describe('colocación de la información', () => {
+    const innerHeight = window.innerHeight;
+    // Botón cerca del borde inferior de una ventana de 600 px; el panel mide lo que diga `panelHeight`.
+    function mockRects(panelHeight: number) {
+      window.innerHeight = 600;
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+        this: Element,
+      ) {
+        const isPanel = this.getAttribute('role') === 'dialog';
+        const top = isPanel ? 0 : 540;
+        const height = isPanel ? panelHeight : 24;
+        return {
+          top,
+          bottom: top + height,
+          height,
+          left: 476,
+          right: 500,
+          width: 24,
+          x: 476,
+          y: top,
+          toJSON: () => ({}),
+        } as DOMRect;
+      });
+    }
+    afterEach(() => {
+      vi.restoreAllMocks();
+      window.innerHeight = innerHeight;
+    });
+
+    it('se abre hacia arriba cuando no cabe debajo del botón', async () => {
+      const user = userEvent.setup();
+      useCardsStore.getState().addImages([fakeImage('a.png')]);
+      render(<CardTray />, { wrapper: MemoryRouter });
+      mockRects(300);
+
+      await user.click(screen.getByRole('button', { name: 'Información de a.png' }));
+      // Encima del botón: 540 − 4 − 300.
+      expect(screen.getByRole('dialog')).toHaveStyle({ top: '236px' });
+    });
+
+    it('si no cabe en ningún lado, usa el lado con más hueco y se desplaza dentro', async () => {
+      const user = userEvent.setup();
+      useCardsStore.getState().addImages([fakeImage('a.png')]);
+      render(<CardTray />, { wrapper: MemoryRouter });
+      mockRects(800);
+
+      await user.click(screen.getByRole('button', { name: 'Información de a.png' }));
+      // Arriba hay 540 − 4 − 16 = 520 px; abajo solo 600 − 16 − 568 = 16.
+      expect(screen.getByRole('dialog')).toHaveStyle({ top: '16px', maxHeight: '520px' });
+    });
+  });
+
   it('«Quitar todas» pide confirmación en una ventana de la app', async () => {
     const user = userEvent.setup();
     useCardsStore.getState().addImages([fakeImage('a.png'), fakeImage('b.png')]);

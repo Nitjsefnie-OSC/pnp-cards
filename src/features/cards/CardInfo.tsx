@@ -203,7 +203,29 @@ function InfoContent({
 
 const PANEL_WIDTH = 300;
 const MARGIN = 16;
+const GAP = 4;
 const NARROW = '(max-width: 560px)';
+
+/**
+ * Dónde va el panel respecto al botón: debajo si cabe; si no, encima; y si no cabe en ninguno
+ * de los dos lados, en el que tenga más hueco, limitando su altura para que se desplace dentro.
+ */
+function panelPosition(
+  button: { top: number; bottom: number; right: number },
+  panelHeight: number,
+  viewport: { width: number; height: number },
+): CSSProperties {
+  const left = Math.min(
+    Math.max(MARGIN, button.right - PANEL_WIDTH),
+    viewport.width - PANEL_WIDTH - MARGIN,
+  );
+  const below = viewport.height - MARGIN - (button.bottom + GAP);
+  const above = button.top - GAP - MARGIN;
+  if (panelHeight <= below) return { top: button.bottom + GAP, left };
+  if (panelHeight <= above) return { top: button.top - GAP - panelHeight, left };
+  if (below >= above) return { top: button.bottom + GAP, left, maxHeight: below };
+  return { top: MARGIN, left, maxHeight: above };
+}
 
 /** Botón «i» que abre la información de la carta; se cierra con Esc o al pulsar fuera. */
 export function CardInfo(props: InfoProps) {
@@ -216,13 +238,16 @@ export function CardInfo(props: InfoProps) {
 
   // Junto al botón y dentro de la ventana (en pantallas estrechas, el CSS lo pone abajo).
   useLayoutEffect(() => {
-    if (!open || !buttonRef.current || window.matchMedia(NARROW).matches) return;
-    const r = buttonRef.current.getBoundingClientRect();
-    const left = Math.min(
-      Math.max(MARGIN, r.right - PANEL_WIDTH),
-      window.innerWidth - PANEL_WIDTH - MARGIN,
+    if (!open || !buttonRef.current || !panelRef.current || window.matchMedia(NARROW).matches) {
+      return;
+    }
+    setPosition(
+      panelPosition(
+        buttonRef.current.getBoundingClientRect(),
+        panelRef.current.getBoundingClientRect().height,
+        { width: window.innerWidth, height: window.innerHeight },
+      ),
     );
-    setPosition({ top: r.bottom + 4, left, width: PANEL_WIDTH });
   }, [open]);
 
   // Si la lista se desplaza o cambia la ventana, el panel se cierra en vez de quedarse suelto.
