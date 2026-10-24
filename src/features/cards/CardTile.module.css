@@ -253,6 +253,7 @@
 .infoPanel {
   position: fixed;
   z-index: 20;
+  width: 300px;
   max-height: calc(100dvh - 120px);
   overflow-y: auto;
   padding: var(--space-3);
