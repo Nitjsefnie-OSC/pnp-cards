@@ -503,5 +503,28 @@ describe('buildPdf', () => {
       // Y la matriz del hueco (10 mm, 60 mm desde abajo) coloca la banda en su sitio.
       expect(pageContent(doc, 0)).toMatch(/1 0 0 1 28\.346\d* 170\.07\d* cm/);
     });
+
+    it('stretch con el hueco girado: la banda estira la última fila de la imagen, no el alto del hueco', async () => {
+      const settings = {
+        ...withFill('stretch'),
+        mode: 'template' as const,
+        crop: { enabled: true, widthMm: 2, heightMm: 3, centered: true, x: 0, y: 0 },
+        template: {
+          id: 't',
+          name: 'x',
+          pageMm: { width: 100, height: 100 },
+          slots: [{ id: 'a', xMm: 10, yMm: 10, widthMm: 40, heightMm: 30, rotation: 90 as const }],
+        },
+      };
+      const doc = await PDFDocument.load(
+        await buildPdf({ settings, cards: [card(jpg, 'jpeg', 1)] }),
+      );
+      // El borde izquierdo de la página es el superior de la imagen sin girar (30 × 40 mm).
+      // Un píxel mide 113,386 / 35 = 3,2396 pt de alto y la banda 5,669: factor 1,75. Con el
+      // alto del hueco en la página (85,039) el factor sería 26,25.
+      expect(pageContent(doc, 0)).toMatch(/1 0 0 -1\.75 0 311\.81\d* cm/);
+      // La matriz del hueco girado (0 1 -1 0 x+w y) coloca la banda en su sitio.
+      expect(pageContent(doc, 0)).toMatch(/0 1 -1 0 141\.73\d* 170\.07\d* cm/);
+    });
   });
 });

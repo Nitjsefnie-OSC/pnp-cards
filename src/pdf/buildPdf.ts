@@ -17,7 +17,7 @@ import {
   type PDFPage,
   type RGB,
 } from 'pdf-lib';
-import { bleedBandMatrix, bleedLocalSide, bleedPixel } from '../lib/bleed';
+import { bleedBandMatrix, bleedImageFill, bleedLocalBand, bleedPixel } from '../lib/bleed';
 import { imageDrawRect } from '../lib/crop';
 import type { Dpi } from '../lib/dpi';
 import type { HeaderPlacement } from '../lib/header';
@@ -207,7 +207,7 @@ export async function buildPdf(
 
     // El margen de corte va debajo de las cartas: color plano, o la propia carta copiada en
     // cada banda (recortada a la banda y transformada para que su borde la rellene).
-    const fill = settings.bleed.fill === 'stretch' ? 'stretch' : 'mirror';
+    const fill = bleedImageFill(settings.bleed.fill);
     for (const band of planned.bleed) {
       const item = band.card === null ? null : planned.items[band.card];
       if (!item) {
@@ -224,9 +224,8 @@ export async function buildPdf(
       // matriz de la carta lleva ese marco al hueco, y dentro va la de la banda.
       const rotation = item.rotation ?? 0;
       const local = { x: 0, y: 0, ...slotLocalSize(item.placement, rotation) };
-      const side = bleedLocalSide(band.side, rotation);
       const px = bleedPixel(local, item.crop, source);
-      const [a, b, c, d, e, f] = bleedBandMatrix({ ...band, side }, local, fill, px);
+      const [a, b, c, d, e, f] = bleedBandMatrix(bleedLocalBand(band, rotation), local, fill, px);
       const drawRect = item.crop ? imageDrawRect(local, item.crop, source) : local;
       const slot = slotMatrix(item.placement, rotation);
       page.pushOperators(

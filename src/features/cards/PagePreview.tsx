@@ -1,6 +1,12 @@
 import { useId, useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { bleedBandSvgMatrix, bleedLocalSide, bleedPixel, type BleedBand } from '../../lib/bleed';
+import {
+  bleedBandSvgMatrix,
+  bleedImageFill,
+  bleedLocalBand,
+  bleedPixel,
+  type BleedBand,
+} from '../../lib/bleed';
 import { imageDrawRect } from '../../lib/crop';
 import type { HeaderPlacement } from '../../lib/header';
 import { planDocument, PlanError, type DocumentPlan, type PlannedItem } from '../../lib/plan';
@@ -132,12 +138,11 @@ function PreviewBand({
   }
   const rotation = item.rotation ?? 0;
   const local = { x: 0, y: 0, ...slotLocalSize(item.placement, rotation) };
-  const side = bleedLocalSide(band.side, rotation);
   const px = bleedPixel(local, item.crop, card);
   const matrix = bleedBandSvgMatrix(
-    { ...band, side },
+    bleedLocalBand(band, rotation),
     local,
-    fill === 'stretch' ? 'stretch' : 'mirror',
+    bleedImageFill(fill),
     px,
   );
   const drawRect = item.crop ? imageDrawRect(local, item.crop, card) : local;

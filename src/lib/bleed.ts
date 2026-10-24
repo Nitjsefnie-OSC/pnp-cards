@@ -1,6 +1,6 @@
 import type { PxRect } from './crop';
 import type { Placement } from './layout';
-import type { LayoutSettings } from './settings';
+import type { BleedFill, LayoutSettings } from './settings';
 import { multiplyMatrix, type Rotation } from './template';
 import { mmToPt } from './units';
 
@@ -56,6 +56,27 @@ export function bleedLocalSide(side: BleedSide, rotation: Rotation): BleedSide {
   const x = mapped.find((e) => e === 'left' || e === 'right');
   const y = mapped.find((e) => e === 'bottom' || e === 'top');
   return (x && y ? `${y}-${x}` : mapped[0]) as BleedSide;
+}
+
+/**
+ * La banda en el marco de la imagen sin girar: el lado se traduce con `bleedLocalSide` y, con la
+ * carta girada un cuarto de vuelta, el ancho y el alto de la banda se intercambian (el borde
+ * corre por un lado en la página y por el otro en la imagen; las esquinas, cuadradas, no
+ * cambian). De la banda devuelta solo se usan su lado y el ancho y el alto del rectángulo.
+ */
+export function bleedLocalBand(band: BleedBand, rotation: Rotation): BleedBand {
+  const swap = rotation === 90 || rotation === 270;
+  const { rect } = band;
+  return {
+    ...band,
+    side: bleedLocalSide(band.side, rotation),
+    rect: swap ? { ...rect, width: rect.height, height: rect.width } : rect,
+  };
+}
+
+/** Modo efectivo de las bandas con carta: «color» no llega nunca aquí (esas van de color plano). */
+export function bleedImageFill(fill: BleedFill): 'stretch' | 'mirror' {
+  return fill === 'stretch' ? 'stretch' : 'mirror';
 }
 
 /** El ancho de las bandas, en puntos. */

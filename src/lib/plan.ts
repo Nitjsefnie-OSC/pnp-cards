@@ -238,13 +238,18 @@ function withBacks(
  * (todos los huecos, con la carta de referencia) para que quede en el mismo sitio en todas las
  * páginas, también en la última aunque tenga menos cartas.
  */
+/** Rectángulos del margen de corte para buscar sitio: aquí la carta que los rellena no importa. */
+function bleedRectsForFit(settings: LayoutSettings, frame: Placement[]) {
+  return bleedRects(
+    frame,
+    settings,
+    frame.map(() => null),
+  ).map((b) => b.rect);
+}
+
 function pageHeader(settings: LayoutSettings, page: Size, frame: Placement[]) {
   if (!settings.header) return null;
-  return headerPlacement(
-    page,
-    frame,
-    bleedRects(frame, settings).map((b) => b.rect),
-  );
+  return headerPlacement(page, frame, bleedRectsForFit(settings, frame));
 }
 
 /**
@@ -254,12 +259,7 @@ function pageHeader(settings: LayoutSettings, page: Size, frame: Placement[]) {
 function pageExtras(settings: LayoutSettings, page: Size, frame: Placement[]) {
   const header = pageHeader(settings, page, frame);
   const ruler = settings.ruler.enabled
-    ? rulerPlacement(
-        page,
-        frame,
-        bleedRects(frame, settings).map((b) => b.rect),
-        header,
-      )
+    ? rulerPlacement(page, frame, bleedRectsForFit(settings, frame), header)
     : null;
   const rulerOn = (number: number) => (settings.ruler.allPages || number === 1 ? ruler : null);
   return { header, rulerOn };

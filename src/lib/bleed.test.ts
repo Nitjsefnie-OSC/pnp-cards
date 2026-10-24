@@ -1,6 +1,7 @@
 import {
   bleedBandMatrix,
   bleedBandSvgMatrix,
+  bleedLocalBand,
   bleedLocalSide,
   bleedPixel,
   bleedRects,
@@ -176,6 +177,40 @@ describe('bleedBandMatrix', () => {
       -4 * z,
       (1 + 2 * z) * 110,
       (1 + 4 * z) * 206,
+    ]);
+  });
+
+  it('con el hueco girado un cuarto de vuelta, la banda mide z en el marco de la imagen', () => {
+    // Hueco de plantilla de 40 × 30 mm girado 90°: la imagen sin girar mide 30 × 40 mm
+    // (85,039 × 113,386 pt) y el borde izquierdo de la página es el superior de la imagen.
+    const local = { x: 0, y: 0, width: 2160 / 25.4, height: 2880 / 25.4 };
+    const bandaIzquierda: BleedBand = {
+      rect: { x: 100 - z, y: 200, width: z, height: 2160 / 25.4 },
+      card: 0,
+      side: 'left',
+    };
+    const enImagen = bleedLocalBand(bandaIzquierda, 90);
+    expect(enImagen.side).toBe('top');
+    // A lo largo del eje que rellena, la banda mide z (el margen), no el alto del hueco.
+    expect(enImagen.rect.width).toBeCloseTo(2160 / 25.4, 9);
+    expect(enImagen.rect.height).toBeCloseTo(z, 9);
+    // Un píxel de 0,25 pt de alto: la última fila se estira factor 4z, anclada arriba.
+    puntual(bleedBandMatrix(enImagen, local, 'stretch', { x: 0.5, y: 0.25 }), [
+      1,
+      0,
+      0,
+      -4 * z,
+      0,
+      (1 + 4 * z) * (2880 / 25.4),
+    ]);
+    // En espejo, la misma banda refleja sobre el borde superior de la imagen.
+    puntual(bleedBandMatrix(enImagen, local, 'mirror', { x: 0.5, y: 0.25 }), [
+      1,
+      0,
+      0,
+      -1,
+      0,
+      2 * (2880 / 25.4),
     ]);
   });
 });
