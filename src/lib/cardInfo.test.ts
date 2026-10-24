@@ -194,3 +194,52 @@ describe('cardSizeSummary', () => {
     expect(cardSizeSummary([poker], settings({ mode: 'template' }))).toBeNull();
   });
 });
+
+describe('con la carta girada', () => {
+  const wide = { widthPx: 1039, heightPx: 744, dpi: { x: 300, y: 300 } };
+  const poker = settings({
+    forceWidth: true,
+    forceHeight: true,
+    cardWidthMm: 63,
+    cardHeightMm: 88,
+  });
+
+  it('printedDpi cuenta los píxeles de la carta ya girada en el hueco', () => {
+    // Sin girar, 744 px en 88 mm → 215 ppp; girada, 1039 px en 88 mm y 744 en 63 → 300.
+    expect(printedDpi(wide, poker)).toBe(215);
+    expect(printedDpi(wide, poker, 270)).toBe(300);
+    expect(lowResolution(wide, poker)).toBe(true);
+    expect(lowResolution(wide, poker, 270)).toBe(false);
+  });
+
+  it('con plantilla y giro automático, la carta se gira en los huecos de otra orientación', () => {
+    const slot = { id: 'a', xMm: 0, yMm: 0, widthMm: 63, heightMm: 88, rotation: 0 as const };
+    const tpl = (autoRotate: boolean) =>
+      settings({
+        mode: 'template',
+        autoRotate,
+        template: { id: 't', name: 't', pageMm: { width: 210, height: 297 }, slots: [slot] },
+      });
+    expect(printedDpi(wide, tpl(false))).toBe(215);
+    expect(printedDpi(wide, tpl(true))).toBe(300);
+    // Con giro propio, el automático no interviene.
+    expect(printedDpi(wide, tpl(true), 180)).toBe(215);
+  });
+
+  it('cardFit compara el tamaño impreso con el físico ya girado', () => {
+    // Girada mide 63 × 88 mm, lo mismo que el tamaño forzado: sale igual, no deformada.
+    const fit = cardFit(wide, poker, 270);
+    expect(fit.physicalMm.width).toBeCloseTo(87.969, 3);
+    expect(fit.result).toEqual({ kind: 'same' });
+    expect(cardFit(wide, poker).result).toMatchObject({ kind: 'distorted' });
+  });
+
+  it('cardSizeSummary cuenta las cartas giradas con su tamaño en la página', () => {
+    const images = [image, wide];
+    expect(cardSizeSummary(images, settings())?.differentCount).toBe(1);
+    expect(cardSizeSummary(images, settings({ autoRotate: true }))?.differentCount).toBe(0);
+    // Girada a mano, también.
+    const turned = [image, { ...wide, rotation: 90 as const }];
+    expect(cardSizeSummary(turned, settings())?.differentCount).toBe(0);
+  });
+});

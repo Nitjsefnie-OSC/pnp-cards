@@ -1,13 +1,17 @@
 import type { ImageRef } from './imageMatch';
 import { mergeSettings, type LayoutSettings } from './settings';
+import { ROTATIONS, type Rotation } from './template';
 
 /** Extensión de los proyectos: un JSON que apunta a las imágenes de la carpeta del usuario. */
 export const PROJECT_EXTENSION = '.pnpcards';
 export const PROJECT_MIME = 'application/x-pnpcards';
 
 const FORMAT = 'pnp-cards';
-/** 2: reverso común (`back`) y cartas sin reverso (`noBack`). */
-const VERSION = 2;
+/**
+ * 2: reverso común (`back`) y cartas sin reverso (`noBack`). 3: giro por carta (`rotation`) y
+ * la casilla de girar las cartas horizontales (`settings.autoRotate`).
+ */
+const VERSION = 3;
 
 /** Carta del proyecto: ruta dentro de la carpeta de imágenes (y nombre); '' = en blanco. */
 export interface ProjectCardRef {
@@ -16,6 +20,8 @@ export interface ProjectCardRef {
   copies: number;
   /** Solo si es true: la carta no lleva reverso. */
   noBack?: true;
+  /** Solo si tiene giro propio (antihorario). */
+  rotation?: Exclude<Rotation, 0>;
 }
 
 export interface ProjectFile {
@@ -46,11 +52,12 @@ export function serializeProject(project: ProjectFile): string {
       name: project.name,
       folder: project.folder,
       settings: project.settings,
-      cards: project.cards.map(({ path, name, copies, noBack }) => ({
+      cards: project.cards.map(({ path, name, copies, noBack, rotation }) => ({
         path,
         name,
         copies,
         ...(noBack ? { noBack } : {}),
+        ...(rotation ? { rotation } : {}),
       })),
       back: project.back ? { path: project.back.path, name: project.back.name } : null,
     },
@@ -60,6 +67,13 @@ export function serializeProject(project: ProjectFile): string {
 }
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
+
+/** Giro guardado, si es un cuarto de vuelta distinto de cero. */
+function readRotation(value: unknown): Exclude<Rotation, 0> | undefined {
+  return ROTATIONS.includes(value as Rotation) && value !== 0
+    ? (value as Exclude<Rotation, 0>)
+    : undefined;
+}
 
 function readBack(value: unknown): ImageRef | null {
   const back = value as Record<string, unknown> | null | undefined;
@@ -90,11 +104,13 @@ export function parseProject(text: string): ProjectFile {
     settings: mergeSettings(json.settings as Partial<LayoutSettings> | undefined),
     cards: (json.cards as Record<string, unknown>[]).map((c) => {
       const copies = Number(c?.copies);
+      const rotation = readRotation(c?.rotation);
       return {
         path: str(c?.path),
         name: str(c?.name),
         copies: Number.isInteger(copies) && copies > 0 ? copies : 1,
         ...(c?.noBack === true ? { noBack: true as const } : {}),
+        ...(rotation ? { rotation } : {}),
       };
     }),
     back: readBack(json.back),

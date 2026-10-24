@@ -59,6 +59,12 @@ export interface LayoutSettings {
   forceHeight: boolean;
   cardWidthMm: number;
   cardHeightMm: number;
+  /**
+   * Girar las cartas horizontales: una carta sin giro propio cuya orientación no es la de la
+   * distribución (el tamaño forzado, el hueco de la plantilla o la mayoría de las cartas) se gira
+   * un cuarto de vuelta para que quepa en su hueco.
+   */
+  autoRotate: boolean;
 
   crop: CropSettings;
 
@@ -94,6 +100,7 @@ export const DEFAULT_SETTINGS: LayoutSettings = {
   forceHeight: false,
   cardWidthMm: 0,
   cardHeightMm: 0,
+  autoRotate: false,
   crop: { enabled: false, widthMm: 0, heightMm: 0, centered: true, x: 0, y: 0 },
   cutLines: { enabled: false, style: 'normal', color: '#000000', widthHundredthsMm: 4 },
   bleed: { enabled: false, mm: 2, color: '#ffffff' },

@@ -27,11 +27,12 @@ export function currentProject(): ProjectFile {
     name,
     folder: folder?.name ?? '',
     settings: useSettingsStore.getState().settings,
-    cards: cards.map(({ path, name, copies, noBack }) => ({
+    cards: cards.map(({ path, name, copies, noBack, rotation }) => ({
       path,
       name,
       copies,
       ...(noBack ? { noBack: true as const } : {}),
+      ...(rotation ? { rotation } : {}),
     })),
     back: back ? { path: back.path, name: back.name } : null,
   };
@@ -78,9 +79,15 @@ export async function openProjectWithFolder(project: ProjectFile, picked: Picked
   const cards: LoadedCard[] = [];
   for (const [i, { ref, file }] of matched.slice(0, project.cards.length).entries()) {
     const image = await loadRef(ref, file);
-    const { copies, noBack } = project.cards[i];
-    if (image) cards.push({ ...image, copies, ...(noBack ? { noBack } : {}) });
-    else failed.push(ref.path || ref.name);
+    const { copies, noBack, rotation } = project.cards[i];
+    if (image) {
+      cards.push({
+        ...image,
+        copies,
+        ...(noBack ? { noBack } : {}),
+        ...(rotation ? { rotation } : {}),
+      });
+    } else failed.push(ref.path || ref.name);
   }
   let back: NewImage | null = null;
   if (project.back) {

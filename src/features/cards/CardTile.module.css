@@ -326,6 +326,26 @@
   background: var(--surface);
 }
 
+/* Marca de carta girada, sobre la esquina superior izquierda de la miniatura. */
+.rotated {
+  position: absolute;
+  top: calc(var(--space-2) + 4px);
+  left: calc(var(--space-2) + 4px);
+  max-width: calc(100% - 2 * (var(--space-2) + 4px) - 2 * 1.75rem - 4px);
+  padding: 1px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
 /* Marca de «sin reverso», sobre la esquina inferior de la miniatura. */
 .noBack {
   position: absolute;
@@ -352,6 +372,41 @@
 
 .infoCheck input {
   accent-color: var(--accent);
+}
+
+/* Botones de girar la carta: ⟲ 90° y ⟳ 90°. */
+.infoRotate {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.infoRotate button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.infoRotate button:hover {
+  background: var(--border);
+}
+
+.infoRotate svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* En pantallas estrechas, la información sale como un panel abajo del todo. */

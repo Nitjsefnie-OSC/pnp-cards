@@ -22,7 +22,7 @@ import type { Dpi } from '../lib/dpi';
 import type { HeaderPlacement } from '../lib/header';
 import { planDocument } from '../lib/plan';
 import { RULER_LABEL, rulerCells, type RulerPlacement } from '../lib/ruler';
-import { slotLocalSize, slotMatrix } from '../lib/template';
+import { slotLocalSize, slotMatrix, type Rotation } from '../lib/template';
 import { INK_SAVER_LIGHTEN, type LayoutSettings } from '../lib/settings';
 
 export interface PdfCard {
@@ -35,6 +35,8 @@ export interface PdfCard {
   copies: number;
   /** La carta no lleva reverso (con los reversos activados). */
   noBack?: boolean;
+  /** Giro elegido para la carta (antihorario). */
+  rotation?: Rotation;
 }
 
 /** Imagen del reverso común: se ajusta a cada hueco, así que no importan sus ppp. */
@@ -213,8 +215,9 @@ export async function buildPdf(
       const img = await image(source);
       if (img) drawn.push(placement);
       if (img && rotation !== undefined) {
-        // Plantilla: se recorta al hueco y se gira el sistema de coordenadas; dentro, la carta
-        // se dibuja sin girar (y con su recorte, si lo hay) de 0,0 a su tamaño.
+        // Carta girada (por plantilla, por su giro o en un reverso): se recorta al hueco y se
+        // gira el sistema de coordenadas; dentro, la carta se dibuja sin girar (y con su
+        // recorte, si lo hay) de 0,0 a su tamaño.
         const { x, y, width, height } = placement;
         const local = { x: 0, y: 0, ...slotLocalSize(placement, rotation) };
         const [a, b, c, d, e, f] = slotMatrix(placement, rotation);

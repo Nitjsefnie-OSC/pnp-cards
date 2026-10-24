@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useCardsStore } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
@@ -9,6 +9,7 @@ import { CardTray } from './CardTray';
 import { PreviewDivider } from './PreviewDivider';
 import { usePreviewWidth } from './usePreviewWidth';
 import { PrintPanel } from './PrintPanel';
+import { rotationsOf } from './rotations';
 import { SettingsPanel } from './SettingsPanel';
 import styles from './CardsPage.module.css';
 
@@ -30,9 +31,11 @@ function DpiWarning() {
 /** Cuántas cartas saldrán por debajo de los ppp mínimos a su tamaño de impresión. */
 function LowDpiWarning() {
   const settings = useSettingsStore((s) => s.settings);
-  const count = useCardsStore(
-    (s) => s.cards.filter((c) => c.blob && lowResolution(c, settings)).length,
-  );
+  const cards = useCardsStore((s) => s.cards);
+  const count = useMemo(() => {
+    const rotations = rotationsOf(settings, cards);
+    return cards.filter((c, i) => c.blob && lowResolution(c, settings, rotations[i])).length;
+  }, [cards, settings]);
   if (count === 0) return null;
   return (
     <p className={`${styles.warning} ${styles.lowDpi}`} role="status">

@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent } from 'react';
+import { useMemo, useRef, useState, type DragEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
   DndContext,
@@ -21,8 +21,10 @@ import { pickFolder as defaultPickFolder, type PickedFolder } from '../../projec
 import { track } from '../../analytics/track';
 import { isProjectFile } from '../../project/useProjectActions';
 import { totalCards, useCardsStore } from '../../store/cardsStore';
+import { useSettingsStore } from '../../store/settingsStore';
 import { IMAGE_ACCEPT } from '../../lib/imageFormat';
 import { CardTile } from './CardTile';
+import { autoRotatedOf, rotationsOf } from './rotations';
 import { loadImages as defaultLoadImages, looseFiles, type LoadResult } from './loadImages';
 import styles from './CardTray.module.css';
 
@@ -40,6 +42,10 @@ export function CardTray({
 }) {
   const { t } = useTranslation();
   const cards = useCardsStore((s) => s.cards);
+  const settings = useSettingsStore((s) => s.settings);
+  // Giro con el que sale cada carta, y si se lo da el giro automático.
+  const rotations = useMemo(() => rotationsOf(settings, cards), [settings, cards]);
+  const autoRotated = useMemo(() => autoRotatedOf(settings, cards), [settings, cards]);
   const lastRemoved = useCardsStore((s) => s.lastRemoved);
   const missingCount = cards.filter((c) => c.missing).length;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -218,7 +224,14 @@ export function CardTray({
           <SortableContext items={cards.map((c) => c.id)} strategy={rectSortingStrategy}>
             <ul className={styles.grid}>
               {cards.map((card, i) => (
-                <CardTile key={card.id} card={card} position={i + 1} total={cards.length} />
+                <CardTile
+                  key={card.id}
+                  card={card}
+                  position={i + 1}
+                  total={cards.length}
+                  rotation={rotations[i]}
+                  autoRotated={autoRotated[i]}
+                />
               ))}
             </ul>
           </SortableContext>

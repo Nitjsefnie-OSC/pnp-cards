@@ -48,6 +48,7 @@
     "noDpi": "Algunas imágenes no indican su resolución y se tratarán como de 72 ppp. Fuerza el ancho o el alto de la carta en Tamaño para que salgan a su medida.",
     "dpiBadge": "{{dpi}} ppp",
     "dpiPrinted": "{{dpi}} ppp al imprimir",
+    "rotated": "Girada {{rotation}}",
     "lowDpi_one": "<strong>{{count}} carta saldrá con poca resolución</strong> (menos de {{min}} ppp al tamaño de impresión) y puede verse borrosa. Busca una imagen más grande o imprímela más pequeña.",
     "lowDpi_other": "<strong>{{count}} cartas saldrán con poca resolución</strong> (menos de {{min}} ppp al tamaño de impresión) y pueden verse borrosas. Busca imágenes más grandes o imprímelas más pequeñas.",
     "pages_one": "{{count}} página",
@@ -131,6 +132,8 @@
     "cardWidth": "Ancho",
     "cardHeight": "Alto",
     "presetHint": "Con un tamaño elegido se fuerzan ancho y alto; si los cambias, pasa a «Personalizado».",
+    "autoRotate": "Girar las cartas horizontales",
+    "autoRotateHint": "Si una carta no tiene la orientación de la distribución, se gira 90° para que quepa en su hueco.",
     "presets": {
       "poker": "Póker",
       "bridge": "Bridge",
@@ -499,7 +502,15 @@
     "copies": "Copias",
     "blank": "Imagen en blanco: en el PDF queda un hueco del tamaño de la carta anterior.",
     "missing": "No se encuentra esta imagen en la carpeta del proyecto.",
-    "noBack": "Sin reverso"
+    "noBack": "Sin reverso",
+    "rotation": "Giro",
+    "rotationNone": "Ninguno",
+    "rotationLeft": "90° a la izquierda",
+    "rotationRight": "90° a la derecha",
+    "rotationHalf": "180°",
+    "rotationAuto": "{{rotation}}, automático",
+    "rotateLeft": "Girar 90° a la izquierda",
+    "rotateRight": "Girar 90° a la derecha"
   },
   "confirm": {
     "cancel": "Cancelar"

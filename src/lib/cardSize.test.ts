@@ -1,4 +1,4 @@
-import { cardSize } from './cardSize';
+import { cardSize, rotatedImage } from './cardSize';
 import { DEFAULT_SETTINGS, type LayoutSettings } from './settings';
 
 const image = { widthPx: 744, heightPx: 1039 };
@@ -49,5 +49,22 @@ describe('cardSize', () => {
     );
     expect(size.width).toBeCloseTo(178.6236, 3);
     expect(size.height).toBeCloseTo(249.4488, 3);
+  });
+});
+
+describe('rotatedImage', () => {
+  it('un cuarto de vuelta intercambia ancho y alto, y sus ppp', () => {
+    const turned = rotatedImage({ ...image, dpi: { x: 300, y: 150 } }, 90);
+    expect(turned).toEqual({ widthPx: 1039, heightPx: 744, dpi: { x: 150, y: 300 } });
+    expect(rotatedImage({ ...image, dpi: null }, 270)).toEqual({
+      widthPx: 1039,
+      heightPx: 744,
+      dpi: null,
+    });
+  });
+
+  it('media vuelta o ninguna deja la imagen como está', () => {
+    expect(rotatedImage({ ...image, dpi: null }, 180)).toEqual({ ...image, dpi: null });
+    expect(rotatedImage({ ...image, dpi: null }, 0)).toEqual({ ...image, dpi: null });
   });
 });

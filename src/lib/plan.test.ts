@@ -6,6 +6,8 @@ const dpi300 = { x: 300, y: 300 };
 const big: CardSpec = { widthPx: 744, heightPx: 1039, dpi: dpi300, blank: false, copies: 1 };
 const small: CardSpec = { widthPx: 372, heightPx: 520, dpi: dpi300, blank: false, copies: 1 };
 const blank: CardSpec = { widthPx: 0, heightPx: 0, dpi: null, blank: true, copies: 1 };
+/** Carta horizontal: 88 × 63 mm a 300 ppp (249,36 × 178,56 pt sin girar). */
+const wide: CardSpec = { widthPx: 1039, heightPx: 744, dpi: dpi300, blank: false, copies: 1 };
 /** Reverso cuadrado, para ver cómo se recorta. */
 const square = { widthPx: 1000, heightPx: 1000 };
 
@@ -282,6 +284,76 @@ describe('planDocument', () => {
     });
   });
 
+  describe('con giro', () => {
+    const auto = settings({ autoRotate: true });
+
+    it('gira un cuarto de vuelta a la derecha la carta horizontal de una distribución vertical', () => {
+      const [first, second] = planDocument(auto, [big, wide]).pages[0].items;
+      expect(first.rotation).toBeUndefined();
+      expect(second.rotation).toBe(270);
+      // Girada ocupa un hueco vertical, igual que la otra carta.
+      expect(second.placement.width).toBeCloseTo(178.56, 3);
+      expect(second.placement.height).toBeCloseTo(249.36, 3);
+      expect(second.placement.x).toBeCloseTo(first.placement.x + 178.56 + 6.983, 2);
+    });
+
+    it('desactivado, la carta horizontal ocupa un hueco ancho', () => {
+      const [, second] = planDocument(settings(), [big, wide]).pages[0].items;
+      expect(second.rotation).toBeUndefined();
+      expect(second.placement.width).toBeCloseTo(249.36, 3);
+    });
+
+    it('el giro elegido para la carta manda sobre el automático', () => {
+      const cards: CardSpec[] = [
+        { ...big, rotation: 180 },
+        { ...wide, rotation: 90 },
+      ];
+      const [first, second] = planDocument(auto, cards).pages[0].items;
+      expect(first.rotation).toBe(180);
+      expect(first.placement.width).toBeCloseTo(178.56, 3);
+      expect(second.rotation).toBe(90);
+      expect(second.placement.width).toBeCloseTo(178.56, 3);
+    });
+
+    it('con ancho y alto forzados, la carta girada ocupa el hueco forzado', () => {
+      const forced = settings({
+        autoRotate: true,
+        forceWidth: true,
+        forceHeight: true,
+        cardWidthMm: 63,
+        cardHeightMm: 88,
+      });
+      const item = planDocument(forced, [wide]).pages[0].items[0];
+      expect(item.rotation).toBe(270);
+      expect(item.placement.width).toBeCloseTo(178.583, 3);
+      expect(item.placement.height).toBeCloseTo(249.449, 3);
+    });
+
+    it('con recorte, decide la forma del recorte, que se aplica antes de girar', () => {
+      // Solo 50 mm de ancho (591 px a 300 ppp) y todo el alto: las dos quedan verticales.
+      const cropped = settings({
+        autoRotate: true,
+        crop: { enabled: true, widthMm: 50, heightMm: 0, centered: true, x: 0, y: 0 },
+      });
+      const [, second] = planDocument(cropped, [big, wide]).pages[0].items;
+      expect(second.rotation).toBeUndefined();
+      expect(second.crop).toEqual({ x: 224, y: 0, width: 591, height: 744 });
+      expect(second.placement.width).toBeCloseTo(141.84, 3);
+      expect(second.placement.height).toBeCloseTo(178.56, 3);
+    });
+
+    it('con reversos, el reverso sigue el giro de la carta combinado con el espejo', () => {
+      const long = settings({ autoRotate: true, backs: { enabled: true, flip: 'long' } });
+      const [front, back] = planDocument(long, [big, wide], square).pages;
+      expect(front.items[1].rotation).toBe(270);
+      expect(back.items[1].rotation).toBe(90);
+      // El reverso se recorta a la forma de la carta sin girar (249,36 × 178,56): 1000 × 716.
+      expect(back.items[1].crop).toEqual({ x: 0, y: 142, width: 1000, height: 716 });
+      const short = settings({ autoRotate: true, backs: { enabled: true, flip: 'short' } });
+      expect(planDocument(short, [big, wide], square).pages[1].items[1].rotation).toBe(270);
+    });
+  });
+
   describe('con plantilla', () => {
     const template = {
       id: 't',
@@ -395,6 +467,25 @@ describe('planDocument', () => {
       const s = settings({ mode: 'template', template, rightToLeft: true });
       const [first] = planDocument(s, [big]).pages;
       expect(first.items[0].placement.x).toBeCloseTo(113.386, 3);
+    });
+
+    it('con el giro automático, la carta horizontal se gira para coincidir con cada hueco', () => {
+      const s = settings({ mode: 'template', template, autoRotate: true });
+      // Hueco 1: vertical, sin giro → la carta gira 270°. Hueco 2: 70 × 50 girado 90° (la carta
+      // va en vertical) → 90° + 270° = 0°.
+      const [first, second] = planDocument(s, [{ ...wide, copies: 2 }]).pages[0].items;
+      expect(first.rotation).toBe(270);
+      expect(second.rotation).toBe(0);
+      // Una carta vertical no cambia.
+      const [a, b] = planDocument(s, [{ ...big, copies: 2 }]).pages[0].items;
+      expect([a.rotation, b.rotation]).toEqual([0, 90]);
+    });
+
+    it('el giro elegido para la carta se suma al del hueco', () => {
+      const [first, second] = planDocument(tpl, [{ ...big, copies: 2, rotation: 180 }]).pages[0]
+        .items;
+      expect(first.rotation).toBe(180);
+      expect(second.rotation).toBe(270);
     });
   });
 
