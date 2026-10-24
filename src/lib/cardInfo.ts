@@ -111,3 +111,42 @@ export function lowResolution(image: ImageInfo, settings: LayoutSettings) {
   const dpi = printedDpi(image, settings);
   return dpi !== null && dpi < MIN_PRINT_DPI;
 }
+
+export interface CardSizeSummary {
+  /** Tamaño con el que saldrá la primera carta. */
+  firstMm: Mm;
+  /** Cuántas de las demás saldrán con otro tamaño (más del 0,5 % de diferencia). */
+  differentCount: number;
+}
+
+/**
+ * Tamaño resultante de las cartas cuando lo decide la imagen (o el recorte), para mostrarlo en
+ * Ajustes: el de la primera y cuántas difieren. Mismo cálculo que `cardSizes` en `plan.ts`. Null
+ * sin cartas, con ancho y alto forzados (el tamaño ya está en el desplegable) o con plantilla
+ * (manda el hueco).
+ */
+export function cardSizeSummary(
+  images: ImageInfo[],
+  settings: LayoutSettings,
+): CardSizeSummary | null {
+  if (images.length === 0) return null;
+  if (settings.mode === 'template') return null;
+  if (settings.forceWidth && settings.forceHeight) return null;
+
+  const sizes = images.map((image) => {
+    const crop = settings.crop.enabled ? cropRect(image, settings.crop) : null;
+    const pt = crop
+      ? cardSize(
+          { widthPx: crop.width, heightPx: crop.height, dpi: { x: CROP_DPI, y: CROP_DPI } },
+          settings,
+        )
+      : cardSize(image, settings);
+    return { width: ptToMm(pt.width), height: ptToMm(pt.height) };
+  });
+  const [first, ...rest] = sizes;
+  const differs = (a: number, b: number) => Math.abs(a / b - 1) >= TOLERANCE;
+  const differentCount = rest.filter(
+    (s) => differs(s.width, first.width) || differs(s.height, first.height),
+  ).length;
+  return { firstMm: first, differentCount };
+}

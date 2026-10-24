@@ -9,6 +9,11 @@
   font-size: 0.875rem;
 }
 
+/* Aviso suave dentro de una sección, como el de poca resolución. */
+.hintWarning {
+  color: var(--note-text);
+}
+
 /* Subopción de una casilla, sangrada bajo ella. */
 .nested {
   padding-left: var(--space-5);

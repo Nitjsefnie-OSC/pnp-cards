@@ -1,4 +1,4 @@
-import { cardFit, lowResolution, MIN_PRINT_DPI, printedDpi } from './cardInfo';
+import { cardFit, cardSizeSummary, lowResolution, MIN_PRINT_DPI, printedDpi } from './cardInfo';
 import { DEFAULT_SETTINGS, type LayoutSettings } from './settings';
 
 const image = { widthPx: 744, heightPx: 1039, dpi: { x: 300, y: 300 } };
@@ -141,5 +141,61 @@ describe('lowResolution', () => {
     expect(lowResolution({ ...image, dpi: null }, settings())).toBe(false);
     expect(lowResolution({ widthPx: 400, heightPx: 560, dpi: null }, forced)).toBe(true);
     expect(lowResolution({ ...image, dpi: null }, forced)).toBe(false);
+  });
+});
+
+describe('cardSizeSummary', () => {
+  // 750 × 1050 px a 300 ppp: 750 · 25,4 / 300 = 63,5 mm; 1050 · 25,4 / 300 = 88,9 mm.
+  const poker = { widthPx: 750, heightPx: 1050, dpi: { x: 300, y: 300 } };
+
+  it('da el tamaño de la primera carta y cuántas miden distinto', () => {
+    // A 150 ppp la misma imagen mide el doble: 127 × 177,8 mm.
+    const half = { ...poker, dpi: { x: 150, y: 150 } };
+    const summary = cardSizeSummary([poker, half, poker, half], settings());
+    expect(summary?.firstMm.width).toBeCloseTo(63.5, 3);
+    expect(summary?.firstMm.height).toBeCloseTo(88.9, 3);
+    expect(summary?.differentCount).toBe(2);
+  });
+
+  it('diferencias de menos del 0,5 % cuentan como el mismo tamaño', () => {
+    // 753 px: 63,754 mm, un 0,4 % más. 754 px: 63,839 mm, un 0,53 % más.
+    const near = { ...poker, widthPx: 753 };
+    const far = { ...poker, widthPx: 754 };
+    expect(cardSizeSummary([poker, near], settings())?.differentCount).toBe(0);
+    expect(cardSizeSummary([poker, far], settings())?.differentCount).toBe(1);
+  });
+
+  it('sin ppp supone 72: 750 px son 264,583 mm', () => {
+    const summary = cardSizeSummary([{ ...poker, dpi: null }], settings());
+    expect(summary?.firstMm.width).toBeCloseTo(264.583, 3);
+    expect(summary?.firstMm.height).toBeCloseTo(370.417, 3);
+  });
+
+  it('con recorte mide lo que el recorte a 300 ppp, así que todas salen iguales', () => {
+    // 60 mm → 709 px → 60,029 mm; 85 mm → 1004 px → 85,005 mm.
+    const crop = { enabled: true, widthMm: 60, heightMm: 85, centered: true, x: 0, y: 0 };
+    const big = { widthPx: 1500, heightPx: 2100, dpi: { x: 600, y: 600 } };
+    const summary = cardSizeSummary([poker, big], settings({ crop }));
+    expect(summary?.firstMm.width).toBeCloseTo(60.029, 3);
+    expect(summary?.firstMm.height).toBeCloseTo(85.005, 3);
+    expect(summary?.differentCount).toBe(0);
+  });
+
+  it('no hay resumen sin cartas, con ancho y alto forzados ni con plantilla', () => {
+    expect(cardSizeSummary([], settings())).toBeNull();
+    expect(cardSizeSummary([poker], settings({ forceWidth: true, forceHeight: true }))).toBeNull();
+    expect(cardSizeSummary([poker], settings({ mode: 'template' }))).toBeNull();
+  });
+
+  it('con solo el ancho forzado, la altura sigue la proporción de cada imagen', () => {
+    // 63 mm de ancho; alto = 63 · 1050 / 750 = 88,2 mm. Una imagen cuadrada: 63 × 63.
+    const square = { widthPx: 1000, heightPx: 1000, dpi: { x: 300, y: 300 } };
+    const summary = cardSizeSummary(
+      [poker, square],
+      settings({ forceWidth: true, cardWidthMm: 63 }),
+    );
+    expect(summary?.firstMm.width).toBeCloseTo(63, 3);
+    expect(summary?.firstMm.height).toBeCloseTo(88.2, 3);
+    expect(summary?.differentCount).toBe(1);
   });
 });

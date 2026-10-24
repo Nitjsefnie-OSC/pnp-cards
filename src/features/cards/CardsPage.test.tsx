@@ -173,6 +173,39 @@ describe('SettingsPanel', () => {
     expect(useSettingsStore.getState().settings.marginMm).toBe(5.5);
   });
 
+  it('sin cartas, la pista del tamaño según la imagen es la genérica', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    expect(screen.getByText(/Si no fuerzas el tamaño/)).toBeInTheDocument();
+  });
+
+  it('con cartas, muestra el tamaño de la primera y cuántas miden distinto', async () => {
+    const user = userEvent.setup();
+    // 744 × 1039 px a 300 ppp: 63,0 × 88,0 mm. A 150 ppp mide el doble.
+    useCardsStore
+      .getState()
+      .addImages([fakeImage('a.png'), fakeImage('b.png', { x: 150, y: 150 }), fakeImage('c.png')]);
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    expect(
+      screen.getByText('Según la resolución de la imagen: 63,0 × 88,0 mm'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('1 carta tiene otro tamaño')).toBeInTheDocument();
+    expect(screen.queryByText(/Si no fuerzas el tamaño/)).not.toBeInTheDocument();
+  });
+
+  it('si todas miden igual no avisa, y con un tamaño elegido no muestra nada', async () => {
+    const user = userEvent.setup();
+    useCardsStore.getState().addImages([fakeImage('a.png'), fakeImage('b.png')]);
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    expect(screen.getByText(/Según la resolución de la imagen: 63,0/)).toBeInTheDocument();
+    expect(screen.queryByText(/otro tamaño/)).not.toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText('Tamaño'), 'poker');
+    expect(screen.queryByText(/Según la resolución de la imagen:/)).not.toBeInTheDocument();
+  });
+
   it('elegir un tamaño predefinido fuerza ancho y alto', async () => {
     const user = userEvent.setup();
     render(<SettingsPanel />, { wrapper: MemoryRouter });

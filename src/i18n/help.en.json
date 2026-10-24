@@ -134,6 +134,10 @@
           "type": "p",
           "text": "If the image doesn’t state its resolution, 72 dpi is assumed, as PDFCartas did, and that same image would come out at 26 × 37 cm. The app warns you when this happens: force the card size then."
         },
+        {
+          "type": "p",
+          "text": "Below the drop-down you can see the size the first card will come out at and, if any of the others has a different resolution and will come out at a different size, how many. With cropping on, the size is that of the crop. To see each card’s exact size, press its info button."
+        },
         { "type": "h", "text": "Preset and custom sizes" },
         {
           "type": "p",
