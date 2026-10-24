@@ -26,12 +26,21 @@ const withBack: ProjectFile = {
   back: { path: 'reversos/dorso.png', name: 'dorso.png' },
 };
 
+const rotated: ProjectFile = {
+  ...project,
+  settings: { ...DEFAULT_SETTINGS, autoRotate: true },
+  cards: [
+    { path: 'elfo.png', name: 'elfo.png', copies: 1 },
+    { path: 'mapa.png', name: 'mapa.png', copies: 2, rotation: 90 },
+  ],
+};
+
 describe('archivo .pnpcards', () => {
   it('es un JSON legible con el formato, la versión y las cartas, sin imágenes', () => {
     const json = JSON.parse(serializeProject(project));
     expect(json).toMatchObject({
       format: 'pnp-cards',
-      version: 2,
+      version: 3,
       name: 'Mi juego',
       folder: 'cartas',
     });
@@ -54,6 +63,37 @@ describe('archivo .pnpcards', () => {
       { path: 'mapa.png', name: 'mapa.png', copies: 1, noBack: true },
     ]);
     expect(parseProject(serializeProject(withBack))).toEqual(withBack);
+  });
+
+  it('guarda el giro de cada carta solo si lo tiene, y la casilla de girar las horizontales', () => {
+    const json = JSON.parse(serializeProject(rotated));
+    expect(json.settings.autoRotate).toBe(true);
+    expect(json.cards).toEqual([
+      { path: 'elfo.png', name: 'elfo.png', copies: 1 },
+      { path: 'mapa.png', name: 'mapa.png', copies: 2, rotation: 90 },
+    ]);
+    expect(parseProject(serializeProject(rotated))).toEqual(rotated);
+  });
+
+  it('ignora un giro que no sea de cuartos de vuelta', () => {
+    const p = parseProject(
+      JSON.stringify({
+        format: 'pnp-cards',
+        version: 3,
+        cards: [
+          { path: 'a.png', name: 'a.png', copies: 1, rotation: 45 },
+          { path: 'b.png', name: 'b.png', copies: 1, rotation: 0 },
+          { path: 'c.png', name: 'c.png', copies: 1, rotation: 270 },
+        ],
+      }),
+    );
+    expect(p.cards.map((c) => c.rotation)).toEqual([undefined, undefined, 270]);
+  });
+
+  it('abre los proyectos de la versión 2 con las cartas sin girar', () => {
+    const p = parseProject(serializeProject(withBack).replace('"version": 3', '"version": 2'));
+    expect(p).toEqual(withBack);
+    expect(p.settings.autoRotate).toBe(false);
   });
 
   it('abre los proyectos de la versión 1: sin reverso y sin la doble cara manual', () => {

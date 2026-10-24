@@ -48,6 +48,7 @@
     "noDpi": "Some images don’t state their resolution and will be treated as 72 dpi. Force the card width or height under Card size so they print at the right size.",
     "dpiBadge": "{{dpi}} dpi",
     "dpiPrinted": "{{dpi}} dpi when printed",
+    "rotated": "Rotated {{rotation}}",
     "lowDpi_one": "<strong>{{count}} card will print at low resolution</strong> (under {{min}} dpi at its print size) and may look blurry. Look for a bigger image or print it smaller.",
     "lowDpi_other": "<strong>{{count}} cards will print at low resolution</strong> (under {{min}} dpi at their print size) and may look blurry. Look for bigger images or print them smaller.",
     "pages_one": "{{count}} page",
@@ -131,6 +132,8 @@
     "cardWidth": "Width",
     "cardHeight": "Height",
     "presetHint": "A chosen size forces the width and height; change them and it becomes “Custom”.",
+    "autoRotate": "Rotate landscape cards",
+    "autoRotateHint": "If a card does not match the orientation of the layout, it is rotated 90° to fit its slot.",
     "presets": {
       "poker": "Poker",
       "bridge": "Bridge",
@@ -499,7 +502,15 @@
     "copies": "Copies",
     "blank": "Blank image: the PDF leaves a gap the size of the previous card.",
     "missing": "This image can’t be found in the project folder.",
-    "noBack": "No back"
+    "noBack": "No back",
+    "rotation": "Rotation",
+    "rotationNone": "None",
+    "rotationLeft": "90° left",
+    "rotationRight": "90° right",
+    "rotationHalf": "180°",
+    "rotationAuto": "{{rotation}}, automatic",
+    "rotateLeft": "Rotate 90° left",
+    "rotateRight": "Rotate 90° right"
   },
   "confirm": {
     "cancel": "Cancel"

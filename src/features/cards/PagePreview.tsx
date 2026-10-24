@@ -72,7 +72,7 @@ function PreviewCard({
     </svg>
   );
   if (item.rotation === undefined) return picture(width, height, x, y);
-  // Plantilla: la carta se dibuja sin girar y la matriz la lleva a su hueco, como en el PDF.
+  // Carta girada: se dibuja sin girar y la matriz la lleva a su hueco, como en el PDF.
   const local = slotLocalSize(item.placement, item.rotation);
   const matrix = slotSvgMatrix(item.placement, item.rotation, pageHeight);
   return <g transform={`matrix(${matrix.join(' ')})`}>{picture(local.width, local.height)}</g>;

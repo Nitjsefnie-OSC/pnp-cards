@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Dpi } from '../lib/dpi';
 import { parseCopies } from '../lib/filename';
+import type { Rotation } from '../lib/template';
 
 export type ImageFormat = 'jpeg' | 'png';
 
@@ -28,6 +29,8 @@ export interface CardImage {
   missing?: boolean;
   /** La carta no lleva reverso (con los reversos activados). */
   noBack?: boolean;
+  /** Giro elegido para la carta (antihorario); ausente, sin giro (o el automático). */
+  rotation?: Rotation;
   copies: number;
 }
 
@@ -52,6 +55,8 @@ interface CardsState {
   addBlank: () => void;
   setCopies: (id: string, copies: number) => void;
   setNoBack: (id: string, noBack: boolean) => void;
+  /** Giro elegido para la carta; 0 lo quita. */
+  setRotation: (id: string, rotation: Rotation) => void;
   setBack: (back: NewImage | null) => void;
   remove: (id: string) => void;
   /** Pone la imagen encontrada en una carta que faltaba, con sus mismas copias. */
@@ -139,6 +144,16 @@ export const useCardsStore = create<CardsState>()((set) => ({
   setNoBack: (id, noBack) =>
     set((s) => ({ cards: s.cards.map((c) => (c.id === id ? { ...c, noBack } : c)) })),
 
+  setRotation: (id, rotation) =>
+    set((s) => ({
+      cards: s.cards.map((c) => {
+        if (c.id !== id) return c;
+        const next: CardImage = { ...c, rotation };
+        if (rotation === 0) delete next.rotation;
+        return next;
+      }),
+    })),
+
   setBack: (back) =>
     set((s) => {
       if (s.back && s.back !== back) revoke(s.back);
@@ -162,9 +177,11 @@ export const useCardsStore = create<CardsState>()((set) => ({
       cards: s.cards.map((c) => {
         if (c.id !== id) return c;
         revoke(c);
-        // Si es la misma imagen se conserva su ruta en la carpeta del proyecto.
+        // Si es la misma imagen se conserva su ruta en la carpeta del proyecto, y la carta
+        // sigue con sus copias, su giro y si va sin reverso.
         const path = image.name === c.name ? c.path : image.path;
-        return { ...image, id, path, copies: c.copies, missing: false };
+        const { copies, noBack, rotation } = c;
+        return { ...image, id, path, copies, noBack, rotation, missing: false };
       }),
     })),
 

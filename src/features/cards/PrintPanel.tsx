@@ -14,6 +14,7 @@ import {
   type GeneratePdf,
 } from '../../workers/pdfClient';
 import { PagePreview } from './PagePreview';
+import { rotationsOf } from './rotations';
 import styles from './CardsPage.module.css';
 
 type Status =
@@ -45,6 +46,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
     const cards = printableCards(useCardsStore.getState().cards);
     const back = printableBack(useCardsStore.getState().back);
     const { settings, openAfter } = useSettingsStore.getState();
+    const rotations = rotationsOf(settings, cards);
     const projectName = useCardsStore.getState().name.trim();
     const fileName = projectName ? `${safeFileName(projectName)}.pdf` : t('cards.fileName');
     // La pestaña se abre ya, durante el clic, para que el navegador no la bloquee.
@@ -74,6 +76,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
             dpi: c.dpi,
             copies: c.copies,
             noBack: c.noBack,
+            rotation: c.rotation,
           })),
           back: back && {
             data: back.blob,
@@ -105,7 +108,7 @@ export function PrintPanel({ generatePdf = defaultGeneratePdf }: { generatePdf?:
         bleed: settings.bleed.enabled,
         backs: settings.backs.enabled,
         inkSaver: settings.inkSaver,
-        lowDpi: cards.filter((c) => c.blob && lowResolution(c, settings)).length,
+        lowDpi: cards.filter((c, i) => c.blob && lowResolution(c, settings, rotations[i])).length,
       });
       setStatus({
         kind: 'ready',

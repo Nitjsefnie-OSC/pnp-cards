@@ -317,6 +317,12 @@ export function SettingsPanel() {
             <p className={styles.hint}>{t('settings.presetHint')}</p>
           </>
         ) : null}
+        <Checkbox
+          label={t('settings.autoRotate')}
+          hint={t('settings.autoRotateHint')}
+          checked={s.autoRotate}
+          onChange={(autoRotate) => update({ autoRotate })}
+        />
       </Section>
 
       <Section title={t('settings.crop')} help="crop">

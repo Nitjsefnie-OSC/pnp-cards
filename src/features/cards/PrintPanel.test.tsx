@@ -99,6 +99,18 @@ describe('PrintPanel', () => {
     expect(input.cards.map((c) => c.noBack ?? false)).toEqual([false, true]);
   });
 
+  it('envía el giro elegido de cada carta', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    useCardsStore.getState().addImages([image, { ...image, name: 'b.png' }]);
+    useCardsStore.getState().setRotation(useCardsStore.getState().cards[1].id, 90);
+    const gen = controllable();
+    render(<PrintPanel generatePdf={gen.generate} />);
+    await user.click(screen.getByRole('button', { name: 'Generar PDF' }));
+    const [input] = gen.generate.mock.calls[0];
+    expect(input.cards.map((c) => c.rotation)).toEqual([undefined, 90]);
+  });
+
   it('explica que falta la imagen del reverso', async () => {
     const user = userEvent.setup();
     useCardsStore.getState().addImages([image]);

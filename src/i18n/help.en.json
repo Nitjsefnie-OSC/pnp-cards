@@ -148,6 +148,15 @@
           "text": "If you force width and height and the image has different proportions, it gets distorted. To avoid that, crop the images to the card proportions first."
         },
         { "type": "link", "topic": "crop", "label": "Cropping" },
+        { "type": "h", "text": "Landscape cards" },
+        {
+          "type": "p",
+          "text": "If your game mixes portrait cards with a few landscape ones (locations, objectives, reference cards), turn on “Rotate landscape cards”: a card that does not match the orientation of the layout is turned a quarter turn to the right and takes a slot like the rest, so the grid stays even. The orientation of the layout is that of the forced size when you force width and height; with a template, that of each slot; otherwise, that of most cards, counting copies. Square cards are never rotated."
+        },
+        {
+          "type": "p",
+          "text": "To rotate one card, or to change the direction of the automatic rotation, use the “Rotate 90° left” and “Rotate 90° right” buttons in its info (the card’s button). A chosen rotation overrides the automatic one and is saved with the project; the card’s tile shows how it will come out. Cropping is applied before rotating, and the card’s back follows its rotation."
+        },
         { "type": "h", "text": "Recommended resolution" },
         {
           "type": "p",
@@ -231,6 +240,10 @@
         {
           "type": "p",
           "text": "To print a card without a back, mark it in its info (the card’s button): its slot stays empty on the backs page."
+        },
+        {
+          "type": "p",
+          "text": "If a card is rotated (by hand or by “Rotate landscape cards”), its back is rotated the same way, combined with the mirroring, so that it lines up with the card when the sheet is turned over."
         },
         {
           "type": "p",
@@ -381,6 +394,10 @@
         {
           "type": "p",
           "text": "Create a blank template or one from the layout you use in Cards, and give it a name and a page size. Each slot has a position (X and Y in millimetres from the top-left corner), width, height and rotation. Drag slots to move them and their corners to resize them; with a slot selected, the arrow keys move it 1 mm (with Shift, 10 mm)."
+        },
+        {
+          "type": "p",
+          "text": "The slot’s rotation adds to the card’s. With “Rotate landscape cards” on in Settings, a card that does not match the orientation of the slot is rotated to fit it."
         },
         {
           "type": "p",

@@ -6,7 +6,9 @@ import { useCardsStore, type CardImage } from '../../store/cardsStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { fixedSize, lowResolution, MIN_PRINT_DPI, printedDpi } from '../../lib/cardInfo';
 import { IMAGE_ACCEPT } from '../../lib/imageFormat';
+import type { Rotation } from '../../lib/template';
 import { CardInfo } from './CardInfo';
+import { rotationLabel } from './rotations';
 import { loadImage } from './loadImages';
 import styles from './CardTile.module.css';
 
@@ -72,10 +74,16 @@ export const CardTile = memo(function CardTile({
   card,
   position,
   total,
+  rotation = 0,
+  autoRotated = false,
 }: {
   card: CardImage;
   position: number;
   total: number;
+  /** Giro con el que sale la carta en la página (elegido o automático). */
+  rotation?: Rotation;
+  /** Si ese giro se lo da el giro automático. */
+  autoRotated?: boolean;
 }) {
   const { t } = useTranslation();
   const {
@@ -91,8 +99,8 @@ export const CardTile = memo(function CardTile({
   const settings = useSettingsStore((s) => s.settings);
   const withoutBack = settings.backs.enabled && card.noBack;
   // Ppp con los que saldrá impresa; sin ppp y sin fijar el tamaño, la etiqueta avisa con «?».
-  const dpi = card.blob ? printedDpi(card, settings) : null;
-  const low = card.blob ? lowResolution(card, settings) : false;
+  const dpi = card.blob ? printedDpi(card, settings, rotation) : null;
+  const low = card.blob ? lowResolution(card, settings, rotation) : false;
   const unknownDpi = !card.dpi && !fixedSize(settings);
   const badge = unknownDpi ? '?' : (dpi ?? card.dpi?.x ?? '?');
 
@@ -171,9 +179,21 @@ export const CardTile = memo(function CardTile({
         ) : null}
       </div>
       {withoutBack ? <span className={styles.noBack}>{t('cardInfo.noBack')}</span> : null}
+      {card.blob && rotation !== 0 ? (
+        <span className={styles.rotated}>
+          {t('cards.rotated', { rotation: rotationLabel(t, rotation) })}
+        </span>
+      ) : null}
       {/* Información y quitar, sobre la esquina de la miniatura. */}
       <div className={styles.tools}>
-        <CardInfo card={card} name={name} position={position} total={total} />
+        <CardInfo
+          card={card}
+          name={name}
+          position={position}
+          total={total}
+          rotation={rotation}
+          autoRotated={autoRotated}
+        />
         <button
           type="button"
           className={styles.remove}

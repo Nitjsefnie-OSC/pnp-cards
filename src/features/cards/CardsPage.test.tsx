@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import i18n from '../../i18n';
@@ -171,6 +171,14 @@ describe('SettingsPanel', () => {
     await user.clear(margin);
     await user.type(margin, '5,5');
     expect(useSettingsStore.getState().settings.marginMm).toBe(5.5);
+  });
+
+  it('activa el giro de las cartas horizontales desde Tamaño de la carta', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    await user.click(screen.getByLabelText(/Girar las cartas horizontales/));
+    expect(useSettingsStore.getState().settings.autoRotate).toBe(true);
   });
 
   it('sin cartas, la pista del tamaño según la imagen es la genérica', async () => {
@@ -368,5 +376,38 @@ describe('CardsPage', () => {
     useCardsStore.getState().addImages([fakeImage('a x10.png')]);
     render(<CardsPage />, { wrapper: MemoryRouter });
     expect(screen.getByText('2 páginas')).toBeInTheDocument();
+  });
+});
+
+describe('giro de la carta', () => {
+  const landscape = { ...fakeImage('mapa.png'), widthPx: 1039, heightPx: 744 };
+
+  it('se gira desde su información y la tarjeta lo indica', async () => {
+    const user = userEvent.setup();
+    useCardsStore.getState().addImages([fakeImage('a.png'), landscape]);
+    render(<CardTray />, { wrapper: MemoryRouter });
+
+    await user.click(screen.getByRole('button', { name: 'Información de mapa.png' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Giro').nextSibling).toHaveTextContent('Ninguno');
+    await user.click(within(dialog).getByRole('button', { name: 'Girar 90° a la derecha' }));
+    expect(useCardsStore.getState().cards[1].rotation).toBe(270);
+    expect(within(dialog).getByText('Giro').nextSibling).toHaveTextContent('90° a la derecha');
+    await user.click(within(dialog).getByRole('button', { name: 'Girar 90° a la izquierda' }));
+    expect(useCardsStore.getState().cards[1].rotation).toBeUndefined();
+    await user.keyboard('{Escape}');
+
+    act(() => useCardsStore.getState().setRotation(useCardsStore.getState().cards[1].id, 90));
+    expect(screen.getByText('Girada 90° a la izquierda')).toBeInTheDocument();
+  });
+
+  it('con el giro automático, la información dice que la carta horizontal se gira sola', async () => {
+    const user = userEvent.setup();
+    useSettingsStore.getState().update({ autoRotate: true });
+    useCardsStore.getState().addImages([fakeImage('a.png'), landscape]);
+    render(<CardTray />, { wrapper: MemoryRouter });
+    expect(screen.getByText('Girada 90° a la derecha')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Información de mapa.png' }));
+    expect(screen.getByText('Giro').nextSibling).toHaveTextContent('90° a la derecha, automático');
   });
 });

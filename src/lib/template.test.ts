@@ -1,5 +1,6 @@
 import { DEFAULT_SETTINGS } from './settings';
 import {
+  combineRotations,
   parseTemplateFile,
   serializeTemplate,
   slotBox,
@@ -133,5 +134,13 @@ describe('archivo .pnptemplate', () => {
       }),
     );
     expect(read.slots[0]).toMatchObject({ widthMm: 1, rotation: 0 });
+  });
+});
+
+describe('combineRotations', () => {
+  it('suma dos giros antihorarios, dando la vuelta a los 360°', () => {
+    expect(combineRotations(0, 90)).toBe(90);
+    expect(combineRotations(180, 270)).toBe(90);
+    expect(combineRotations(90, 270)).toBe(0);
   });
 });

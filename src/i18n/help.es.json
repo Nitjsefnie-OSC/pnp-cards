@@ -209,6 +209,18 @@
         },
         {
           "type": "h",
+          "text": "Cartas horizontales"
+        },
+        {
+          "type": "p",
+          "text": "Si tu juego mezcla cartas verticales con alguna horizontal (lugares, objetivos, cartas de referencia), activa «Girar las cartas horizontales»: la carta que no tiene la orientación de la distribución se gira un cuarto de vuelta a la derecha y ocupa un hueco igual que las demás, así que la cuadrícula no se descuadra. La orientación de la distribución es la del tamaño forzado si fuerzas ancho y alto; con plantilla, la de cada hueco; y si no, la de la mayoría de las cartas, contando copias. Las cartas cuadradas no se giran."
+        },
+        {
+          "type": "p",
+          "text": "Para girar una carta concreta, o cambiar el sentido del giro automático, usa los botones «Girar 90° a la izquierda» y «Girar 90° a la derecha» de su información (el botón de la carta). El giro elegido manda sobre el automático y se guarda con el proyecto; la tarjeta de la carta indica cómo saldrá. El recorte se aplica antes de girar, y el reverso de la carta sigue su giro."
+        },
+        {
+          "type": "h",
           "text": "Resolución recomendada"
         },
         {
@@ -305,6 +317,10 @@
         {
           "type": "p",
           "text": "Para que una carta salga sin reverso, márcalo en su información (el botón de la carta): su hueco queda vacío en la página de reversos."
+        },
+        {
+          "type": "p",
+          "text": "Si una carta va girada (a mano o por «Girar las cartas horizontales»), su reverso se gira igual, combinado con el espejo, para que al dar la vuelta a la hoja quede orientado como la carta."
         },
         {
           "type": "p",
@@ -501,6 +517,10 @@
         {
           "type": "p",
           "text": "«Usar en Cartas» pone la distribución en «Plantilla» con esa plantilla. El proyecto guarda su propia copia, así que sigue funcionando aunque la borres o la cambies después."
+        },
+        {
+          "type": "p",
+          "text": "El giro del hueco se suma al de la carta. Con «Girar las cartas horizontales» activado en Ajustes, una carta que no tiene la orientación del hueco se gira para coincidir con él."
         },
         {
           "type": "p",

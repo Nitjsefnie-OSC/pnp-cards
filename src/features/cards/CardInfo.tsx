@@ -11,7 +11,9 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { formatSize } from '../../components/formatSize';
 import { cardFit, fixedSize, lowResolution, printedDpi } from '../../lib/cardInfo';
+import { combineRotations, type Rotation } from '../../lib/template';
 import { useCardsStore, type CardImage } from '../../store/cardsStore';
+import { rotationLabel } from './rotations';
 import { useSettingsStore } from '../../store/settingsStore';
 import styles from './CardTile.module.css';
 
@@ -35,18 +37,29 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-/** Datos de la carta en un panel junto a ella: formato, píxeles, ppp, tamaño y cómo sale en el PDF. */
+interface InfoProps {
+  card: CardImage;
+  name: string;
+  position: number;
+  total: number;
+  /** Giro con el que sale la carta en la página (elegido o automático). */
+  rotation?: Rotation;
+  /** Si ese giro se lo da el giro automático. */
+  autoRotated?: boolean;
+}
+
+/**
+ * Datos de la carta en un panel junto a ella: formato, píxeles, ppp, tamaño y cómo sale en el PDF,
+ * con los botones para girarla.
+ */
 function InfoContent({
   card,
   name,
   position,
   total,
-}: {
-  card: CardImage;
-  name: string;
-  position: number;
-  total: number;
-}) {
+  rotation = 0,
+  autoRotated = false,
+}: InfoProps) {
   const { t, i18n } = useTranslation();
   const settings = useSettingsStore((s) => s.settings);
   const mm = new Intl.NumberFormat(i18n.resolvedLanguage, {
@@ -58,9 +71,12 @@ function InfoContent({
 
   if (!card.blob && !card.missing) return <p>{t('cardInfo.blank')}</p>;
 
-  const fit = card.blob ? cardFit(card, settings) : null;
-  const printed = card.blob ? printedDpi(card, settings) : null;
-  const low = card.blob ? lowResolution(card, settings) : false;
+  const fit = card.blob ? cardFit(card, settings, rotation) : null;
+  const printed = card.blob ? printedDpi(card, settings, rotation) : null;
+  const low = card.blob ? lowResolution(card, settings, rotation) : false;
+  const own = card.rotation ?? 0;
+  const rotate = (by: Rotation) =>
+    useCardsStore.getState().setRotation(card.id, combineRotations(own, by));
   const format = card.sourceFormat
     ? (FORMAT_NAMES[card.sourceFormat] ?? card.sourceFormat.toUpperCase())
     : null;
@@ -134,7 +150,42 @@ function InfoContent({
           </Row>
         ) : null}
         <Row label={t('cardInfo.copies')}>{card.copies}</Row>
+        {card.blob ? (
+          <Row label={t('cardInfo.rotation')}>
+            {autoRotated
+              ? t('cardInfo.rotationAuto', { rotation: rotationLabel(t, rotation) })
+              : rotationLabel(t, own)}
+          </Row>
+        ) : null}
       </dl>
+      {card.blob ? (
+        <div className={styles.infoRotate} role="group" aria-label={t('cardInfo.rotation')}>
+          <button
+            type="button"
+            title={t('cardInfo.rotateLeft')}
+            aria-label={t('cardInfo.rotateLeft')}
+            onClick={() => rotate(90)}
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M3.2 6.2A5 5 0 1 1 3 9" />
+              <path d="M2.5 2.5v4h4" />
+            </svg>
+            90°
+          </button>
+          <button
+            type="button"
+            title={t('cardInfo.rotateRight')}
+            aria-label={t('cardInfo.rotateRight')}
+            onClick={() => rotate(270)}
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M12.8 6.2A5 5 0 1 0 13 9" />
+              <path d="M13.5 2.5v4h-4" />
+            </svg>
+            90°
+          </button>
+        </div>
+      ) : null}
       {settings.backs.enabled ? (
         <label className={styles.infoCheck}>
           <input
@@ -155,12 +206,7 @@ const MARGIN = 16;
 const NARROW = '(max-width: 560px)';
 
 /** Botón «i» que abre la información de la carta; se cierra con Esc o al pulsar fuera. */
-export function CardInfo(props: {
-  card: CardImage;
-  name: string;
-  position: number;
-  total: number;
-}) {
+export function CardInfo(props: InfoProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);

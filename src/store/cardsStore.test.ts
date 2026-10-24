@@ -41,6 +41,19 @@ describe('cardsStore', () => {
     expect(store().cards[0].copies).toBe(1);
   });
 
+  it('gira una carta, y conserva el giro al encontrar su imagen', () => {
+    store().addImages([image('a.png')]);
+    const id = store().cards[0].id;
+    store().setRotation(id, 270);
+    expect(store().cards[0].rotation).toBe(270);
+    store().setRotation(id, 0);
+    expect(store().cards[0].rotation).toBeUndefined();
+    store().setRotation(id, 90);
+    store().setNoBack(id, true);
+    store().replaceImage(id, image('a.png'));
+    expect(store().cards[0]).toMatchObject({ rotation: 90, noBack: true });
+  });
+
   it('añade una imagen en blanco al final', () => {
     store().addImages([image('a.png')]);
     store().addBlank();

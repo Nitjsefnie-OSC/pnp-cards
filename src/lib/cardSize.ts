@@ -1,5 +1,6 @@
 import type { Dpi } from './dpi';
 import type { LayoutSettings } from './settings';
+import type { Rotation } from './template';
 import { mmToPt } from './units';
 
 export interface Size {
@@ -30,4 +31,17 @@ export function cardSize(image: ImageInfo, settings: LayoutSettings): Size {
   const dpiX = image.dpi?.x ?? 72;
   const dpiY = image.dpi?.y ?? 72;
   return { width: (widthPx * 72) / dpiX, height: (heightPx * 72) / dpiY };
+}
+
+/**
+ * La imagen tal como se coloca en la página tras girarla: un cuarto de vuelta intercambia ancho y
+ * alto (y los ppp de cada eje). Con ella se calcula el hueco de una carta girada.
+ */
+export function rotatedImage(image: ImageInfo, rotation: Rotation): ImageInfo {
+  if (rotation !== 90 && rotation !== 270) return image;
+  return {
+    widthPx: image.heightPx,
+    heightPx: image.widthPx,
+    dpi: image.dpi && { x: image.dpi.y, y: image.dpi.x },
+  };
 }

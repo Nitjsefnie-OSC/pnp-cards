@@ -6,6 +6,11 @@ import { mmToPt, ptToMm } from './units';
 export type Rotation = 0 | 90 | 180 | 270;
 export const ROTATIONS: Rotation[] = [0, 90, 180, 270];
 
+/** Suma de dos giros antihorarios (el del hueco y el de la carta, por ejemplo). */
+export function combineRotations(a: Rotation, b: Rotation): Rotation {
+  return ((a + b) % 360) as Rotation;
+}
+
 /** Hueco de una plantilla, en mm desde la esquina superior izquierda de la página. */
 export interface TemplateSlot {
   id: string;
