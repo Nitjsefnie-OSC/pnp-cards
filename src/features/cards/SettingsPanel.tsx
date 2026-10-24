@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, ColorField, FieldRow, RadioGroup, Section } from '../../components/form/Fields';
@@ -40,14 +40,22 @@ export function SettingsPanel() {
   const sizeChoice: CardSizeChoice =
     customChosen && derivedSize !== 'image' ? 'custom' : derivedSize;
   // Tamaño con el que saldrán las cartas cuando lo decide la imagen (o el recorte).
-  const sizeSummary = cardSizeSummary(
-    printableCards(cards).filter((c) => c.blob),
-    s,
+  const sizeSummary = useMemo(
+    () =>
+      cardSizeSummary(
+        printableCards(cards).filter((c) => c.blob),
+        s,
+      ),
+    [cards, s],
   );
-  const mmFormat = new Intl.NumberFormat(i18n.resolvedLanguage, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
+  const mmFormat = useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.resolvedLanguage, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    [i18n.resolvedLanguage],
+  );
 
   function chooseSize(value: string) {
     setCustomChosen(value === 'custom');
@@ -239,13 +247,13 @@ export function SettingsPanel() {
           sizeSummary ? (
             <>
               <p className={styles.hint}>
-                {t('settings.sizeFromImage', {
+                {t(s.crop.enabled ? 'settings.sizeFromCrop' : 'settings.sizeFromImage', {
                   w: mmFormat.format(sizeSummary.firstMm.width),
                   h: mmFormat.format(sizeSummary.firstMm.height),
                 })}
               </p>
               {sizeSummary.differentCount > 0 ? (
-                <p className={`${styles.hint} ${styles.hintWarning}`} role="status">
+                <p className={`${styles.hint} ${styles.hintWarning}`}>
                   {t('settings.sizeOthers', { count: sizeSummary.differentCount })}
                 </p>
               ) : null}

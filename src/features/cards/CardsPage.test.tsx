@@ -195,6 +195,21 @@ describe('SettingsPanel', () => {
     expect(screen.queryByText(/Si no fuerzas el tamaño/)).not.toBeInTheDocument();
   });
 
+  it('con recorte activo dice que el tamaño es el del recorte', async () => {
+    const user = userEvent.setup();
+    useCardsStore
+      .getState()
+      .addImages([fakeImage('a.png'), fakeImage('b.png', { x: 150, y: 150 })]);
+    // 60 mm → 709 px → 60,0 mm; 85 mm → 1004 px → 85,0 mm. Recortadas, todas miden igual.
+    useSettingsStore
+      .getState()
+      .update({ crop: { enabled: true, widthMm: 60, heightMm: 85, centered: true, x: 0, y: 0 } });
+    render(<SettingsPanel />, { wrapper: MemoryRouter });
+    await user.click(screen.getByText('Tamaño de la carta'));
+    expect(screen.getByText('Con el recorte: 60,0 × 85,0 mm')).toBeInTheDocument();
+    expect(screen.queryByText(/otro tamaño/)).not.toBeInTheDocument();
+  });
+
   it('si todas miden igual no avisa, y con un tamaño elegido no muestra nada', async () => {
     const user = userEvent.setup();
     useCardsStore.getState().addImages([fakeImage('a.png'), fakeImage('b.png')]);

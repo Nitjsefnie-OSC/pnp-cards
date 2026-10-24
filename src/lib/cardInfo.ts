@@ -74,16 +74,23 @@ export function fixedSize(settings: LayoutSettings) {
 }
 
 /**
+ * Lo que se ve de la imagen: con recorte, el rectángulo recortado a 300 ppp (como en PDFCartas y
+ * en `cardSizes` de plan.ts); si no, la imagen entera.
+ */
+function visibleImage(image: ImageInfo, settings: LayoutSettings): ImageInfo {
+  if (!settings.crop.enabled) return image;
+  const crop = cropRect(image, settings.crop);
+  return { widthPx: crop.width, heightPx: crop.height, dpi: { x: CROP_DPI, y: CROP_DPI } };
+}
+
+/**
  * Ppp con los que saldrá impresa la carta: los píxeles visibles (los del recorte, si lo hay) entre
  * su tamaño final en pulgadas, en el eje que peor queda. Sin forzar ni recortar coinciden con los
  * de la imagen (72 si no los indica). Con plantilla manda el hueco más grande, que es el peor
  * caso; null si no hay plantilla.
  */
 export function printedDpi(image: ImageInfo, settings: LayoutSettings): number | null {
-  const crop = settings.crop.enabled ? cropRect(image, settings.crop) : null;
-  const visible: ImageInfo = crop
-    ? { widthPx: crop.width, heightPx: crop.height, dpi: { x: CROP_DPI, y: CROP_DPI } }
-    : image;
+  const visible = visibleImage(image, settings);
   const dpiFor = (widthMm: number, heightMm: number) =>
     Math.round(Math.min(visible.widthPx / (widthMm / 25.4), visible.heightPx / (heightMm / 25.4)));
 
@@ -115,38 +122,31 @@ export function lowResolution(image: ImageInfo, settings: LayoutSettings) {
 export interface CardSizeSummary {
   /** Tamaño con el que saldrá la primera carta. */
   firstMm: Mm;
-  /** Cuántas de las demás saldrán con otro tamaño (más del 0,5 % de diferencia). */
+  /** Cuántas cartas (contando copias) saldrán con otro tamaño: más del 0,5 % de diferencia. */
   differentCount: number;
 }
 
 /**
  * Tamaño resultante de las cartas cuando lo decide la imagen (o el recorte), para mostrarlo en
- * Ajustes: el de la primera y cuántas difieren. Mismo cálculo que `cardSizes` en `plan.ts`. Null
- * sin cartas, con ancho y alto forzados (el tamaño ya está en el desplegable) o con plantilla
- * (manda el hueco).
+ * Ajustes: el de la primera y cuántas difieren. Null sin cartas, con algún lado forzado (ese caso
+ * lo explica ya el desplegable) o con plantilla (manda el hueco).
  */
 export function cardSizeSummary(
-  images: ImageInfo[],
+  images: (ImageInfo & { copies?: number })[],
   settings: LayoutSettings,
 ): CardSizeSummary | null {
   if (images.length === 0) return null;
   if (settings.mode === 'template') return null;
-  if (settings.forceWidth && settings.forceHeight) return null;
+  if (settings.forceWidth || settings.forceHeight) return null;
 
   const sizes = images.map((image) => {
-    const crop = settings.crop.enabled ? cropRect(image, settings.crop) : null;
-    const pt = crop
-      ? cardSize(
-          { widthPx: crop.width, heightPx: crop.height, dpi: { x: CROP_DPI, y: CROP_DPI } },
-          settings,
-        )
-      : cardSize(image, settings);
-    return { width: ptToMm(pt.width), height: ptToMm(pt.height) };
+    const pt = cardSize(visibleImage(image, settings), settings);
+    return { width: ptToMm(pt.width), height: ptToMm(pt.height), copies: image.copies ?? 1 };
   });
   const [first, ...rest] = sizes;
   const differs = (a: number, b: number) => Math.abs(a / b - 1) >= TOLERANCE;
-  const differentCount = rest.filter(
-    (s) => differs(s.width, first.width) || differs(s.height, first.height),
-  ).length;
-  return { firstMm: first, differentCount };
+  const differentCount = rest
+    .filter((s) => differs(s.width, first.width) || differs(s.height, first.height))
+    .reduce((n, s) => n + s.copies, 0);
+  return { firstMm: { width: first.width, height: first.height }, differentCount };
 }

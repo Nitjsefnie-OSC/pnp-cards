@@ -157,6 +157,11 @@ describe('cardSizeSummary', () => {
     expect(summary?.differentCount).toBe(2);
   });
 
+  it('cuenta las copias, como «N cartas» en la bandeja', () => {
+    const half = { ...poker, dpi: { x: 150, y: 150 }, copies: 3 };
+    expect(cardSizeSummary([{ ...poker, copies: 2 }, half], settings())?.differentCount).toBe(3);
+  });
+
   it('diferencias de menos del 0,5 % cuentan como el mismo tamaño', () => {
     // 753 px: 63,754 mm, un 0,4 % más. 754 px: 63,839 mm, un 0,53 % más.
     const near = { ...poker, widthPx: 753 };
@@ -181,21 +186,11 @@ describe('cardSizeSummary', () => {
     expect(summary?.differentCount).toBe(0);
   });
 
-  it('no hay resumen sin cartas, con ancho y alto forzados ni con plantilla', () => {
+  it('no hay resumen sin cartas, con algún lado forzado ni con plantilla', () => {
     expect(cardSizeSummary([], settings())).toBeNull();
     expect(cardSizeSummary([poker], settings({ forceWidth: true, forceHeight: true }))).toBeNull();
+    expect(cardSizeSummary([poker], settings({ forceWidth: true }))).toBeNull();
+    expect(cardSizeSummary([poker], settings({ forceHeight: true }))).toBeNull();
     expect(cardSizeSummary([poker], settings({ mode: 'template' }))).toBeNull();
-  });
-
-  it('con solo el ancho forzado, la altura sigue la proporción de cada imagen', () => {
-    // 63 mm de ancho; alto = 63 · 1050 / 750 = 88,2 mm. Una imagen cuadrada: 63 × 63.
-    const square = { widthPx: 1000, heightPx: 1000, dpi: { x: 300, y: 300 } };
-    const summary = cardSizeSummary(
-      [poker, square],
-      settings({ forceWidth: true, cardWidthMm: 63 }),
-    );
-    expect(summary?.firstMm.width).toBeCloseTo(63, 3);
-    expect(summary?.firstMm.height).toBeCloseTo(88.2, 3);
-    expect(summary?.differentCount).toBe(1);
   });
 });

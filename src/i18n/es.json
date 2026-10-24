@@ -121,6 +121,7 @@
     "forceHeight": "Forzar alto",
     "sizeHint": "Si no fuerzas el tamaño, se usa la resolución de cada imagen.",
     "sizeFromImage": "Según la resolución de la imagen: {{w}} × {{h}} mm",
+    "sizeFromCrop": "Con el recorte: {{w}} × {{h}} mm",
     "sizeOthers_one": "{{count}} carta tiene otro tamaño",
     "sizeOthers_other": "{{count}} cartas tienen otro tamaño",
     "sizeChoice": "Tamaño",

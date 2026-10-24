@@ -121,6 +121,7 @@
     "forceHeight": "Force height",
     "sizeHint": "If you don’t force a size, each image’s resolution is used.",
     "sizeFromImage": "From the image resolution: {{w}} × {{h}} mm",
+    "sizeFromCrop": "With the crop: {{w}} × {{h}} mm",
     "sizeOthers_one": "{{count}} card has a different size",
     "sizeOthers_other": "{{count}} cards have a different size",
     "sizeChoice": "Size",
